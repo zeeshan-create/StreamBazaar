@@ -1,0 +1,252 @@
+const Service = require('./models/Service');
+const fs = require('fs');
+const path = require('path');
+
+// Ensure data directory exists
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir);
+}
+
+const allServices = [
+  // ── STREAMING ─────────────────────────────────────────────────
+  { name: 'YouTube Premium', category: 'Streaming', color: '#FF0000',
+    description: 'Individual Plan · 1 Device Seat Access',
+    plans: [
+      { label: 'Own Email',   quality: 'Individual', duration: '30 Days', price: '₹90',  type: 'Own Email'  },
+      { label: 'Mobile Only', quality: 'Mobile',     duration: '30 Days', price: '₹60',  type: 'Mobile Only'},
+      { label: 'TV/PC Only',  quality: 'TV/PC',      duration: '30 Days', price: '₹75',  type: 'TV/PC Only' },
+      { label: 'Own Email',   quality: 'Individual', duration: '1 Year',  price: '₹850', type: 'Own Email'  },
+    ]
+  },
+  { name: 'YouTube Music', category: 'Streaming', color: '#FF0000',
+    description: 'Individual Plan · 1 Device Seat Access',
+    plans: [
+      { label: 'Own Email',   quality: 'Individual', duration: '30 Days', price: '₹90', type: 'Own Email'  },
+      { label: 'Mobile Only', quality: 'Mobile',     duration: '30 Days', price: '₹60', type: 'Mobile Only'},
+      { label: 'TV/PC Only',  quality: 'TV/PC',      duration: '30 Days', price: '₹75', type: 'TV/PC Only' },
+    ]
+  },
+  { name: 'Sony LIV', category: 'Streaming', color: '#FCA515',
+    description: 'Premium 4K · 1 Device Seat Access',
+    plans: [
+      { label: '4K',      quality: '4K Video',     duration: '30 Days', price: '₹120', type: '4K Quality'},
+      { label: 'Full HD', quality: 'Full HD 1080P', duration: '30 Days', price: '₹70',  type: 'Full HD'  },
+      { label: '4K',      quality: '4K Video',     duration: '45 Days', price: '₹180', type: '4K Quality'},
+    ]
+  },
+  { name: 'Netflix', category: 'Streaming', color: '#E50914',
+    description: '4K Ultra HD · 1 Device Seat Access',
+    plans: [
+      { label: '4K',      quality: '4K Video',     duration: '30 Days',  price: '₹135',  type: '4K Quality'},
+      { label: '4K',      quality: '4K Video',     duration: '45 Days',  price: '₹180',  type: '4K Quality'},
+      { label: 'Full HD', quality: 'Full HD 1080P', duration: '30 Days',  price: '₹70',   type: 'Full HD'  },
+      { label: '4K',      quality: '4K Video',     duration: '6 Months', price: '₹850',  type: '4K Quality'},
+      { label: '4K',      quality: '4K Video',     duration: '1 Year',   price: '₹1285', type: '4K Quality'},
+    ]
+  },
+  { name: 'Amazon Prime', category: 'Streaming', color: '#00A8E1',
+    description: '4K Ultra HD · 1 Device Seat Access',
+    plans: [
+      { label: '4K', quality: '4K Video', duration: '30 Days',  price: '₹80',  type: '4K Quality'},
+      { label: '4K', quality: '4K Video', duration: '45 Days',  price: '₹180', type: '4K Quality'},
+      { label: '4K', quality: '4K Video', duration: '6 Months', price: '₹490', type: '4K Quality'},
+      { label: '4K', quality: '4K Video', duration: '1 Year',   price: '₹990', type: '4K Quality'},
+    ]
+  },
+  { name: 'Hoichoi', category: 'Streaming', color: '#E91E63',
+    description: '4K Premium · 1 Device Seat Access',
+    plans: [
+      { label: '4K', quality: '4K Video', duration: '30 Days', price: '₹95', type: '4K Quality'},
+    ]
+  },
+  { name: 'Discovery Plus', category: 'Streaming', color: '#0060A9',
+    description: '4K Documentaries · 1 Device Seat Access',
+    plans: [
+      { label: '4K', quality: '4K Video', duration: '30 Days',  price: '₹75',  type: '4K Quality'},
+      { label: '4K', quality: '4K Video', duration: '45 Days',  price: '₹125', type: '4K Quality'},
+      { label: '4K', quality: '4K Video', duration: '6 Months', price: '₹350', type: '4K Quality'},
+    ]
+  },
+  { name: 'Airtel Xstream', category: 'Streaming', color: '#EF3E23',
+    description: 'Xstream Play · 1 Device Seat Access',
+    plans: [
+      { label: 'Mobile Basic', quality: 'Mobile Only', duration: '30 Days', price: '₹35', type: 'Basic'},
+    ]
+  },
+  { name: 'Apple Music', category: 'Streaming', color: '#FC3C44',
+    description: 'Individual Plan · 1 Device Seat Access',
+    plans: [
+      { label: 'Individual', quality: 'Individual', duration: '30 Days', price: '₹75',  type: 'Individual'},
+      { label: 'Individual', quality: 'Individual', duration: '45 Days', price: '₹125', type: 'Individual'},
+      { label: 'Individual', quality: 'Individual', duration: '3 Months',price: '₹170', type: 'Individual'},
+    ]
+  },
+  { name: 'Apple TV+', category: 'Streaming', color: '#888888',
+    description: 'Premium Shows · 1 Device Seat Access',
+    plans: [
+      { label: 'Premium', quality: 'Premium', duration: '30 Days', price: '₹75',  type: 'Premium'},
+      { label: 'Premium', quality: 'Premium', duration: '45 Days', price: '₹125', type: 'Premium'},
+    ]
+  },
+  { name: 'Spotify Premium', category: 'Streaming', color: '#1DB954',
+    description: 'Premium Music · 1 Device Seat Access',
+    plans: [
+      { label: 'Standard', quality: 'Standard', duration: '3 Months', price: '₹255', type: 'Own Email'},
+      { label: 'Premium',  quality: 'Premium',  duration: '3 Months', price: '₹299', type: 'Own Email'},
+      { label: 'Premium',  quality: 'Premium',  duration: '30 Days',  price: '₹95',  type: 'Shared'  },
+    ]
+  },
+  { name: 'LinkedIn Premium', category: 'Streaming', color: '#0A66C2',
+    description: 'Career & Business · 1 Device Seat Access',
+    plans: [
+      { label: 'Career',   quality: 'Career Plan',   duration: '3 Months', price: '₹699', type: 'Own Email'},
+      { label: 'Business', quality: 'Business Plan', duration: '45 Days',  price: '₹895', type: 'Own Email'},
+    ]
+  },
+  { name: 'Adobe Creative', category: 'AI+', color: '#FF3F00',
+    description: 'Pro Plan Own Email · 1 Device Seat Access',
+    plans: [
+      { label: 'Pro', quality: 'Pro Plan', duration: '3 Months', price: '₹1750', type: 'Own Email'},
+    ]
+  },
+  { name: 'Google One', category: 'AI+', color: '#4285F4',
+    description: 'Storage & Gemini · 1 Device Seat Access',
+    plans: [
+      { label: '5TB',            quality: '5TB Storage',    duration: '30 Days', price: '₹97',      type: 'Own Email'},
+      { label: 'Gemini Premium', quality: 'Gemini Premium', duration: '1 Year',  price: '₹1748.90', type: 'Own Email'},
+    ]
+  },
+  { name: 'Jio Hotstar', category: 'Streaming', color: '#a855f7',
+    description: 'Premium 4K + Live Sports · 1 Device Seat Access',
+    plans: [
+      { label: '4K',      quality: '4K Video',     duration: '30 Days', price: '₹120', type: '4K Quality'},
+      { label: 'Full HD', quality: 'Full HD 1080P', duration: '30 Days', price: '₹35',  type: 'Full HD'  },
+      { label: '4K',      quality: '4K Video',     duration: '45 Days', price: '₹180', type: '4K Quality'},
+    ]
+  },
+  { name: 'ZEE5', category: 'Streaming', color: '#8230C6',
+    description: 'Premium 4K · 1 Device Seat Access',
+    plans: [
+      { label: '4K',      quality: '4K Video',     duration: '30 Days', price: '₹120', type: '4K Quality'},
+      { label: 'Full HD', quality: 'Full HD 1080P', duration: '30 Days', price: '₹70',  type: 'Full HD'  },
+      { label: '4K',      quality: '4K Video',     duration: '45 Days', price: '₹180', type: '4K Quality'},
+    ]
+  },
+
+  // ── VPN ────────────────────────────────────────────────────────
+  { name: 'Surfshark VPN', category: 'VPN', color: '#00d18a',
+    description: 'Individual Mobile Plan · 1 Device Seat Access',
+    plans: [
+      { label: 'Mobile Only', quality: 'Mobile', duration: '30 Days', price: '₹175', type: 'Mobile Only'},
+    ]
+  },
+  { name: 'NordVPN', category: 'VPN', color: '#4687FF',
+    description: 'Premium Plan Own Email · 1 Device Seat Access',
+    plans: [
+      { label: 'Premium', quality: 'Premium', duration: '3 Months', price: '₹868.90', type: 'Own Email'},
+    ]
+  },
+
+  // ── GAMING ─────────────────────────────────────────────────────
+  { name: 'Steam Gaming', category: 'Gaming', color: '#66c0f4',
+    description: 'PC Game Seat Access · 1 Device',
+    plans: [
+      { label: 'WWE 2K25',          quality: 'WWE 2K25',                      duration: '30 Days',  price: '₹249', type: 'Seat Access'},
+      { label: 'WWE 2K25',          quality: 'WWE 2K25',                      duration: '3 Months', price: '₹549', type: 'Seat Access'},
+      { label: 'Forza Horizon 5',   quality: 'Forza Horizon 5',               duration: '30 Days',  price: '₹175', type: 'Seat Access'},
+      { label: 'GTA V',             quality: 'GTA V',                         duration: '30 Days',  price: '₹120', type: 'Seat Access'},
+      { label: 'GTA V',             quality: 'GTA V',                         duration: '45 Days',  price: '₹170', type: 'Seat Access'},
+      { label: 'Spider-Man 2',      quality: 'Spider-Man 2',                  duration: '30 Days',  price: '₹160', type: 'Seat Access'},
+      { label: 'Uncharted',         quality: 'Uncharted',                     duration: '30 Days',  price: '₹220', type: 'Seat Access'},
+      { label: 'Uncharted',         quality: 'Uncharted',                     duration: '45 Days',  price: '₹320', type: 'Seat Access'},
+      { label: 'Crimson Desert',    quality: 'Crimson Desert',                duration: '30 Days',  price: '₹249', type: 'Seat Access'},
+      { label: 'Crimson Desert',    quality: 'Crimson Desert',                duration: '3 Months', price: '₹549', type: 'Seat Access'},
+      { label: 'The Last of Us II', quality: 'The Last of Us II Remastered',  duration: '30 Days',  price: '₹175', type: 'Seat Access'},
+      { label: 'The Last of Us II', quality: 'The Last of Us II Remastered',  duration: '3 Months', price: '₹420', type: 'Seat Access'},
+      { label: 'Black Myth Wukong', quality: 'Black Myth Wukong',             duration: '30 Days',  price: '₹249', type: 'Seat Access'},
+      { label: 'Black Myth Wukong', quality: 'Black Myth Wukong',             duration: '3 Months', price: '₹599', type: 'Seat Access'},
+      { label: 'Ghost of Tsushima', quality: 'Ghost of Tsushima',             duration: '30 Days',  price: '₹199', type: 'Seat Access'},
+      { label: 'Ghost of Tsushima', quality: 'Ghost of Tsushima',             duration: '3 Months', price: '₹499', type: 'Seat Access'},
+    ]
+  },
+  { name: 'PlayStation', category: 'Gaming', color: '#0070CC',
+    description: 'PS5 Game Seat Access · 1 Device',
+    plans: [
+      { label: 'Black Myth Wukong', quality: 'Black Myth Wukong',     duration: '30 Days', price: '₹599',  type: 'Seat Access'},
+      { label: 'Elden Ring',        quality: 'Elden Ring',            duration: '30 Days', price: '₹599',  type: 'Seat Access'},
+      { label: 'Resident Evil',     quality: 'Resident Evil Requiem', duration: '30 Days', price: '₹1300', type: 'Seat Access'},
+      { label: 'Hogwarts Legacy',   quality: 'Hogwarts Legacy',       duration: '30 Days', price: '₹599',  type: 'Seat Access'},
+      { label: 'God of War',        quality: 'God of War',            duration: '30 Days', price: '₹449',  type: 'Seat Access'},
+    ]
+  },
+
+  // ── AI+ ────────────────────────────────────────────────────────
+  { name: 'Microsoft Copilot', category: 'AI+', color: '#0078D4',
+    description: '1TB Own Email · 1 Device Seat Access',
+    plans: [
+      { label: '1TB', quality: '1TB Storage', duration: '1 Year', price: '₹1765', type: 'Own Email'},
+    ]
+  },
+  { name: 'ChatGPT Plus', category: 'AI+', color: '#10a37f',
+    description: 'Plus Plan Own Email · 1 Device Seat Access',
+    plans: [
+      { label: 'Plus', quality: 'GPT-4o', duration: '30 Days', price: '₹899', type: 'Own Email'},
+    ]
+  },
+  { name: 'Claude AI', category: 'AI+', color: '#D97706',
+    description: 'Pro Plan · 1 Device Seat Access',
+    plans: [
+      { label: 'Pro Mobile',  quality: 'Pro Plan', duration: '30 Days', price: '₹1865', type: 'Mobile Only'},
+      { label: 'Pro Own Email',quality: 'Pro Plan', duration: '30 Days', price: '₹1995', type: 'Own Email' },
+    ]
+  },
+  { name: 'Canva Pro', category: 'AI+', color: '#00C4CC',
+    description: 'Pro Plan Own Email · 1 Device Seat Access',
+    plans: [
+      { label: 'Pro', quality: 'Pro Plan', duration: '1 Year', price: '₹550', type: 'Own Email'},
+    ]
+  },
+  { name: 'Picsart Pro', category: 'AI+', color: '#FF005E',
+    description: 'Pro Plan Own Email · 1 Device Seat Access',
+    plans: [
+      { label: 'Pro', quality: 'Pro Plan', duration: '1 Year', price: '₹400', type: 'Own Email'},
+    ]
+  },
+  { name: 'Envato Elements', category: 'AI+', color: '#82B441',
+    description: 'Individual Plan Own Email · 1 Device Seat Access',
+    plans: [
+      { label: 'Individual', quality: 'Individual', duration: '30 Days', price: '₹749', type: 'Own Email'},
+    ]
+  },
+  { name: 'Grok AI', category: 'AI+', color: '#1DA1F2',
+    description: 'Super Mobile Only · 1 Device Seat Access',
+    plans: [
+      { label: 'Super', quality: 'Super', duration: '30 Days', price: '₹700',  type: 'Mobile Only'},
+      { label: 'Super', quality: 'Super', duration: '1 Year',  price: '₹3300', type: 'Mobile Only'},
+    ]
+  },
+  { name: 'ElevenLabs', category: 'AI+', color: '#9333EA',
+    description: 'Creator Plan · 1 Device Seat Access',
+    plans: [
+      { label: 'Creator', quality: 'Creator', duration: '30 Days', price: '₹1895', type: 'Seat Access'},
+      { label: 'Creator', quality: 'Creator', duration: '45 Days', price: '₹2765', type: 'Seat Access'},
+      { label: 'Creator', quality: 'Creator', duration: '3 Months',price: '₹5995', type: 'Seat Access'},
+    ]
+  },
+];
+
+async function seedDB() {
+  try {
+    await Service.remove({}, { multi: true });
+    console.log('Cleared existing local services DB.');
+
+    await Service.insert(allServices);
+    console.log('Successfully seeded NeDB database with StreamBazaar services!');
+  } catch (err) {
+    console.error('Error seeding database:', err);
+    process.exit(1);
+  }
+}
+
+seedDB();
