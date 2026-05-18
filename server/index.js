@@ -13,9 +13,18 @@ const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
 
+const { allServices: seedServices, seedDB } = require('./seed');
+
+// Run initial seed if needed
+seedDB();
+
 app.get('/api/plans', async (req, res) => {
   try {
-    const allServices = await Service.find({});
+    let allServices = await Service.find({});
+    // Fallback to static seed data if ephemeral DB is empty
+    if (allServices.length === 0) {
+      allServices = seedServices;
+    }
     res.json(allServices);
   } catch (err) {
     res.status(500).json({ error: 'Database error' });

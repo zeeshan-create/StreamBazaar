@@ -249,4 +249,7 @@ async function seedDB() {
   }
 }
 
-seedDB();
+// Remove direct call so we can export
+// seedDB();
+
+module.exports = { allServices, seedDB };
