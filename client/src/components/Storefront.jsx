@@ -210,6 +210,11 @@ export default function App() {
       setBuyError('Full Name and Email Address are required to verify your seat delivery!');
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(buyerEmail.trim())) {
+      setBuyError('Please enter a valid email address (e.g. name@domain.com)!');
+      return;
+    }
     setBuyError('');
     const { product, plan, device } = popup;
     
@@ -241,6 +246,11 @@ export default function App() {
     if (!popup || !popup.device) return;
     if (!buyerName.trim() || !buyerEmail.trim()) {
       setBuyError('Full Name and Email Address are required to verify your seat delivery!');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(buyerEmail.trim())) {
+      setBuyError('Please enter a valid email address (e.g. name@domain.com)!');
       return;
     }
     setBuyError('');
