@@ -1,0 +1,20 @@
+services:
+  # Backend Express API Server
+  - type: web
+    name: streambazaar-api
+    env: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: GEMINI_API_KEY
+        sync: true
+      - key: ADMIN_USERNAME
+        value: Ai+rizwan#1974000hussain!#/
+      - key: ADMIN_PASSWORD
+        value: "@#12Rizwan55Hussain/!#7861974000!12"
+      - key: MONGODB_URI
+        sync: true
