@@ -17,6 +17,8 @@ const WELCOME = {
   id: 0,
 };
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 function formatMessage(text) {
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -60,7 +62,7 @@ export default function ChatWidget() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/chat', {
+      const res = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: sanitized, history: getHistory() }),

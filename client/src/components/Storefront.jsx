@@ -12,6 +12,7 @@ import ChatWidget from '../ChatWidget';
 import FomoToast from './FomoToast';
 
 const TELEGRAM_LINK = 'https://t.me/TrustedStreams';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const DOMAINS = {
   'YouTube Premium': 'youtube.com',
@@ -171,7 +172,7 @@ export default function App() {
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
-    fetch('http://localhost:5000/api/plans')
+    fetch(`${API_BASE}/api/plans`)
       .then(r => r.json())
       .then(d => { setPlans(d); setLoading(false); })
       .catch(() => setLoading(false));
@@ -219,7 +220,7 @@ export default function App() {
     const { product, plan, device } = popup;
     
     try {
-      await fetch('http://localhost:5000/api/orders', {
+      await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -257,7 +258,7 @@ export default function App() {
     const { product, plan, device } = popup;
 
     try {
-      await fetch('http://localhost:5000/api/orders', {
+      await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
