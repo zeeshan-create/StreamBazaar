@@ -60,6 +60,7 @@ const MOCK_MEDIA = [
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -107,7 +108,8 @@ export default function AdminDashboard() {
   const [apiKey, setApiKey] = useState('sb_live_a8f92bd8c9d04402a83e0c03636f');
   const [apiKeyCopied, setApiKeyCopied] = useState(false);
 
-  const ADMIN_PASSWORD = 'admin123';
+  const ADMIN_USERNAME = 'Ai+rizwan#1974000hussain!#/';
+  const ADMIN_PASSWORD = '@#12Rizwan55Hussain/!#7861974000!12';
 
   // Debouncing search inputs (300ms)
   useEffect(() => {
@@ -119,11 +121,11 @@ export default function AdminDashboard() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       fetchServices();
     } else {
-      setError('Invalid password. Please try again!');
+      setError('Invalid username or password. Please try again!');
     }
   };
 
@@ -318,6 +320,20 @@ export default function AdminDashboard() {
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>Admin Access</h2>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.88rem', marginBottom: '2rem' }}>Sign in to continue to your interactive StreamBazaar dashboard.</p>
             
+            <div className="admin-form-group" style={{ textAlign: 'left', marginBottom: '1.25rem' }}>
+              <label htmlFor="admin_user">Username</label>
+              <input 
+                id="admin_user"
+                type="text" 
+                className="admin-form-input" 
+                placeholder="Enter secret username"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                autoFocus
+                required
+              />
+            </div>
+
             <div className="admin-form-group" style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
               <label htmlFor="admin_pass">Password</label>
               <div style={{ position: 'relative' }}>
@@ -329,7 +345,6 @@ export default function AdminDashboard() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   style={{ paddingRight: '3rem' }}
-                  autoFocus
                   required
                 />
                 <button
