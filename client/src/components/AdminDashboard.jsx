@@ -804,6 +804,31 @@ export default function AdminDashboard() {
                                     <label>Description</label>
                                     <textarea className="admin-form-input" rows={2} value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} />
                                   </div>
+
+                                  <div className="admin-form-group" style={{ marginTop: '0.5rem' }}>
+                                    <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
+                                    {editForm.plans && editForm.plans.map((plan, idx) => (
+                                      <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                                        <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K · 30D)" value={plan.label} onChange={e => {
+                                          const newPlans = [...editForm.plans];
+                                          newPlans[idx].label = e.target.value;
+                                          setEditForm({...editForm, plans: newPlans});
+                                        }} />
+                                        <input className="admin-form-input" style={{ width: '80px' }} placeholder="Price" value={plan.price} onChange={e => {
+                                          const newPlans = [...editForm.plans];
+                                          newPlans[idx].price = e.target.value;
+                                          setEditForm({...editForm, plans: newPlans});
+                                        }} />
+                                        <button className="admin-action-btn delete" onClick={() => {
+                                          const newPlans = editForm.plans.filter((_, i) => i !== idx);
+                                          setEditForm({...editForm, plans: newPlans});
+                                        }}><Trash2 size={16} /></button>
+                                      </div>
+                                    ))}
+                                    <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'New Plan', quality: '', duration: '', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
+                                      <Plus size={14} /> Add Plan
+                                    </button>
+                                  </div>
                                   
                                   <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
                                     <button className="btn-primary" onClick={() => handleSave(s._id)} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}><Save size={16} /> Save</button>
@@ -904,6 +929,31 @@ export default function AdminDashboard() {
                             <div className="admin-form-group">
                               <label>Description Description</label>
                               <textarea className="admin-form-input" rows={2} placeholder="Premium shared profiles..." onChange={e => setEditForm({...editForm, description: e.target.value})} />
+                            </div>
+
+                            <div className="admin-form-group">
+                              <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
+                              {editForm.plans && editForm.plans.map((plan, idx) => (
+                                <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                                  <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K · 30D)" value={plan.label} onChange={e => {
+                                    const newPlans = [...editForm.plans];
+                                    newPlans[idx].label = e.target.value;
+                                    setEditForm({...editForm, plans: newPlans});
+                                  }} />
+                                  <input className="admin-form-input" style={{ width: '80px' }} placeholder="Price" value={plan.price} onChange={e => {
+                                    const newPlans = [...editForm.plans];
+                                    newPlans[idx].price = e.target.value;
+                                    setEditForm({...editForm, plans: newPlans});
+                                  }} />
+                                  <button className="admin-action-btn delete" onClick={() => {
+                                    const newPlans = editForm.plans.filter((_, i) => i !== idx);
+                                    setEditForm({...editForm, plans: newPlans});
+                                  }}><Trash2 size={16} /></button>
+                                </div>
+                              ))}
+                              <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'New Plan', quality: '', duration: '', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
+                                <Plus size={14} /> Add Plan
+                              </button>
                             </div>
                             
                             <button className="btn-primary" onClick={handleAdd} style={{ marginTop: '1rem', padding: '0.85rem', borderRadius: '10px', justifyContent: 'center' }}>
