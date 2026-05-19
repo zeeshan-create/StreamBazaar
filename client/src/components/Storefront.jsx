@@ -135,12 +135,6 @@ export default function App() {
   const [searchTerm, setSearchTerm]   = useState('');
   const [activeCategory, setCategory] = useState('all');
   const [popup, setPopup]             = useState(null); // { product, plan, device }
-  const [buyerName, setBuyerName]     = useState('');
-  const [buyerEmail, setBuyerEmail]   = useState('');
-  const [buyError, setBuyError]       = useState('');
-  const [showKeetInfo, setShowKeetInfo] = useState(false);
-  const [keetCopied, setKeetCopied]   = useState(false);
-  const [showQrModal, setShowQrModal] = useState(false);
   const [imgErr, setImgErr]           = useState({});
   const [showResults, setShowResults] = useState(false);
   const searchRef                     = useRef(null);
@@ -198,25 +192,10 @@ export default function App() {
 
   const openPopup = (product, plan) => {
     setPopup({ product, plan, device: null });
-    setBuyerName('');
-    setBuyerEmail('');
-    setBuyError('');
-    setShowKeetInfo(false);
-    setKeetCopied(false);
   };
 
   const handleBuy = async () => {
     if (!popup || !popup.device) return;
-    if (!buyerName.trim() || !buyerEmail.trim()) {
-      setBuyError('Full Name and Email Address are required to verify your seat delivery!');
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(buyerEmail.trim())) {
-      setBuyError('Please enter a valid email address (e.g. name@domain.com)!');
-      return;
-    }
-    setBuyError('');
     const { product, plan, device } = popup;
     
     try {
@@ -224,8 +203,6 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: buyerName.trim(),
-          email: buyerEmail.trim(),
           product: product.name,
           plan: plan.label,
           device: device,
@@ -236,54 +213,9 @@ export default function App() {
       console.error('Failed to log actual checkout click:', err);
     }
 
-    const msg = `Hi! I want to buy ${product.name} — ${plan.label} — Device: ${device} — Price: ${plan.price}\n\nBuyer Details:\nName: ${buyerName.trim()}\nEmail: ${buyerEmail.trim()}`;
+    const msg = `Hi! I want to buy ${product.name} — ${plan.label} — Device: ${device} — Price: ${plan.price}`;
     window.open(`${TELEGRAM_LINK}?text=${encodeURIComponent(msg)}`, '_blank');
     setPopup(null);
-    setBuyerName('');
-    setBuyerEmail('');
-  };
-
-  const handleKeetClick = async () => {
-    if (!popup || !popup.device) return;
-    if (!buyerName.trim() || !buyerEmail.trim()) {
-      setBuyError('Full Name and Email Address are required to verify your seat delivery!');
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(buyerEmail.trim())) {
-      setBuyError('Please enter a valid email address (e.g. name@domain.com)!');
-      return;
-    }
-    setBuyError('');
-    const { product, plan, device } = popup;
-
-    try {
-      await fetch(`${API_BASE}/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: buyerName.trim(),
-          email: buyerEmail.trim(),
-          product: product.name,
-          plan: plan.label,
-          device: device,
-          price: plan.price
-        })
-      });
-    } catch (err) {
-      console.error('Failed to log actual checkout click:', err);
-    }
-
-    const msg = `Hi! I want to buy ${product.name} — ${plan.label} — Device: ${device} — Price: ${plan.price}\n\nBuyer Details:\nName: ${buyerName.trim()}\nEmail: ${buyerEmail.trim()}`;
-    try {
-      await navigator.clipboard.writeText(msg);
-      setKeetCopied(true);
-      setTimeout(() => setKeetCopied(false), 5000);
-    } catch (err) {
-      console.error('Clipboard error: ', err);
-    }
-
-    setShowKeetInfo(true);
   };
 
   const getFavicon = name => {
@@ -851,53 +783,7 @@ export default function App() {
                 ))}
               </motion.div>
 
-              {/* Customer Verification Form */}
-              <div className="popup-device-label" style={{ marginTop: '1.25rem' }}>Customer Verification Details</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', margin: '0.75rem 0' }}>
-                <input 
-                  type="text" 
-                  placeholder="Full Name" 
-                  value={buyerName} 
-                  onChange={e => setBuyerName(e.target.value)} 
-                  style={{
-                    width: '100%',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    padding: '0.65rem 0.85rem',
-                    color: 'white',
-                    fontSize: '0.85rem',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={e => e.target.style.borderColor = popup.product.color}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-                />
-                <input 
-                  type="email" 
-                  placeholder="Email Address" 
-                  value={buyerEmail} 
-                  onChange={e => setBuyerEmail(e.target.value)} 
-                  style={{
-                    width: '100%',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    padding: '0.65rem 0.85rem',
-                    color: 'white',
-                    fontSize: '0.85rem',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={e => e.target.style.borderColor = popup.product.color}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-                />
-                {buyError && (
-                  <span style={{ fontSize: '0.75rem', color: '#ff4444', fontWeight: 600 }}>
-                    {buyError}
-                  </span>
-                )}
-              </div>
+
 
               {/* Summary */}
               <div className="popup-summary">
@@ -923,332 +809,23 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Dual Purchase Options (Telegram & Keet Side-by-Side) */}
-              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', width: '100%' }}>
-                <motion.button
-                  className={`popup-buy-btn ${!popup.device ? 'disabled' : ''}`}
-                  whileHover={popup.device ? { scale: 1.02 } : {}}
-                  whileTap={popup.device ? { scale: 0.98 } : {}}
-                  onClick={handleBuy}
-                  style={{ flex: 1, height: '48px', fontSize: '0.85rem', margin: 0 }}
-                >
-                  <MessageCircle size={16} />
-                  {popup.device ? 'Buy on Telegram' : 'Select a Device'}
-                </motion.button>
-                
-                <motion.button
-                  className={`popup-keet-btn ${!popup.device ? 'disabled' : ''}`}
-                  whileHover={popup.device ? { scale: 1.02 } : {}}
-                  whileTap={popup.device ? { scale: 0.98 } : {}}
-                  onClick={handleKeetClick}
-                  style={{ flex: 1, height: '48px', fontSize: '0.85rem', margin: 0 }}
-                >
-                  <Smartphone size={16} />
-                  {popup.device ? 'Buy on Keet App' : 'Select a Device'}
-                </motion.button>
-              </div>
-
-              {/* Collapsible/Animated Keet App Details Drawer */}
-              <AnimatePresence>
-                {showKeetInfo && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                    animate={{ height: 'auto', opacity: 1, marginTop: 24 }}
-                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                    transition={{ type: 'spring', stiffness: 220, damping: 20 }}
-                    style={{
-                      overflow: 'hidden',
-                      width: '100%',
-                      paddingTop: '1.25rem',
-                      borderTop: '1px solid rgba(255,255,255,0.06)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '0.85rem',
-                      textAlign: 'center'
-                    }}
-                  >
-                    {/* Copy Toast Indicator inside modal */}
-                    <div style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      color: '#10b981',
-                      background: 'rgba(16,185,129,0.1)',
-                      border: '1px solid rgba(16,185,129,0.2)',
-                      padding: '6px 14px',
-                      borderRadius: '100px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      boxShadow: '0 4px 12px rgba(16,185,129,0.1)'
-                    }}>
-                      <span>✓ Order Details Copied to Clipboard!</span>
-                    </div>
-
-                    <div style={{
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      color: 'rgba(255,255,255,0.9)',
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      background: 'rgba(59,130,246,0.1)',
-                      padding: '4px 12px',
-                      borderRadius: '100px',
-                      border: '1px solid rgba(59,130,246,0.2)'
-                    }}>
-                      <Smartphone size={12} style={{ color: '#3b82f6' }} /> Connect & Paste on Keet App
-                    </div>
-
-                    <p style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--color-text-muted, rgba(255,255,255,0.5))',
-                      lineHeight: '1.45',
-                      margin: 0,
-                      maxWidth: '320px'
-                    }}>
-                      Keet is a secure peer-to-peer chat app. Use the username <strong>@dynamo_rockstar07</strong> or click <strong>"Contact Seller"</strong> to display the QR code and connect directly with the owner, then paste your copied order message!
-                    </p>
-
-                    {/* Action Links using keet.io */}
-                    <div style={{ display: 'flex', gap: '0.6rem', width: '100%' }}>
-                      <a
-                        href="https://keet.io/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          flex: 1,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.4rem',
-                          padding: '0.65rem',
-                          background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
-                          borderRadius: '10px',
-                          color: 'white',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          textDecoration: 'none',
-                          boxShadow: '0 4px 15px rgba(59,130,246,0.3)',
-                          transition: 'all 0.25s'
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(59,130,246,0.45)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 4px 15px rgba(59,130,246,0.3)';
-                        }}
-                      >
-                        <Smartphone size={13} /> Download Keet App
-                      </a>
-                      <button
-                        onClick={() => setShowQrModal(true)}
-                        style={{
-                          flex: 1,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.4rem',
-                          padding: '0.65rem',
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: '10px',
-                          color: 'white',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          transition: 'all 0.25s'
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                        }}
-                      >
-                        <MessageCircle size={13} /> Contact Seller
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── SELLER QR CODE MODAL ──────────────────────────────── */}
-      <AnimatePresence>
-        {showQrModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(5, 5, 10, 0.85)',
-              backdropFilter: 'blur(16px)',
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1.5rem'
-            }}
-            onClick={() => setShowQrModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              style={{
-                background: 'linear-gradient(145deg, #090916, #0e0e24)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
-                boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(59, 130, 246, 0.15)',
-                borderRadius: '24px',
-                width: '100%',
-                maxWidth: '340px',
-                padding: '1.75rem',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                position: 'relative',
-                gap: '1.2rem'
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              {/* Close Button X */}
-              <button
-                onClick={() => setShowQrModal(false)}
-                style={{
-                  position: 'absolute',
-                  top: '1rem',
-                  right: '1rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: 'none',
-                  borderRadius: '50px',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'rgba(255,255,255,0.6)',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.color = '#fff';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                  e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
-                }}
+              {/* Purchase Options */}
+              <motion.button
+                className={`popup-buy-btn ${!popup.device ? 'disabled' : ''}`}
+                whileHover={popup.device ? { scale: 1.02 } : {}}
+                whileTap={popup.device ? { scale: 0.98 } : {}}
+                onClick={handleBuy}
+                style={{ width: '100%', marginTop: '1.25rem' }}
               >
-                ✕
-              </button>
-
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                <span style={{
-                  fontSize: '0.7rem',
-                  fontWeight: 900,
-                  color: '#3b82f6',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  background: 'rgba(59,130,246,0.1)',
-                  padding: '3px 12px',
-                  borderRadius: '50px',
-                  border: '1px solid rgba(59,130,246,0.2)',
-                  marginBottom: '0.4rem'
-                }}>
-                  Connect with Owner
-                </span>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', fontFamily: 'var(--font2)', fontWeight: 800, color: 'white' }}>
-                  Keet Messenger
-                </h3>
-              </div>
-
-              {/* QR Image Frame */}
-              <div style={{
-                background: 'white',
-                padding: '10px',
-                borderRadius: '20px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                width: '240px',
-                height: '272px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <img
-                  src="/keet-qr.png"
-                  alt="Dyanmo QR Code Card"
-                  style={{ width: '100%', height: '100%', borderRadius: '12px', objectFit: 'contain' }}
-                />
-              </div>
-
-              <div style={{ width: '100%' }}>
-                <p style={{
-                  fontSize: '0.75rem',
-                  color: 'rgba(255,255,255,0.6)',
-                  lineHeight: '1.45',
-                  margin: '0 0 1rem 0'
-                }}>
-                  Scan this QR code with the Keet app or contact us using username:
-                </p>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  color: 'white'
-                }}>
-                  <span>@dynamo_rockstar07</span>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText('@dynamo_rockstar07');
-                      alert('Username copied to clipboard!');
-                    }}
-                    style={{
-                      background: '#3b82f6',
-                      border: 'none',
-                      color: 'white',
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#2563eb'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#3b82f6'}
-                  >
-                    Copy
-                  </button>
-                </div>
-              </div>
+                <MessageCircle size={16} />
+                {popup.device ? 'Buy on Telegram' : 'Select a Device'}
+              </motion.button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+
 
       {/* ── STREAMBOT AI CHAT ─────────────────────────────────── */}
       <ChatWidget />
