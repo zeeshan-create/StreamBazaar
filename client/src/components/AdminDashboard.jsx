@@ -69,7 +69,7 @@ export default function AdminDashboard() {
   const [forgotSent, setForgotSent] = useState(false);
 
   // Layout Tab control
-  const [activeTab, setActiveTab] = useState('overview'); // overview, products, users, media, settings
+  const [activeTab, setActiveTab] = useState('products'); // products, media, settings
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   // Data States
@@ -446,22 +446,10 @@ export default function AdminDashboard() {
             
             <div className="sidebar-menu">
               <button 
-                className={`sidebar-btn ${activeTab === 'overview' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('overview'); setSidebarExpanded(false); }}
-              >
-                <LayoutDashboard size={18} /> Overview
-              </button>
-              <button 
                 className={`sidebar-btn ${activeTab === 'products' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('products'); setSidebarExpanded(false); }}
               >
                 <Package size={18} /> Products & Plans
-              </button>
-              <button 
-                className={`sidebar-btn ${activeTab === 'users' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('users'); setSidebarExpanded(false); }}
-              >
-                <Users size={18} /> User Management
               </button>
               <button 
                 className={`sidebar-btn ${activeTab === 'media' ? 'active' : ''}`}
@@ -593,149 +581,7 @@ export default function AdminDashboard() {
             {/* ── MAIN SCROLLABLE CONTENT BODY ──────────────────────── */}
             <main style={{ flex: 1, padding: 'clamp(1rem, 3vw, 2rem)', overflowY: 'auto' }}>
               
-              {/* ── TAB 1: OVERVIEW DASHBOARD ───────────────────────── */}
-              {activeTab === 'overview' && (
-                <div>
-                  {/* Stats Cards Row */}
-                  <div className="kpi-row">
-                    <div className="kpi-stat-card" style={{ '--pulse-color': 'rgba(34, 197, 94, 0.08)' }}>
-                      <span className="kpi-label">Sales Revenue</span>
-                      <span className="kpi-value">₹1,48,500</span>
-                      <div className="kpi-footer">
-                        <span className="kpi-trend up"><Activity size={12} /> +24%</span>
-                        <span style={{ color: 'var(--color-text-muted)' }}>vs last month</span>
-                      </div>
-                    </div>
 
-                    <div className="kpi-stat-card" style={{ '--pulse-color': 'rgba(124, 58, 237, 0.08)' }}>
-                      <span className="kpi-label">Active Seats</span>
-                      <span className="kpi-value">420</span>
-                      <div className="kpi-footer">
-                        <span className="kpi-trend up"><Activity size={12} /> +12%</span>
-                        <span style={{ color: 'var(--color-text-muted)' }}>current device count</span>
-                      </div>
-                    </div>
-
-                    <div className="kpi-stat-card" style={{ '--pulse-color': 'rgba(245, 158, 11, 0.08)' }}>
-                      <span className="kpi-label">Total Orders</span>
-                      <span className="kpi-value">1,280</span>
-                      <div className="kpi-footer">
-                        <span className="kpi-trend up"><Activity size={12} /> +8%</span>
-                        <span style={{ color: 'var(--color-text-muted)' }}>automated checkouts</span>
-                      </div>
-                    </div>
-
-                    <div className="kpi-stat-card" style={{ '--pulse-color': 'rgba(239, 68, 68, 0.08)' }}>
-                      <span className="kpi-label">Support Response</span>
-                      <span className="kpi-value">&lt; 5m</span>
-                      <div className="kpi-footer">
-                        <span className="kpi-trend up"><Activity size={12} /> 99.8%</span>
-                        <span style={{ color: 'var(--color-text-muted)' }}>uptime efficiency</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SVG Analytical Line Chart */}
-                  <div className="admin-chart-card">
-                    <div className="chart-header">
-                      <div>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Revenue Analytics Overview</h3>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Realtime checkout orders tracking</p>
-                      </div>
-                      
-                      <div className="chart-filters">
-                        {['7D', '30D', '90D'].map(f => (
-                          <button 
-                            key={f}
-                            className={`chart-filter-btn ${chartFilter === f ? 'active' : ''}`}
-                            onClick={() => setChartFilter(f)}
-                          >
-                            {f}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="svg-chart-container">
-                      <svg width="100%" height="100%" viewBox="0 0 500 200" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.4"/>
-                            <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0"/>
-                          </linearGradient>
-                        </defs>
-                        
-                        {/* Grid lines */}
-                        <line x1="0" y1="50" x2="500" y2="50" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                        <line x1="0" y1="100" x2="500" y2="100" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                        <line x1="0" y1="150" x2="500" y2="150" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-
-                        {CHART_DATA[chartFilter].gridX.map((x, idx) => (
-                          <line key={idx} x1={x} y1="0" x2={x} y2="180" stroke="var(--color-border)" strokeWidth="0.5" />
-                        ))}
-                        
-                        {/* Glow Gradient path */}
-                        <path 
-                          d={`M10,180 L${CHART_DATA[chartFilter].points} L430,180 Z`} 
-                          fill="url(#chartGlow)" 
-                        />
-                        
-                        {/* Highlight line path */}
-                        <path 
-                          d={`M${CHART_DATA[chartFilter].points}`} 
-                          fill="none" 
-                          stroke="var(--color-primary)" 
-                          strokeWidth="3.5" 
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', padding: '0 10px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                        {CHART_DATA[chartFilter].labels.map((lbl, idx) => (
-                          <span key={idx}>{lbl}</span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', flexWrap: 'wrap', borderTop: '1px solid var(--color-border)', paddingTop: '1.25rem' }}>
-                      <div>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>Total Period Revenue</div>
-                        <div style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--color-success)' }}>{CHART_DATA[chartFilter].revenue}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>Period Orders count</div>
-                        <div style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--color-primary)' }}>{CHART_DATA[chartFilter].orders} checkouts</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Activity and performing tables grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                    <div className="admin-chart-card" style={{ margin: 0 }}>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '1.25rem' }}>Recent Order Checkout Stream</h3>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {[
-                          { name: "John Doe", game: "Netflix Premium · 3M", amount: "₹450", time: "5 mins ago" },
-                          { name: "Amit Patel", game: "WWE 2K25 · 30D", amount: "₹249", time: "25 mins ago" },
-                          { name: "Rohan Das", game: "Sony LIV · 45D", amount: "₹180", time: "1 hour ago" },
-                          { name: "Sara Khan", game: "Black Myth Wukong · 3M", amount: "₹599", time: "3 hours ago" }
-                        ].map((act, idx) => (
-                          <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border)', fontSize: '0.85rem' }}>
-                            <div>
-                              <div style={{ fontWeight: 600 }}>{act.name}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{act.game}</div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontWeight: 700, color: 'var(--color-success)' }}>{act.amount}</div>
-                              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>{act.time}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* ── TAB 2: PRODUCTS & PLANS MANAGER ─────────────────── */}
               {activeTab === 'products' && (
@@ -809,14 +655,19 @@ export default function AdminDashboard() {
                                     <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
                                     {editForm.plans && editForm.plans.map((plan, idx) => (
                                       <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                                        <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K · 30D)" value={plan.label} onChange={e => {
+                                        <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K)" value={plan.label} onChange={e => {
                                           const newPlans = [...editForm.plans];
-                                          newPlans[idx].label = e.target.value;
+                                          newPlans[idx] = { ...newPlans[idx], label: e.target.value };
+                                          setEditForm({...editForm, plans: newPlans});
+                                        }} />
+                                        <input className="admin-form-input" style={{ width: '100px' }} placeholder="Duration (e.g. 30D)" value={plan.duration || ''} onChange={e => {
+                                          const newPlans = [...editForm.plans];
+                                          newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
                                           setEditForm({...editForm, plans: newPlans});
                                         }} />
                                         <input className="admin-form-input" style={{ width: '80px' }} placeholder="Price" value={plan.price} onChange={e => {
                                           const newPlans = [...editForm.plans];
-                                          newPlans[idx].price = e.target.value;
+                                          newPlans[idx] = { ...newPlans[idx], price: e.target.value };
                                           setEditForm({...editForm, plans: newPlans});
                                         }} />
                                         <button className="admin-action-btn delete" onClick={() => {
@@ -935,14 +786,19 @@ export default function AdminDashboard() {
                               <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
                               {editForm.plans && editForm.plans.map((plan, idx) => (
                                 <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                                  <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K · 30D)" value={plan.label} onChange={e => {
+                                  <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K)" value={plan.label} onChange={e => {
                                     const newPlans = [...editForm.plans];
-                                    newPlans[idx].label = e.target.value;
+                                    newPlans[idx] = { ...newPlans[idx], label: e.target.value };
+                                    setEditForm({...editForm, plans: newPlans});
+                                  }} />
+                                  <input className="admin-form-input" style={{ width: '100px' }} placeholder="Duration (e.g. 30D)" value={plan.duration || ''} onChange={e => {
+                                    const newPlans = [...editForm.plans];
+                                    newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
                                     setEditForm({...editForm, plans: newPlans});
                                   }} />
                                   <input className="admin-form-input" style={{ width: '80px' }} placeholder="Price" value={plan.price} onChange={e => {
                                     const newPlans = [...editForm.plans];
-                                    newPlans[idx].price = e.target.value;
+                                    newPlans[idx] = { ...newPlans[idx], price: e.target.value };
                                     setEditForm({...editForm, plans: newPlans});
                                   }} />
                                   <button className="admin-action-btn delete" onClick={() => {
@@ -967,182 +823,7 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* ── TAB 3: USER MANAGEMENT PAGE ─────────────────────── */}
-              {activeTab === 'users' && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div className="user-filter-tabs">
-                      {['All', 'Admin', 'Editor', 'Viewer'].map(r => (
-                        <button 
-                          key={r}
-                          className={`user-filter-btn ${userRoleFilter === r ? 'active' : ''}`}
-                          onClick={() => setUserRoleFilter(r)}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
 
-                    <button 
-                      className="btn-primary"
-                      onClick={() => setShowInviteModal(true)}
-                      style={{ padding: '0.6rem 1.25rem', borderRadius: '10px' }}
-                    >
-                      <PlusCircle size={16} /> Invite New Staff
-                    </button>
-                  </div>
-
-                  <div style={{ overflowX: 'auto', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '16px' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
-                          <th style={{ padding: '1rem 1.5rem' }}>Name</th>
-                          <th style={{ padding: '1rem 1.5rem' }}>Email</th>
-                          <th style={{ padding: '1rem 1.5rem' }}>Role</th>
-                          <th style={{ padding: '1rem 1.5rem' }}>Status</th>
-                          <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {users.filter(u => userRoleFilter === 'All' || u.role === userRoleFilter).map(u => (
-                          <tr key={u.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                            <td style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary-glow)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
-                                {u.name[0].toUpperCase()}
-                              </div>
-                              <span style={{ fontWeight: 600 }}>{u.name}</span>
-                            </td>
-                            <td style={{ padding: '1rem 1.5rem' }}>{u.email}</td>
-                            <td style={{ padding: '1rem 1.5rem' }}>
-                              <span style={{ fontSize: '0.75rem', background: u.role === 'Admin' ? 'rgba(124,58,237,0.12)' : 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px', color: u.role === 'Admin' ? 'var(--color-primary)' : 'var(--color-text-muted)', fontWeight: 600 }}>
-                                {u.role}
-                              </span>
-                            </td>
-                            <td style={{ padding: '1rem 1.5rem' }}>
-                              <button 
-                                onClick={() => toggleUserStatus(u.id)}
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: u.status === 'Active' ? 'var(--color-success)' : 'var(--color-text-muted)', fontSize: '0.85rem', cursor: 'pointer' }}
-                                aria-label="Toggle user active status"
-                              >
-                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: u.status === 'Active' ? 'var(--color-success)' : 'var(--color-text-muted)' }} />
-                                {u.status}
-                              </button>
-                            </td>
-                            <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                              <button 
-                                className="user-filter-btn" 
-                                onClick={() => setSelectedUser(u)}
-                                style={{ fontSize: '0.72rem', padding: '0.3rem 0.75rem' }}
-                              >
-                                Permissions Detail
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* User Permissions side-drawer/modal */}
-                  <AnimatePresence>
-                    {selectedUser && (
-                      <div className="popup-overlay" style={{ zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <motion.div 
-                          initial={{ scale: 0.9, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0.9, opacity: 0 }}
-                          className="popup-modal"
-                          style={{ width: '92%', maxWidth: '440px', padding: '2rem' }}
-                        >
-                          <button className="popup-close" onClick={() => setSelectedUser(null)} aria-label="Close modal">
-                            <X size={16} />
-                          </button>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>Security & Permissions</h3>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary-glow)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-                              {selectedUser.name[0].toUpperCase()}
-                            </div>
-                            <div>
-                              <div style={{ fontWeight: 700 }}>{selectedUser.name}</div>
-                              <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>{selectedUser.email}</div>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                              <span>Allow catalog editing</span>
-                              <input type="checkbox" defaultChecked={selectedUser.role !== 'Viewer'} style={{ cursor: 'pointer' }} />
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                              <span>Allow user invitations</span>
-                              <input type="checkbox" defaultChecked={selectedUser.role === 'Admin'} style={{ cursor: 'pointer' }} />
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                              <span>System log inspection</span>
-                              <input type="checkbox" defaultChecked={selectedUser.role === 'Admin'} style={{ cursor: 'pointer' }} />
-                            </div>
-                          </div>
-
-                          <button className="btn-primary" onClick={() => setSelectedUser(null)} style={{ width: '100%', marginTop: '2rem', padding: '0.85rem', borderRadius: '10px', justifyContent: 'center' }}>
-                            Confirm & Save Permissions
-                          </button>
-                        </motion.div>
-                      </div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Invite New User Modal */}
-                  <AnimatePresence>
-                    {showInviteModal && (
-                      <div className="popup-overlay" style={{ zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <motion.div 
-                          initial={{ scale: 0.9, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0.9, opacity: 0 }}
-                          className="popup-modal"
-                          style={{ width: '92%', maxWidth: '400px', padding: '2rem' }}
-                        >
-                          <button className="popup-close" onClick={() => setShowInviteModal(false)} aria-label="Close modal">
-                            <X size={16} />
-                          </button>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', fontFamily: 'var(--font-display)' }}>Invite staff member</h3>
-                          
-                          <form onSubmit={handleInviteSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div className="admin-form-group">
-                              <label htmlFor="invite_email">Staff Email</label>
-                              <input 
-                                id="invite_email"
-                                type="email" 
-                                className="admin-form-input" 
-                                placeholder="name@streambazaar.in" 
-                                value={inviteEmail} 
-                                onChange={e => setInviteEmail(e.target.value)} 
-                                required
-                              />
-                            </div>
-                            <div className="admin-form-group">
-                              <label htmlFor="invite_role">System Role</label>
-                              <select 
-                                id="invite_role"
-                                className="admin-form-input" 
-                                value={inviteRole} 
-                                onChange={e => setInviteRole(e.target.value)}
-                              >
-                                <option value="Viewer">Viewer</option>
-                                <option value="Editor">Editor</option>
-                                <option value="Admin">Admin</option>
-                              </select>
-                            </div>
-                            <button className="btn-primary" style={{ width: '100%', marginTop: '1rem', padding: '0.85rem', borderRadius: '10px', justifyContent: 'center' }}>
-                              Send Invitation Link
-                            </button>
-                          </form>
-                        </motion.div>
-                      </div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
 
               {/* ── TAB 4: MEDIA LIBRARY GRID ───────────────────────── */}
               {activeTab === 'media' && (
