@@ -11,7 +11,7 @@ import '../App.css';
 import ChatWidget from '../ChatWidget';
 import FomoToast from './FomoToast';
 
-const TELEGRAM_LINK = 'https://t.me/TrustedStreams';
+const TELEGRAM_LINK = 'https://t.me/owner_trusted_streams';
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const DOMAINS = {
