@@ -35,7 +35,7 @@ const DOMAINS = {
   'NordVPN': 'nordvpn.com',
   'Steam Gaming': 'store.steampowered.com',
   'PlayStation': 'playstation.com',
-  'Microsoft Copilot': 'copilot.microsoft.com',
+  'Microsoft Copilot': 'microsoft.com',
   'ChatGPT Plus': 'openai.com',
   'Claude AI': 'claude.ai',
   'Canva Pro': 'canva.com',
