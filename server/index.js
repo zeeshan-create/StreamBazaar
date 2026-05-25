@@ -13,17 +13,16 @@ const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
 
-const { allServices: seedServices, seedDB } = require('./seed');
-
-// Run initial seed if needed
-seedDB();
+const { allServices: seedServices } = require('./seed');
 
 app.get('/api/plans', async (req, res) => {
   try {
     let allServices = await Service.find({});
-    // Fallback to static seed data if ephemeral DB is empty
+    // If KVDB is empty, seed it permanently so _ids are generated
     if (allServices.length === 0) {
-      allServices = seedServices;
+      console.log('KVDB empty! Seeding initial data...');
+      await Service.insert(seedServices);
+      allServices = await Service.find({});
     }
     res.json(allServices);
   } catch (err) {
@@ -34,7 +33,7 @@ app.get('/api/plans', async (req, res) => {
 // ── ORDER/BUYER ROUTES ──────────────────────────────────────────
 app.get('/api/admin/orders', async (req, res) => {
   try {
-    const orders = await Order.find({});
+    let orders = await Order.find({});
     if (orders.length === 0) {
       const seedOrders = [
         { _id: 'o1', name: "Rahul Sharma", email: "rahul@streambazaar.in", role: "Viewer", status: "Active", product: "Netflix", plan: "Premium 4K · 30D", device: "Laptop", price: "₹175", date: "2026-05-16" },
@@ -43,7 +42,8 @@ app.get('/api/admin/orders', async (req, res) => {
         { _id: 'o4', name: "Aman Verma", email: "aman@streambazaar.in", role: "Viewer", status: "Inactive", product: "PlayStation", plan: "Black Myth Wukong · 30D", device: "PS5", price: "₹599", date: "2026-05-15" },
         { _id: 'o5', name: "Sneha Patel", email: "sneha@streambazaar.in", role: "Viewer", status: "Active", product: "Prime Video", plan: "UHD · 30D", device: "Tablet", price: "₹129", date: "2026-05-18" }
       ];
-      return res.json(seedOrders);
+      await Order.insert(seedOrders);
+      orders = await Order.find({});
     }
     res.json(orders);
   } catch (err) {
