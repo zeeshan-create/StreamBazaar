@@ -76,6 +76,33 @@ const DOMAINS = {
   'kaspersky': 'kaspersky.com'
 };
 
+const BRAND_COLORS = {
+  'netflix': '#e50914',
+  'youtube': '#ff0000',
+  'amazon': '#00a8e1',
+  'prime': '#00a8e1',
+  'hotstar': '#030b14',
+  'jio hotstar': '#030b14',
+  'jio': '#c5286e',
+  'jiocinema': '#c5286e',
+  'sony': '#df1827',
+  'sonyliv': '#df1827',
+  'zee5': '#8224e3',
+  'chatgpt': '#10a37f',
+  'claude': '#d97757',
+  'canva': '#00c4cc',
+  'spotify': '#1db954',
+  'discord': '#5865f2',
+  'discovery': '#0f4ff5',
+  'airtel': '#ff0000',
+  'lionsgate': '#f5ce38',
+  'aha': '#ff6d00',
+  'ullu': '#eeb914',
+  'nord': '#4687ff',
+  'nordvpn': '#4687ff',
+  'surfshark': '#00d6aa'
+};
+
 const GAME_IMGS = {
   'wwe 2k25': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
   'forza horizon 5': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_184x69.jpg',
@@ -200,7 +227,18 @@ export default function App() {
     const cacheBuster = Date.now(); // 100% instant cache bypass
     fetch(`${API_BASE}/api/plans?v=${cacheBuster}`, { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => { setPlans(d); setLoading(false); })
+      .then(d => { 
+        const formatted = d.map(p => {
+          if (!p.color || p.color === '#000000' || p.color === '#333' || p.color === '#333333' || p.color === '') {
+             const lower = p.name.toLowerCase();
+             const matchedBrand = Object.keys(BRAND_COLORS).find(k => lower.includes(k));
+             if (matchedBrand) p.color = BRAND_COLORS[matchedBrand];
+          }
+          return p;
+        });
+        setPlans(formatted); 
+        setLoading(false); 
+      })
       .catch(() => setLoading(false));
   }, []);
 
