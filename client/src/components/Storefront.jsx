@@ -474,14 +474,13 @@ export default function App() {
                   >
                     {product.plans.map((plan, i) => {
                       const gameIcon = product.category === 'Gaming' ? getGameIcon(plan.label) : null;
-                      const isMonthly = (plan.duration || '').toLowerCase().includes('month') || (plan.duration || '').toLowerCase().includes('30 day');
                       return (
                         <motion.div
                           key={i}
                           custom={i}
                           variants={planRowVariants}
                           className="plan-row"
-                          style={isMonthly ? { background: `linear-gradient(90deg, ${product.color}15 0%, transparent 100%)`, borderLeft: `3px solid ${product.color}` } : {}}
+                          style={{ background: `linear-gradient(90deg, ${product.color}15 0%, transparent 100%)`, borderLeft: `3px solid ${product.color}` }}
                           whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.2)', transition: { duration: 0.15 } }}
                           whileTap={{ scale: 0.97 }}
                           onClick={() => {
