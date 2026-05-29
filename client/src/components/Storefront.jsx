@@ -73,7 +73,14 @@ const DOMAINS = {
   'sunnxt': 'sunnxt.com',
   'epic on': 'epicon.in',
   'eros now': 'erosnow.com',
-  'kaspersky': 'kaspersky.com'
+  'kaspersky': 'kaspersky.com',
+  'express vpn': 'expressvpn.com',
+  'expressvpn': 'expressvpn.com',
+  'vpn': 'nordvpn.com',
+  'epic': 'epicgames.com',
+  'server': 'digitalocean.com',
+  'stream server': 'plex.tv',
+  'ott': 'netflix.com'
 };
 
 const BRAND_COLORS = {

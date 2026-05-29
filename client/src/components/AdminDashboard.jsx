@@ -98,6 +98,12 @@ const DOMAINS = {
   'nord': 'nordvpn.com',
   'surfshark': 'surfshark.com',
   'express vpn': 'expressvpn.com',
+  'expressvpn': 'expressvpn.com',
+  'vpn': 'nordvpn.com',
+  'epic': 'epicgames.com',
+  'server': 'digitalocean.com',
+  'stream server': 'plex.tv',
+  'ott': 'netflix.com',
   'kaspersky': 'kaspersky.com'
 };
 
@@ -780,7 +786,33 @@ export default function AdminDashboard() {
                                   </div>
                                   <div className="admin-form-group">
                                     <label>Category</label>
-                                    <input className="admin-form-input" list="category-recommendations" value={editForm.category} onChange={e => setEditForm({...editForm, category: e.target.value})} />
+                                    <select 
+                                      className="admin-form-input" 
+                                      value={['Streaming', 'Gaming', 'VPN', 'AI+'].includes(editForm.category) ? editForm.category : 'Custom'}
+                                      onChange={e => {
+                                        if (e.target.value === 'Custom') {
+                                          setEditForm({...editForm, category: ''});
+                                        } else {
+                                          setEditForm({...editForm, category: e.target.value});
+                                        }
+                                      }}
+                                    >
+                                      <option value="Streaming">Streaming</option>
+                                      <option value="Gaming">Gaming</option>
+                                      <option value="VPN">VPN</option>
+                                      <option value="AI+">AI+</option>
+                                      <option value="Custom">Custom...</option>
+                                    </select>
+                                    {!['Streaming', 'Gaming', 'VPN', 'AI+'].includes(editForm.category) && editForm.category !== undefined && (
+                                      <input 
+                                        className="admin-form-input" 
+                                        style={{ marginTop: '0.5rem' }} 
+                                        placeholder="Enter custom category" 
+                                        value={editForm.category || ''} 
+                                        onChange={e => setEditForm({...editForm, category: e.target.value})} 
+                                        autoFocus
+                                      />
+                                    )}
                                   </div>
                                   <div className="admin-form-group">
                                     <label>Accent Color</label>
@@ -805,26 +837,40 @@ export default function AdminDashboard() {
                                   <div className="admin-form-group" style={{ marginTop: '0.5rem' }}>
                                     <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
                                     {editForm.plans && editForm.plans.map((plan, idx) => (
-                                      <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                                        <input className="admin-form-input" list="plan-labels" style={{ flex: 1 }} placeholder="Label (e.g. 4K UHD)" value={plan.label} onChange={e => {
-                                          const newPlans = [...editForm.plans];
-                                          newPlans[idx] = { ...newPlans[idx], label: e.target.value };
-                                          setEditForm({...editForm, plans: newPlans});
-                                        }} />
-                                        <input className="admin-form-input" list="duration-recommendations" style={{ width: '120px' }} placeholder="Duration" value={plan.duration || ''} onChange={e => {
-                                          const newPlans = [...editForm.plans];
-                                          newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
-                                          setEditForm({...editForm, plans: newPlans});
-                                        }} />
-                                        <input className="admin-form-input" style={{ width: '80px' }} placeholder="Price" value={plan.price} onChange={e => {
-                                          const newPlans = [...editForm.plans];
-                                          newPlans[idx] = { ...newPlans[idx], price: e.target.value };
-                                          setEditForm({...editForm, plans: newPlans});
-                                        }} />
-                                        <button className="admin-action-btn delete" onClick={() => {
-                                          const newPlans = editForm.plans.filter((_, i) => i !== idx);
-                                          setEditForm({...editForm, plans: newPlans});
-                                        }}><Trash2 size={16} /></button>
+                                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem', padding: '1rem', background: 'var(--color-background)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                          <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Plan {idx + 1}</span>
+                                          <button className="admin-action-btn delete" onClick={() => {
+                                            const newPlans = editForm.plans.filter((_, i) => i !== idx);
+                                            setEditForm({...editForm, plans: newPlans});
+                                          }}><Trash2 size={16} /></button>
+                                        </div>
+                                        <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                          <label style={{ fontSize: '0.85rem' }}>Plan Label</label>
+                                          <input className="admin-form-input" list="plan-labels" placeholder="e.g. 4K UHD" value={plan.label} onChange={e => {
+                                            const newPlans = [...editForm.plans];
+                                            newPlans[idx] = { ...newPlans[idx], label: e.target.value };
+                                            setEditForm({...editForm, plans: newPlans});
+                                          }} />
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.85rem' }}>Duration</label>
+                                            <input className="admin-form-input" list="duration-recommendations" placeholder="Duration" value={plan.duration || ''} onChange={e => {
+                                              const newPlans = [...editForm.plans];
+                                              newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
+                                              setEditForm({...editForm, plans: newPlans});
+                                            }} />
+                                          </div>
+                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.85rem' }}>Price (₹)</label>
+                                            <input className="admin-form-input" placeholder="Price" value={plan.price} onChange={e => {
+                                              const newPlans = [...editForm.plans];
+                                              newPlans[idx] = { ...newPlans[idx], price: e.target.value };
+                                              setEditForm({...editForm, plans: newPlans});
+                                            }} />
+                                          </div>
+                                        </div>
                                       </div>
                                     ))}
                                     <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'New Plan', quality: '', duration: '', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
@@ -985,7 +1031,33 @@ export default function AdminDashboard() {
                             </div>
                             <div className="admin-form-group">
                               <label>Category</label>
-                              <input className="admin-form-input" list="category-recommendations" placeholder="Streaming, Gaming, AI+, VPN" value={editForm.category || ''} onChange={e => setEditForm({...editForm, category: e.target.value})} />
+                              <select 
+                                className="admin-form-input" 
+                                value={['Streaming', 'Gaming', 'VPN', 'AI+'].includes(editForm.category) ? editForm.category : 'Custom'}
+                                onChange={e => {
+                                  if (e.target.value === 'Custom') {
+                                    setEditForm({...editForm, category: ''});
+                                  } else {
+                                    setEditForm({...editForm, category: e.target.value});
+                                  }
+                                }}
+                              >
+                                <option value="Streaming">Streaming</option>
+                                <option value="Gaming">Gaming</option>
+                                <option value="VPN">VPN</option>
+                                <option value="AI+">AI+</option>
+                                <option value="Custom">Custom...</option>
+                              </select>
+                              {!['Streaming', 'Gaming', 'VPN', 'AI+'].includes(editForm.category) && editForm.category !== undefined && (
+                                <input 
+                                  className="admin-form-input" 
+                                  style={{ marginTop: '0.5rem' }} 
+                                  placeholder="Enter custom category" 
+                                  value={editForm.category || ''} 
+                                  onChange={e => setEditForm({...editForm, category: e.target.value})} 
+                                  autoFocus
+                                />
+                              )}
                             </div>
                             <div className="admin-form-group">
                               <label>Accent Hex Color</label>
@@ -1002,29 +1074,43 @@ export default function AdminDashboard() {
                             <div className="admin-form-group">
                               <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
                               {editForm.plans && editForm.plans.map((plan, idx) => (
-                                <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                                  <input className="admin-form-input" list="plan-labels" style={{ flex: 1 }} placeholder="Label (e.g. 4K UHD)" value={plan.label} onChange={e => {
-                                    const newPlans = [...editForm.plans];
-                                    newPlans[idx] = { ...newPlans[idx], label: e.target.value };
-                                    setEditForm({...editForm, plans: newPlans});
-                                  }} />
-                                  <input className="admin-form-input" list="duration-recommendations" style={{ width: '120px' }} placeholder="Duration" value={plan.duration || ''} onChange={e => {
-                                    const newPlans = [...editForm.plans];
-                                    newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
-                                    setEditForm({...editForm, plans: newPlans});
-                                  }} />
-                                  <input className="admin-form-input" style={{ width: '80px' }} placeholder="Price" value={plan.price} onChange={e => {
-                                    const newPlans = [...editForm.plans];
-                                    newPlans[idx] = { ...newPlans[idx], price: e.target.value };
-                                    setEditForm({...editForm, plans: newPlans});
-                                  }} />
-                                  <button className="admin-action-btn delete" onClick={() => {
-                                    const newPlans = editForm.plans.filter((_, i) => i !== idx);
-                                    setEditForm({...editForm, plans: newPlans});
-                                  }}><Trash2 size={16} /></button>
+                                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem', padding: '1rem', background: 'var(--color-background)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                    <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Plan {idx + 1}</span>
+                                    <button type="button" className="admin-action-btn delete" onClick={() => {
+                                      const newPlans = editForm.plans.filter((_, i) => i !== idx);
+                                      setEditForm({...editForm, plans: newPlans});
+                                    }}><Trash2 size={16} /></button>
+                                  </div>
+                                  <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                    <label style={{ fontSize: '0.85rem' }}>Plan Label</label>
+                                    <input className="admin-form-input" list="plan-labels" placeholder="e.g. 4K UHD" value={plan.label} onChange={e => {
+                                      const newPlans = [...editForm.plans];
+                                      newPlans[idx] = { ...newPlans[idx], label: e.target.value };
+                                      setEditForm({...editForm, plans: newPlans});
+                                    }} />
+                                  </div>
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                      <label style={{ fontSize: '0.85rem' }}>Duration</label>
+                                      <input className="admin-form-input" list="duration-recommendations" placeholder="Duration" value={plan.duration || ''} onChange={e => {
+                                        const newPlans = [...editForm.plans];
+                                        newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
+                                        setEditForm({...editForm, plans: newPlans});
+                                      }} />
+                                    </div>
+                                    <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                      <label style={{ fontSize: '0.85rem' }}>Price (₹)</label>
+                                      <input className="admin-form-input" placeholder="Price" value={plan.price} onChange={e => {
+                                        const newPlans = [...editForm.plans];
+                                        newPlans[idx] = { ...newPlans[idx], price: e.target.value };
+                                        setEditForm({...editForm, plans: newPlans});
+                                      }} />
+                                    </div>
+                                  </div>
                                 </div>
                               ))}
-                              <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'New Plan', quality: '', duration: '', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
+                              <button type="button" className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'New Plan', quality: '', duration: '', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
                                 <Plus size={14} /> Add Plan
                               </button>
                             </div>
