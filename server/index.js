@@ -18,12 +18,6 @@ const { allServices: seedServices } = require('./seed');
 app.get('/api/plans', async (req, res) => {
   try {
     let allServices = await Service.find({});
-    // If KVDB is empty, seed it permanently so _ids are generated
-    if (allServices.length === 0) {
-      console.log('KVDB empty! Seeding initial data...');
-      await Service.insert(seedServices);
-      allServices = await Service.find({});
-    }
     // Tell mobile browsers NEVER to cache, and disable Vercel CDN caching to ensure real-time price updates
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json(allServices);
@@ -36,17 +30,6 @@ app.get('/api/plans', async (req, res) => {
 app.get('/api/admin/orders', async (req, res) => {
   try {
     let orders = await Order.find({});
-    if (orders.length === 0) {
-      const seedOrders = [
-        { _id: 'o1', name: "Rahul Sharma", email: "rahul@streambazaar.in", role: "Viewer", status: "Active", product: "Netflix", plan: "Premium 4K · 30D", device: "Laptop", price: "₹175", date: "2026-05-16" },
-        { _id: 'o2', name: "Anjali Gupta", email: "anjali@streambazaar.in", role: "Editor", status: "Active", product: "Steam Gaming", plan: "Forza Horizon 5 · 30D", device: "PC", price: "₹175", date: "2026-05-17" },
-        { _id: 'o3', name: "Vikram Singh", email: "vikram@streambazaar.in", role: "Admin", status: "Active", product: "Netflix", plan: "UHD · 45D", device: "Mobile", price: "₹249", date: "2026-05-18" },
-        { _id: 'o4', name: "Aman Verma", email: "aman@streambazaar.in", role: "Viewer", status: "Inactive", product: "PlayStation", plan: "Black Myth Wukong · 30D", device: "PS5", price: "₹599", date: "2026-05-15" },
-        { _id: 'o5', name: "Sneha Patel", email: "sneha@streambazaar.in", role: "Viewer", status: "Active", product: "Prime Video", plan: "UHD · 30D", device: "Tablet", price: "₹129", date: "2026-05-18" }
-      ];
-      await Order.insert(seedOrders);
-      orders = await Order.find({});
-    }
     res.json(orders);
   } catch (err) {
     res.status(500).json({ error: err.message });
