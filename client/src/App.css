@@ -458,6 +458,7 @@ nav {
   width: 44px; height: 44px;
   object-fit: contain;
   border-radius: 8px;
+  filter: drop-shadow(0 0 1px rgba(255,255,255,0.6));
 }
 .card-title-area { flex: 1; min-width: 0; }
 .card-name {
