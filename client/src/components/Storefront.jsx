@@ -15,34 +15,39 @@ const TELEGRAM_LINK = 'https://t.me/owner_trusted_streams';
 const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
 
 const DOMAINS = {
-  'YouTube Premium': 'youtube.com',
-  'YouTube Music': 'music.youtube.com',
-  'Sony LIV': 'sonyliv.com',
-  'Netflix': 'netflix.com',
-  'Amazon Prime': 'primevideo.com',
-  'Hoichoi': 'hoichoi.tv',
-  'Discovery Plus': 'discoveryplus.com',
-  'Airtel Xstream': 'airtelxstream.in',
-  'Apple Music': 'music.apple.com',
-  'Apple TV+': 'tv.apple.com',
-  'Spotify Premium': 'spotify.com',
-  'LinkedIn Premium': 'linkedin.com',
-  'Adobe Creative': 'adobe.com',
-  'Google One': 'one.google.com',
-  'Jio Hotstar': 'jiohotstar.com',
-  'ZEE5': 'zee5.com',
-  'Surfshark VPN': 'surfshark.com',
-  'NordVPN': 'nordvpn.com',
-  'Steam Gaming': 'store.steampowered.com',
-  'PlayStation': 'playstation.com',
-  'Microsoft Copilot': 'microsoft.com',
-  'ChatGPT Plus': 'openai.com',
-  'Claude AI': 'claude.ai',
-  'Canva Pro': 'canva.com',
-  'Picsart Pro': 'picsart.com',
-  'Envato Elements': 'elements.envato.com',
-  'Grok AI': 'x.ai',
-  'ElevenLabs': 'elevenlabs.io',
+  'youtube premium': 'youtube.com',
+  'youtube music': 'music.youtube.com',
+  'youtube': 'youtube.com',
+  'sony liv': 'sonyliv.com',
+  'netflix': 'netflix.com',
+  'amazon prime': 'primevideo.com',
+  'hoichoi tv': 'hoichoi.tv',
+  'hoichoi': 'hoichoi.tv',
+  'discovery plus': 'discoveryplus.com',
+  'airtel xstream': 'airtelxstream.in',
+  'apple music': 'music.apple.com',
+  'apple tv+': 'tv.apple.com',
+  'spotify premium': 'spotify.com',
+  'linkedin premium': 'linkedin.com',
+  'adobe creative': 'adobe.com',
+  'google one': 'one.google.com',
+  'jio hotstar': 'jiohotstar.com',
+  'zee5': 'zee5.com',
+  'surfshark vpn': 'surfshark.com',
+  'nordvpn': 'nordvpn.com',
+  'steam gaming': 'store.steampowered.com',
+  'playstation': 'playstation.com',
+  'microsoft copilot': 'microsoft.com',
+  'chatgpt plus': 'openai.com',
+  'claude ai': 'claude.ai',
+  'canva pro': 'canva.com',
+  'picsart pro': 'picsart.com',
+  'envato elements': 'elements.envato.com',
+  'grok ai': 'x.ai',
+  'elevenlabs': 'elevenlabs.io',
+  'iptv': 'iptvsmarters.com',
+  'lionsgate play': 'lionsgateplay.com',
+  'crunchy roll': 'crunchyroll.com',
 };
 
 const GAME_IMGS = {
@@ -220,7 +225,7 @@ export default function App() {
   };
 
   const getFavicon = name => {
-    let domain = DOMAINS[name];
+    let domain = DOMAINS[name.toLowerCase()];
     if (!domain) {
       // Smart domain fallback based on name
       domain = `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
