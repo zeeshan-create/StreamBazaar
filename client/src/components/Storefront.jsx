@@ -220,7 +220,11 @@ export default function App() {
   };
 
   const getFavicon = name => {
-    const domain = DOMAINS[name] || 'google.com';
+    let domain = DOMAINS[name];
+    if (!domain) {
+      // Smart domain fallback based on name
+      domain = `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
+    }
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
   };
 
@@ -465,12 +469,14 @@ export default function App() {
                   >
                     {product.plans.map((plan, i) => {
                       const gameIcon = product.category === 'Gaming' ? getGameIcon(plan.label) : null;
+                      const isMonthly = (plan.duration || '').toLowerCase().includes('month') || (plan.duration || '').toLowerCase().includes('30 day');
                       return (
                         <motion.div
                           key={i}
                           custom={i}
                           variants={planRowVariants}
                           className="plan-row"
+                          style={isMonthly ? { background: `linear-gradient(90deg, ${product.color}15 0%, transparent 100%)`, borderLeft: `3px solid ${product.color}` } : {}}
                           whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.2)', transition: { duration: 0.15 } }}
                           whileTap={{ scale: 0.97 }}
                           onClick={() => {
