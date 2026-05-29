@@ -10,7 +10,7 @@ import {
 import { Link } from 'react-router-dom';
 import '../App.css';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api';
+const API_BASE = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
 
 // Analytical Mock Datasets for SVG Chart
 const CHART_DATA = {

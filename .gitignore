@@ -23,3 +23,5 @@ server/data/*.db
 .DS_Store
 Thumbs.db
 *.log
+
+.vercel
