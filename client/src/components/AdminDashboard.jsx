@@ -159,9 +159,17 @@ const BRAND_CATEGORIES = {
   'hoichoi': 'Streaming'
 };
 
+const CUSTOM_ICONS = {
+  'airtel': 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/37/82/87/3782873a-f10d-5b3f-1d4e-b5a03e1e6db1/AppIcon-0-0-1x_U007emarketing-0-7-0-sRGB-85-220.png/246x0w.webp',
+};
+
 const getFavicon = (serviceName) => {
   if (!serviceName) return null;
   const lowerName = serviceName.toLowerCase().trim();
+  
+  const matchedCustom = Object.keys(CUSTOM_ICONS).find(k => lowerName.includes(k));
+  if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
+
   const matchedKey = Object.keys(DOMAINS).find(key => lowerName.includes(key));
   if (matchedKey) {
     return `https://www.google.com/s2/favicons?domain=${DOMAINS[matchedKey]}&sz=128`;

@@ -288,11 +288,21 @@ export default function App() {
     setPopup(null);
   };
 
+  const CUSTOM_ICONS = {
+    'airtel': 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/37/82/87/3782873a-f10d-5b3f-1d4e-b5a03e1e6db1/AppIcon-0-0-1x_U007emarketing-0-7-0-sRGB-85-220.png/246x0w.webp',
+  };
+
   const getFavicon = name => {
-    let domain = DOMAINS[name.toLowerCase()];
+    const lowerName = name.toLowerCase();
+    
+    // Check custom overrides first
+    const matchedCustom = Object.keys(CUSTOM_ICONS).find(k => lowerName.includes(k));
+    if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
+
+    let domain = DOMAINS[lowerName];
     if (!domain) {
       // Smart domain fallback based on name
-      domain = `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
+      domain = `${lowerName.replace(/[^a-z0-9]/g, '')}.com`;
     }
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
   };
