@@ -165,9 +165,7 @@ const BRAND_CATEGORIES = {
   'hoichoi': 'Streaming'
 };
 
-const CUSTOM_ICONS = {
-  'airtel': 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/37/82/87/3782873a-f10d-5b3f-1d4e-b5a03e1e6db1/AppIcon-0-0-1x_U007emarketing-0-7-0-sRGB-85-220.png/246x0w.webp',
-};
+const CUSTOM_ICONS = {};
 
 const getFavicon = (serviceName) => {
   if (!serviceName) return null;
@@ -192,6 +190,25 @@ const getGameIcon = (gameName) => {
   }
   return null;
 };
+
+const DESC_OPTIONS = [
+  "Premium shared profiles. Instant access upon purchase.",
+  "Private account. Instant delivery.",
+  "Premium Seat Access • Guaranteed",
+  "4K Ultra HD • 1 Device Seat Access",
+  "Offline game activation for PC. Full updates supported.",
+  "100% legal, genuine, and carefully verified premium accounts.",
+  "Personal email upgrade. Secure and private access."
+];
+const PLAN_LABELS = [
+  "4K UHD", "4K Ultra HD", "Full HD 1080p", "720p", "Premium Plan", 
+  "Individual Plan", "Shared Profile", "Private Profile", 
+  "1 Device Seat Access", "2 Device Seat Access", "PC Game Seat Access", 
+  "PlayStation", "Xbox"
+];
+const DURATION_OPTIONS = [
+  "30 Days", "1 Month", "45 Days", "2 Months", "3 Months", "6 Months", "1 Year", "Lifetime"
+];
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -797,10 +814,10 @@ export default function AdminDashboard() {
                                         }
                                       }}
                                     >
-                                      <option value="Streaming">Streaming</option>
-                                      <option value="Gaming">Gaming</option>
-                                      <option value="VPN">VPN</option>
-                                      <option value="AI+">AI+</option>
+                                      <option value="Streaming" style={{color: '#ef4444'}}>Streaming</option>
+                                      <option value="Gaming" style={{color: '#22c55e'}}>Gaming</option>
+                                      <option value="VPN" style={{color: '#3b82f6'}}>VPN</option>
+                                      <option value="AI+" style={{color: '#a855f7'}}>AI+</option>
                                       <option value="Custom">Custom...</option>
                                     </select>
                                     {!['Streaming', 'Gaming', 'VPN', 'AI+'].includes(editForm.category) && editForm.category !== undefined && (
@@ -831,7 +848,28 @@ export default function AdminDashboard() {
                                   </div>
                                   <div className="admin-form-group">
                                     <label>Description</label>
-                                    <input className="admin-form-input" list="description-recommendations" value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} />
+                                    <select 
+                                      className="admin-form-input" 
+                                      value={DESC_OPTIONS.includes(editForm.description) ? editForm.description : (editForm.description ? 'Custom' : '')}
+                                      onChange={e => {
+                                        if (e.target.value === 'Custom') setEditForm({...editForm, description: ''});
+                                        else setEditForm({...editForm, description: e.target.value});
+                                      }}
+                                    >
+                                      <option value="" disabled>Select a description</option>
+                                      {DESC_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                      <option value="Custom">Custom...</option>
+                                    </select>
+                                    {(!DESC_OPTIONS.includes(editForm.description) && editForm.description !== undefined && editForm.description !== '') && (
+                                      <input 
+                                        className="admin-form-input" 
+                                        style={{ marginTop: '0.5rem' }} 
+                                        placeholder="Enter custom description" 
+                                        value={editForm.description || ''} 
+                                        onChange={e => setEditForm({...editForm, description: e.target.value})} 
+                                        autoFocus
+                                      />
+                                    )}
                                   </div>
 
                                   <div className="admin-form-group" style={{ marginTop: '0.5rem' }}>
@@ -847,20 +885,64 @@ export default function AdminDashboard() {
                                         </div>
                                         <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                           <label style={{ fontSize: '0.85rem' }}>Plan Label</label>
-                                          <input className="admin-form-input" list="plan-labels" placeholder="e.g. 4K UHD" value={plan.label} onChange={e => {
-                                            const newPlans = [...editForm.plans];
-                                            newPlans[idx] = { ...newPlans[idx], label: e.target.value };
-                                            setEditForm({...editForm, plans: newPlans});
-                                          }} />
+                                          <select 
+                                            className="admin-form-input" 
+                                            value={PLAN_LABELS.includes(plan.label) ? plan.label : (plan.label ? 'Custom' : '')}
+                                            onChange={e => {
+                                              const newPlans = [...editForm.plans];
+                                              newPlans[idx] = { ...newPlans[idx], label: e.target.value === 'Custom' ? '' : e.target.value };
+                                              setEditForm({...editForm, plans: newPlans});
+                                            }}
+                                          >
+                                            <option value="" disabled>Select label</option>
+                                            {PLAN_LABELS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                            <option value="Custom">Custom...</option>
+                                          </select>
+                                          {(!PLAN_LABELS.includes(plan.label) && plan.label !== undefined && plan.label !== '') && (
+                                            <input 
+                                              className="admin-form-input" 
+                                              style={{ marginTop: '0.5rem' }} 
+                                              placeholder="Enter custom label" 
+                                              value={plan.label || ''} 
+                                              onChange={e => {
+                                                const newPlans = [...editForm.plans];
+                                                newPlans[idx] = { ...newPlans[idx], label: e.target.value };
+                                                setEditForm({...editForm, plans: newPlans});
+                                              }} 
+                                              autoFocus
+                                            />
+                                          )}
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                           <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                             <label style={{ fontSize: '0.85rem' }}>Duration</label>
-                                            <input className="admin-form-input" list="duration-recommendations" placeholder="Duration" value={plan.duration || ''} onChange={e => {
-                                              const newPlans = [...editForm.plans];
-                                              newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
-                                              setEditForm({...editForm, plans: newPlans});
-                                            }} />
+                                            <select 
+                                              className="admin-form-input" 
+                                              value={DURATION_OPTIONS.includes(plan.duration) ? plan.duration : (plan.duration ? 'Custom' : '')}
+                                              onChange={e => {
+                                                const newPlans = [...editForm.plans];
+                                                newPlans[idx] = { ...newPlans[idx], duration: e.target.value === 'Custom' ? '' : e.target.value };
+                                                setEditForm({...editForm, plans: newPlans});
+                                              }}
+                                            >
+                                              <option value="" disabled>Select</option>
+                                              {DURATION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                              <option value="Custom">Custom...</option>
+                                            </select>
+                                            {(!DURATION_OPTIONS.includes(plan.duration) && plan.duration !== undefined && plan.duration !== '') && (
+                                              <input 
+                                                className="admin-form-input" 
+                                                style={{ marginTop: '0.5rem' }} 
+                                                placeholder="Custom" 
+                                                value={plan.duration || ''} 
+                                                onChange={e => {
+                                                  const newPlans = [...editForm.plans];
+                                                  newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
+                                                  setEditForm({...editForm, plans: newPlans});
+                                                }} 
+                                                autoFocus
+                                              />
+                                            )}
                                           </div>
                                           <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                             <label style={{ fontSize: '0.85rem' }}>Price (₹)</label>
@@ -1042,10 +1124,10 @@ export default function AdminDashboard() {
                                   }
                                 }}
                               >
-                                <option value="Streaming">Streaming</option>
-                                <option value="Gaming">Gaming</option>
-                                <option value="VPN">VPN</option>
-                                <option value="AI+">AI+</option>
+                                <option value="Streaming" style={{color: '#ef4444'}}>Streaming</option>
+                                <option value="Gaming" style={{color: '#22c55e'}}>Gaming</option>
+                                <option value="VPN" style={{color: '#3b82f6'}}>VPN</option>
+                                <option value="AI+" style={{color: '#a855f7'}}>AI+</option>
                                 <option value="Custom">Custom...</option>
                               </select>
                               {!['Streaming', 'Gaming', 'VPN', 'AI+'].includes(editForm.category) && editForm.category !== undefined && (
@@ -1068,7 +1150,28 @@ export default function AdminDashboard() {
                             </div>
                             <div className="admin-form-group">
                               <label>Description</label>
-                              <input className="admin-form-input" list="description-recommendations" placeholder="Premium shared profiles..." value={editForm.description || ''} onChange={e => setEditForm({...editForm, description: e.target.value})} />
+                              <select 
+                                className="admin-form-input" 
+                                value={DESC_OPTIONS.includes(editForm.description) ? editForm.description : (editForm.description ? 'Custom' : '')}
+                                onChange={e => {
+                                  if (e.target.value === 'Custom') setEditForm({...editForm, description: ''});
+                                  else setEditForm({...editForm, description: e.target.value});
+                                }}
+                              >
+                                <option value="" disabled>Select a description</option>
+                                {DESC_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                <option value="Custom">Custom...</option>
+                              </select>
+                              {(!DESC_OPTIONS.includes(editForm.description) && editForm.description !== undefined && editForm.description !== '') && (
+                                <input 
+                                  className="admin-form-input" 
+                                  style={{ marginTop: '0.5rem' }} 
+                                  placeholder="Enter custom description" 
+                                  value={editForm.description || ''} 
+                                  onChange={e => setEditForm({...editForm, description: e.target.value})} 
+                                  autoFocus
+                                />
+                              )}
                             </div>
 
                             <div className="admin-form-group">
@@ -1084,20 +1187,64 @@ export default function AdminDashboard() {
                                   </div>
                                   <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                     <label style={{ fontSize: '0.85rem' }}>Plan Label</label>
-                                    <input className="admin-form-input" list="plan-labels" placeholder="e.g. 4K UHD" value={plan.label} onChange={e => {
-                                      const newPlans = [...editForm.plans];
-                                      newPlans[idx] = { ...newPlans[idx], label: e.target.value };
-                                      setEditForm({...editForm, plans: newPlans});
-                                    }} />
+                                    <select 
+                                      className="admin-form-input" 
+                                      value={PLAN_LABELS.includes(plan.label) ? plan.label : (plan.label ? 'Custom' : '')}
+                                      onChange={e => {
+                                        const newPlans = [...editForm.plans];
+                                        newPlans[idx] = { ...newPlans[idx], label: e.target.value === 'Custom' ? '' : e.target.value };
+                                        setEditForm({...editForm, plans: newPlans});
+                                      }}
+                                    >
+                                      <option value="" disabled>Select label</option>
+                                      {PLAN_LABELS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                      <option value="Custom">Custom...</option>
+                                    </select>
+                                    {(!PLAN_LABELS.includes(plan.label) && plan.label !== undefined && plan.label !== '') && (
+                                      <input 
+                                        className="admin-form-input" 
+                                        style={{ marginTop: '0.5rem' }} 
+                                        placeholder="Enter custom label" 
+                                        value={plan.label || ''} 
+                                        onChange={e => {
+                                          const newPlans = [...editForm.plans];
+                                          newPlans[idx] = { ...newPlans[idx], label: e.target.value };
+                                          setEditForm({...editForm, plans: newPlans});
+                                        }} 
+                                        autoFocus
+                                      />
+                                    )}
                                   </div>
                                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                       <label style={{ fontSize: '0.85rem' }}>Duration</label>
-                                      <input className="admin-form-input" list="duration-recommendations" placeholder="Duration" value={plan.duration || ''} onChange={e => {
-                                        const newPlans = [...editForm.plans];
-                                        newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
-                                        setEditForm({...editForm, plans: newPlans});
-                                      }} />
+                                      <select 
+                                        className="admin-form-input" 
+                                        value={DURATION_OPTIONS.includes(plan.duration) ? plan.duration : (plan.duration ? 'Custom' : '')}
+                                        onChange={e => {
+                                          const newPlans = [...editForm.plans];
+                                          newPlans[idx] = { ...newPlans[idx], duration: e.target.value === 'Custom' ? '' : e.target.value };
+                                          setEditForm({...editForm, plans: newPlans});
+                                        }}
+                                      >
+                                        <option value="" disabled>Select</option>
+                                        {DURATION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                        <option value="Custom">Custom...</option>
+                                      </select>
+                                      {(!DURATION_OPTIONS.includes(plan.duration) && plan.duration !== undefined && plan.duration !== '') && (
+                                        <input 
+                                          className="admin-form-input" 
+                                          style={{ marginTop: '0.5rem' }} 
+                                          placeholder="Custom" 
+                                          value={plan.duration || ''} 
+                                          onChange={e => {
+                                            const newPlans = [...editForm.plans];
+                                            newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
+                                            setEditForm({...editForm, plans: newPlans});
+                                          }} 
+                                          autoFocus
+                                        />
+                                      )}
                                     </div>
                                     <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                       <label style={{ fontSize: '0.85rem' }}>Price (₹)</label>

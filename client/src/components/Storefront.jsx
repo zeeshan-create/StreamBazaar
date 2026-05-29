@@ -331,9 +331,7 @@ export default function App() {
     setPopup(null);
   };
 
-  const CUSTOM_ICONS = {
-    'airtel': 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/37/82/87/3782873a-f10d-5b3f-1d4e-b5a03e1e6db1/AppIcon-0-0-1x_U007emarketing-0-7-0-sRGB-85-220.png/246x0w.webp',
-  };
+  const CUSTOM_ICONS = {};
 
   const getFavicon = name => {
     const lowerName = name.toLowerCase();
