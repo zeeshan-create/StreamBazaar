@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
 
-const { allServices: seedServices } = require('./seed');
+
 
 app.get('/api/plans', async (req, res) => {
   try {
