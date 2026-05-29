@@ -487,8 +487,13 @@ export default function App() {
                           {gameIcon && (
                             <img src={gameIcon} className="plan-game-icon" alt={plan.label} />
                           )}
-                          <span className="plan-row-label">{gameIcon ? plan.duration : <>{plan.label} &nbsp;·&nbsp; {plan.duration}</>}</span>
-                          <span className="plan-row-price" style={{ color: product.color }}>{plan.price}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: 0 }}>
+                            <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)' }}>{plan.label}</span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {gameIcon ? plan.duration : <>{plan.quality ? `${plan.quality} • ` : ''}{plan.duration}</>}
+                            </span>
+                          </div>
+                          <span className="plan-row-price" style={{ color: product.color, marginLeft: 'auto', marginRight: '8px' }}>{plan.price}</span>
                           <motion.span
                             className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
                             whileHover={product.status === 'Available' ? { scale: 1.1, backgroundColor: `${product.color}40`, borderColor: product.color } : {}}
@@ -770,7 +775,7 @@ export default function App() {
 
               {/* Selected Plan */}
               <div className="popup-plan-chip">
-                <strong>{popup.plan.label}</strong> &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
+                <strong>{popup.plan.label}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
                 <strong style={{ color: popup.product.color }}>{popup.plan.price}</strong>
               </div>
 
