@@ -166,7 +166,8 @@ export default function App() {
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
-    fetch(`${API_BASE}/api/plans`, { cache: 'no-store' })
+    const cacheBuster = Math.floor(Date.now() / 60000); // changes every 1 minute
+    fetch(`${API_BASE}/api/plans?v=${cacheBuster}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { setPlans(d); setLoading(false); })
       .catch(() => setLoading(false));
