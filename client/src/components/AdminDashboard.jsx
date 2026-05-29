@@ -58,6 +58,121 @@ const MOCK_MEDIA = [
   { id: 4, name: "GTA V capsule cover", url: "https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_184x69.jpg", date: "2026-05-18" }
 ];
 
+const DOMAINS = {
+  'netflix': 'netflix.com',
+  'youtube': 'youtube.com',
+  'amazon': 'primevideo.com',
+  'prime': 'primevideo.com',
+  'hotstar': 'hotstar.com',
+  'jio hotstar': 'hotstar.com',
+  'sony': 'sonyliv.com',
+  'sonyliv': 'sonyliv.com',
+  'zee5': 'zee5.com',
+  'chatgpt': 'openai.com',
+  'claude': 'anthropic.com',
+  'canva': 'canva.com',
+  'spotify': 'spotify.com',
+  'crunchyroll': 'crunchyroll.com',
+  'discord': 'discord.com',
+  'disney': 'disneyplus.com',
+  'hoichoi': 'hoichoi.tv',
+  'iptv': 'iptv-org.github.io',
+  'ullu': 'ullu.app',
+  'aha': 'aha.video',
+  'altbalaji': 'altt.co.in',
+  'voot': 'voot.com',
+  'sun nxt': 'sunnxt.com',
+  'sunnxt': 'sunnxt.com',
+  'jiocinema': 'jiocinema.com',
+  'discovery': 'discoveryplus.in',
+  'lionsgate': 'lionsgateplay.com',
+  'epic on': 'epicon.in',
+  'eros now': 'erosnow.com',
+  'nord vpn': 'nordvpn.com',
+  'nordvpn': 'nordvpn.com',
+  'surfshark': 'surfshark.com',
+  'express vpn': 'expressvpn.com',
+  'kaspersky': 'kaspersky.com'
+};
+
+const GAME_IMGS = {
+  'gta 5': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_231x87.jpg',
+  'gta v': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_231x87.jpg',
+  'rdr 2': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_231x87.jpg',
+  'red dead': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_231x87.jpg',
+  'cyberpunk': 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_231x87.jpg',
+  'wwe': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_231x87.jpg',
+  'forza': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_231x87.jpg',
+  'fifa': 'https://cdn.akamai.steamstatic.com/steam/apps/2195250/capsule_231x87.jpg',
+  'fc 24': 'https://cdn.akamai.steamstatic.com/steam/apps/2195250/capsule_231x87.jpg',
+  'spider-man': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_231x87.jpg',
+  'spiderman': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_231x87.jpg',
+  'god of war': 'https://cdn.akamai.steamstatic.com/steam/apps/1593500/capsule_231x87.jpg',
+  'hogwarts': 'https://cdn.akamai.steamstatic.com/steam/apps/990080/capsule_231x87.jpg',
+  'resident evil': 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/capsule_231x87.jpg',
+  'elden ring': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_231x87.jpg',
+  'call of duty': 'https://cdn.akamai.steamstatic.com/steam/apps/1938090/capsule_231x87.jpg'
+};
+
+const BRAND_COLORS = {
+  'netflix': '#e50914',
+  'youtube': '#ff0000',
+  'amazon': '#00a8e1',
+  'prime': '#00a8e1',
+  'hotstar': '#030b14',
+  'jio hotstar': '#030b14',
+  'sony': '#df1827',
+  'sonyliv': '#df1827',
+  'zee5': '#8224e3',
+  'chatgpt': '#10a37f',
+  'claude': '#d97757',
+  'canva': '#00c4cc',
+  'spotify': '#1db954',
+  'discord': '#5865f2',
+  'nordvpn': '#4687ff',
+  'surfshark': '#00d6aa'
+};
+
+const BRAND_CATEGORIES = {
+  'netflix': 'Streaming',
+  'youtube': 'Streaming',
+  'amazon': 'Streaming',
+  'prime': 'Streaming',
+  'hotstar': 'Streaming',
+  'jio hotstar': 'Streaming',
+  'sony': 'Streaming',
+  'sonyliv': 'Streaming',
+  'zee5': 'Streaming',
+  'chatgpt': 'AI+',
+  'claude': 'AI+',
+  'canva': 'AI+',
+  'spotify': 'Streaming',
+  'nordvpn': 'VPN',
+  'surfshark': 'VPN',
+  'iptv': 'Streaming',
+  'hoichoi': 'Streaming'
+};
+
+const getFavicon = (serviceName) => {
+  if (!serviceName) return null;
+  const lowerName = serviceName.toLowerCase().trim();
+  const matchedKey = Object.keys(DOMAINS).find(key => lowerName.includes(key));
+  if (matchedKey) {
+    return `https://www.google.com/s2/favicons?domain=${DOMAINS[matchedKey]}&sz=128`;
+  }
+  const cleanName = lowerName.split(' ')[0].replace(/[^a-z0-9]/g, '');
+  return `https://www.google.com/s2/favicons?domain=${cleanName}.com&sz=128`;
+};
+
+const getGameIcon = (gameName) => {
+  if (!gameName) return null;
+  const lowerName = gameName.toLowerCase();
+  for (let key in GAME_IMGS) {
+    if (lowerName.includes(key)) return GAME_IMGS[key];
+  }
+  return null;
+};
+
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
@@ -628,15 +743,35 @@ export default function AdminDashboard() {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                   <div className="admin-form-group">
                                     <label>Service Name</label>
-                                    <input className="admin-form-input" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                      {(getFavicon(editForm.name) || getGameIcon(editForm.name)) && (
+                                        <img src={getGameIcon(editForm.name) || getFavicon(editForm.name)} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'contain', background: '#222' }} alt="Preview" />
+                                      )}
+                                      <input className="admin-form-input" style={{ flex: 1 }} value={editForm.name} onChange={e => {
+                                        const val = e.target.value;
+                                        const lowerVal = val.toLowerCase();
+                                        let newCategory = editForm.category;
+                                        let newColor = editForm.color;
+                                        
+                                        const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
+                                        if (matchedBrand) {
+                                          if (!editForm.category) newCategory = BRAND_CATEGORIES[matchedBrand];
+                                          if (!editForm.color && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
+                                        }
+                                        setEditForm({...editForm, name: val, category: newCategory, color: newColor});
+                                      }} />
+                                    </div>
                                   </div>
                                   <div className="admin-form-group">
                                     <label>Category</label>
-                                    <input className="admin-form-input" value={editForm.category} onChange={e => setEditForm({...editForm, category: e.target.value})} />
+                                    <input className="admin-form-input" list="category-recommendations" value={editForm.category} onChange={e => setEditForm({...editForm, category: e.target.value})} />
                                   </div>
                                   <div className="admin-form-group">
                                     <label>Accent Color</label>
-                                    <input className="admin-form-input" value={editForm.color} onChange={e => setEditForm({...editForm, color: e.target.value})} />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                      <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: editForm.color || '#333' }}></div>
+                                      <input className="admin-form-input" style={{ flex: 1 }} value={editForm.color} onChange={e => setEditForm({...editForm, color: e.target.value})} />
+                                    </div>
                                   </div>
                                   <div className="admin-form-group">
                                     <label>Status</label>
@@ -648,19 +783,19 @@ export default function AdminDashboard() {
                                   </div>
                                   <div className="admin-form-group">
                                     <label>Description</label>
-                                    <textarea className="admin-form-input" rows={2} value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} />
+                                    <input className="admin-form-input" list="description-recommendations" value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} />
                                   </div>
 
                                   <div className="admin-form-group" style={{ marginTop: '0.5rem' }}>
                                     <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
                                     {editForm.plans && editForm.plans.map((plan, idx) => (
                                       <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                                        <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K)" value={plan.label} onChange={e => {
+                                        <input className="admin-form-input" list="plan-labels" style={{ flex: 1 }} placeholder="Label (e.g. 4K UHD)" value={plan.label} onChange={e => {
                                           const newPlans = [...editForm.plans];
                                           newPlans[idx] = { ...newPlans[idx], label: e.target.value };
                                           setEditForm({...editForm, plans: newPlans});
                                         }} />
-                                        <input className="admin-form-input" style={{ width: '100px' }} placeholder="Duration (e.g. 30D)" value={plan.duration || ''} onChange={e => {
+                                        <input className="admin-form-input" list="duration-recommendations" style={{ width: '120px' }} placeholder="Duration" value={plan.duration || ''} onChange={e => {
                                           const newPlans = [...editForm.plans];
                                           newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
                                           setEditForm({...editForm, plans: newPlans});
@@ -764,34 +899,85 @@ export default function AdminDashboard() {
                             <X size={16} />
                           </button>
                           <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '1.5rem', fontFamily: 'var(--font-display)' }}>Add New Product</h2>
+                          
+                          <datalist id="category-recommendations">
+                            <option value="Streaming" />
+                            <option value="Gaming" />
+                            <option value="AI+" />
+                            <option value="VPN" />
+                          </datalist>
+                          <datalist id="duration-recommendations">
+                            <option value="1 Month" />
+                            <option value="3 Months" />
+                            <option value="6 Months" />
+                            <option value="1 Year" />
+                            <option value="Lifetime" />
+                          </datalist>
+                          <datalist id="plan-labels">
+                            <option value="4K UHD" />
+                            <option value="Full HD 1080p" />
+                            <option value="720p" />
+                            <option value="Premium Plan" />
+                            <option value="PC Game Seat Access" />
+                            <option value="PlayStation" />
+                            <option value="Xbox" />
+                          </datalist>
+                          <datalist id="description-recommendations">
+                            <option value="Premium shared profiles. Instant access upon purchase." />
+                            <option value="Private account. Instant delivery." />
+                            <option value="Offline game activation for PC. Full updates supported." />
+                          </datalist>
+
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div className="admin-form-group">
                               <label>Service/Game Title</label>
-                              <input className="admin-form-input" placeholder="Netflix, Grok AI, etc." onChange={e => setEditForm({...editForm, name: e.target.value})} />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                {(getFavicon(editForm.name) || getGameIcon(editForm.name)) && (
+                                  <img src={getGameIcon(editForm.name) || getFavicon(editForm.name)} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'contain', background: '#222' }} alt="Preview" />
+                                )}
+                                <input className="admin-form-input" style={{ flex: 1 }} placeholder="Netflix, Grok AI, etc." value={editForm.name || ''} onChange={e => {
+                                  const val = e.target.value;
+                                  const lowerVal = val.toLowerCase();
+                                  
+                                  let newCategory = editForm.category;
+                                  let newColor = editForm.color;
+                                  
+                                  const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
+                                  if (matchedBrand) {
+                                    if (!editForm.category) newCategory = BRAND_CATEGORIES[matchedBrand];
+                                    if (!editForm.color && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
+                                  }
+                                  
+                                  setEditForm({...editForm, name: val, category: newCategory, color: newColor});
+                                }} />
+                              </div>
                             </div>
                             <div className="admin-form-group">
                               <label>Category</label>
-                              <input className="admin-form-input" placeholder="Streaming, Gaming, AI+, VPN" onChange={e => setEditForm({...editForm, category: e.target.value})} />
+                              <input className="admin-form-input" list="category-recommendations" placeholder="Streaming, Gaming, AI+, VPN" value={editForm.category || ''} onChange={e => setEditForm({...editForm, category: e.target.value})} />
                             </div>
                             <div className="admin-form-group">
                               <label>Accent Hex Color</label>
-                              <input className="admin-form-input" placeholder="#e50914" onChange={e => setEditForm({...editForm, color: e.target.value})} />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: editForm.color || '#333' }}></div>
+                                <input className="admin-form-input" style={{ flex: 1 }} placeholder="#e50914" value={editForm.color || ''} onChange={e => setEditForm({...editForm, color: e.target.value})} />
+                              </div>
                             </div>
                             <div className="admin-form-group">
-                              <label>Description Description</label>
-                              <textarea className="admin-form-input" rows={2} placeholder="Premium shared profiles..." onChange={e => setEditForm({...editForm, description: e.target.value})} />
+                              <label>Description</label>
+                              <input className="admin-form-input" list="description-recommendations" placeholder="Premium shared profiles..." value={editForm.description || ''} onChange={e => setEditForm({...editForm, description: e.target.value})} />
                             </div>
 
                             <div className="admin-form-group">
                               <label style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'block' }}>Plans & Pricing</label>
                               {editForm.plans && editForm.plans.map((plan, idx) => (
                                 <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                                  <input className="admin-form-input" style={{ flex: 1 }} placeholder="Label (e.g. Premium 4K)" value={plan.label} onChange={e => {
+                                  <input className="admin-form-input" list="plan-labels" style={{ flex: 1 }} placeholder="Label (e.g. 4K UHD)" value={plan.label} onChange={e => {
                                     const newPlans = [...editForm.plans];
                                     newPlans[idx] = { ...newPlans[idx], label: e.target.value };
                                     setEditForm({...editForm, plans: newPlans});
                                   }} />
-                                  <input className="admin-form-input" style={{ width: '100px' }} placeholder="Duration (e.g. 30D)" value={plan.duration || ''} onChange={e => {
+                                  <input className="admin-form-input" list="duration-recommendations" style={{ width: '120px' }} placeholder="Duration" value={plan.duration || ''} onChange={e => {
                                     const newPlans = [...editForm.plans];
                                     newPlans[idx] = { ...newPlans[idx], duration: e.target.value };
                                     setEditForm({...editForm, plans: newPlans});
