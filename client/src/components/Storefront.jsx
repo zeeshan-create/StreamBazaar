@@ -491,19 +491,29 @@ export default function App() {
                           {gameIcon && (
                             <img src={gameIcon} className="plan-game-icon" alt={plan.label} />
                           )}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: 0 }}>
-                            <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)' }}>{plan.label}</span>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {gameIcon ? plan.duration : <>{plan.quality ? `${plan.quality} • ` : ''}{plan.duration}</>}
-                            </span>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
+                            <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>{plan.label}</span>
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: `${product.color}20`, color: product.color, border: `1px solid ${product.color}40`, whiteSpace: 'nowrap' }}>
+                                {plan.duration}
+                              </span>
+                              {(!gameIcon && plan.quality && plan.quality.toLowerCase() !== plan.label.toLowerCase()) && (
+                                <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', border: '1px solid rgba(255,255,255,0.1)', whiteSpace: 'nowrap' }}>
+                                  {plan.quality}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <span className="plan-row-price" style={{ color: product.color, marginLeft: 'auto', marginRight: '8px' }}>{plan.price}</span>
-                          <motion.span
-                            className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
-                            whileHover={product.status === 'Available' ? { scale: 1.1, backgroundColor: `${product.color}40`, borderColor: product.color } : {}}
-                          >
-                            {product.status && product.status !== 'Available' ? product.status : 'Buy'}
-                          </motion.span>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
+                            <span className="plan-row-price" style={{ color: product.color, fontWeight: 'bold', fontSize: '1.05rem', letterSpacing: '0.5px' }}>{plan.price}</span>
+                            <motion.span
+                              className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
+                              whileHover={product.status === 'Available' ? { scale: 1.1, backgroundColor: `${product.color}40`, borderColor: product.color } : {}}
+                            >
+                              {product.status && product.status !== 'Available' ? product.status : 'Buy'}
+                            </motion.span>
+                          </div>
                         </motion.div>
                       );
                     })}
