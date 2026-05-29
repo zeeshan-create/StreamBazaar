@@ -166,7 +166,7 @@ export default function App() {
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
-    fetch(`${API_BASE}/api/plans?t=${Date.now()}`, { cache: 'no-store' })
+    fetch(`${API_BASE}/api/plans`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { setPlans(d); setLoading(false); })
       .catch(() => setLoading(false));
@@ -386,7 +386,19 @@ export default function App() {
       {/* ── PRODUCT GRID ───────────────────────────────────────── */}
       <section className="ott-section" id="deals">
         {loading ? (
-          <div className="empty-state"><p>Loading plans...</p></div>
+          <div className="ott-grid">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+              <div key={i} className="ott-card skeleton-card">
+                <div className="skeleton-header">
+                  <div className="skeleton-logo"></div>
+                  <div className="skeleton-title"></div>
+                </div>
+                <div className="skeleton-plan"></div>
+                <div className="skeleton-plan"></div>
+                <div className="skeleton-plan"></div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="ott-grid">
             <AnimatePresence mode="popLayout">

@@ -24,6 +24,8 @@ app.get('/api/plans', async (req, res) => {
       await Service.insert(seedServices);
       allServices = await Service.find({});
     }
+    // Tell mobile browsers NEVER to cache, but tell Vercel CDN to cache for 60s and update in background
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=86400');
     res.json(allServices);
   } catch (err) {
     res.status(500).json({ error: 'Database error' });
