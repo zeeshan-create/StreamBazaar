@@ -769,8 +769,10 @@ export default function AdminDashboard() {
                                         
                                         const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
                                         if (matchedBrand) {
-                                          if (!editForm.category) newCategory = BRAND_CATEGORIES[matchedBrand];
-                                          if (!editForm.color && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
+                                          const catIsDefault = !editForm.category || editForm.category === 'Streaming';
+                                          const colorIsDefault = !editForm.color || editForm.color === '#6366f1' || editForm.color === '#000000';
+                                          if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
+                                          if (colorIsDefault && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
                                         }
                                         setEditForm({...editForm, name: val, category: newCategory, color: newColor});
                                       }} />
@@ -921,7 +923,10 @@ export default function AdminDashboard() {
                             <option value="VPN" />
                           </datalist>
                           <datalist id="duration-recommendations">
+                            <option value="30 Days" />
                             <option value="1 Month" />
+                            <option value="45 Days" />
+                            <option value="2 Months" />
                             <option value="3 Months" />
                             <option value="6 Months" />
                             <option value="1 Year" />
@@ -929,9 +934,15 @@ export default function AdminDashboard() {
                           </datalist>
                           <datalist id="plan-labels">
                             <option value="4K UHD" />
+                            <option value="4K Ultra HD" />
                             <option value="Full HD 1080p" />
                             <option value="720p" />
                             <option value="Premium Plan" />
+                            <option value="Individual Plan" />
+                            <option value="Shared Profile" />
+                            <option value="Private Profile" />
+                            <option value="1 Device Seat Access" />
+                            <option value="2 Device Seat Access" />
                             <option value="PC Game Seat Access" />
                             <option value="PlayStation" />
                             <option value="Xbox" />
@@ -939,7 +950,11 @@ export default function AdminDashboard() {
                           <datalist id="description-recommendations">
                             <option value="Premium shared profiles. Instant access upon purchase." />
                             <option value="Private account. Instant delivery." />
+                            <option value="Premium Seat Access • Guaranteed" />
+                            <option value="4K Ultra HD • 1 Device Seat Access" />
                             <option value="Offline game activation for PC. Full updates supported." />
+                            <option value="100% legal, genuine, and carefully verified premium accounts." />
+                            <option value="Personal email upgrade. Secure and private access." />
                           </datalist>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -958,8 +973,10 @@ export default function AdminDashboard() {
                                   
                                   const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
                                   if (matchedBrand) {
-                                    if (!editForm.category) newCategory = BRAND_CATEGORIES[matchedBrand];
-                                    if (!editForm.color && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
+                                    const catIsDefault = !editForm.category || editForm.category === 'Streaming';
+                                    const colorIsDefault = !editForm.color || editForm.color === '#6366f1' || editForm.color === '#000000';
+                                    if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
+                                    if (colorIsDefault && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
                                   }
                                   
                                   setEditForm({...editForm, name: val, category: newCategory, color: newColor});
