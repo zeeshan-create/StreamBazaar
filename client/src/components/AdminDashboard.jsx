@@ -143,7 +143,7 @@ export default function AdminDashboard() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch(`${API_BASE}/plans`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE}/plans?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       setServices(data);
       setLoading(false);
