@@ -143,13 +143,13 @@ export default function AdminDashboard() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch(`${API_BASE}/plans`);
+      const res = await fetch(`${API_BASE}/plans`, { cache: 'no-store' });
       const data = await res.json();
       setServices(data);
       setLoading(false);
 
       // Fetch dynamic buyer orders
-      const resUsers = await fetch(`${API_BASE}/admin/orders`);
+      const resUsers = await fetch(`${API_BASE}/admin/orders`, { cache: 'no-store' });
       const dataUsers = await resUsers.json();
       const mapped = dataUsers.map(u => ({
         ...u,
