@@ -345,7 +345,7 @@ export default function App() {
       // Smart domain fallback based on name
       domain = `${lowerName.replace(/[^a-z0-9]/g, '')}.com`;
     }
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
   };
 
   return (

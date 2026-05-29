@@ -176,10 +176,10 @@ const getFavicon = (serviceName) => {
 
   const matchedKey = Object.keys(DOMAINS).find(key => lowerName.includes(key));
   if (matchedKey) {
-    return `https://www.google.com/s2/favicons?domain=${DOMAINS[matchedKey]}&sz=128`;
+    return `https://www.google.com/s2/favicons?domain=${DOMAINS[matchedKey]}&sz=256`;
   }
   const cleanName = lowerName.split(' ')[0].replace(/[^a-z0-9]/g, '');
-  return `https://www.google.com/s2/favicons?domain=${cleanName}.com&sz=128`;
+  return `https://www.google.com/s2/favicons?domain=${cleanName}.com&sz=256`;
 };
 
 const getGameIcon = (gameName) => {
