@@ -560,7 +560,9 @@ export default function App() {
                     </div>
                     <div className="card-title-area">
                       <div className="card-name">
-                        {product.name}
+                        <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={product.name}>
+                          {product.name}
+                        </span>
                         {product.status && product.status !== 'Available' && (
                           <span className="status-badge-inline" style={{ 
                             background: product.status === 'Coming Soon' ? '#fbbf2422' : '#ef444422',
