@@ -394,6 +394,12 @@ nav {
   gap: 1.15rem;
 }
 
+@media (min-width: 1024px) {
+  .ott-grid {
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  }
+}
+
 /* ── OTT CARD ────────────────────────────────────────────────────── */
 .ott-card {
   background: var(--card);
@@ -463,15 +469,14 @@ nav {
 .card-title-area { 
   flex: 1; 
   min-width: 0; 
-  container-type: inline-size;
 }
 .card-name {
   font-family: var(--font2);
-  font-size: clamp(0.7rem, 9.5cqw, 1.15rem);
+  font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 0.15rem;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
 }
 .card-desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; }
 .card-badge {
