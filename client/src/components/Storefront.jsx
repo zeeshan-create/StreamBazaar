@@ -103,6 +103,35 @@ const BRAND_COLORS = {
   'surfshark': '#00d6aa'
 };
 
+const BRAND_CATEGORIES = {
+  'netflix': 'Streaming',
+  'youtube': 'Streaming',
+  'amazon': 'Streaming',
+  'prime': 'Streaming',
+  'hotstar': 'Streaming',
+  'jio hotstar': 'Streaming',
+  'jio': 'Streaming',
+  'jiocinema': 'Streaming',
+  'sony': 'Streaming',
+  'sonyliv': 'Streaming',
+  'zee5': 'Streaming',
+  'chatgpt': 'AI+',
+  'claude': 'AI+',
+  'canva': 'AI+',
+  'spotify': 'Streaming',
+  'discord': 'AI+',
+  'discovery': 'Streaming',
+  'airtel': 'Streaming',
+  'lionsgate': 'Streaming',
+  'aha': 'Streaming',
+  'ullu': 'Streaming',
+  'nord': 'VPN',
+  'nordvpn': 'VPN',
+  'surfshark': 'VPN',
+  'iptv': 'Streaming',
+  'hoichoi': 'Streaming'
+};
+
 const GAME_IMGS = {
   'wwe 2k25': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
   'forza horizon 5': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_184x69.jpg',
@@ -229,11 +258,18 @@ export default function App() {
       .then(r => r.json())
       .then(d => { 
         const formatted = d.map(p => {
+          const lower = p.name.toLowerCase();
+          
           if (!p.color || p.color === '#000000' || p.color === '#333' || p.color === '#333333' || p.color === '') {
-             const lower = p.name.toLowerCase();
              const matchedBrand = Object.keys(BRAND_COLORS).find(k => lower.includes(k));
              if (matchedBrand) p.color = BRAND_COLORS[matchedBrand];
           }
+
+          if (!p.category || p.category.trim() === '') {
+             const matchedCat = Object.keys(BRAND_CATEGORIES).find(k => lower.includes(k));
+             p.category = matchedCat ? BRAND_CATEGORIES[matchedCat] : 'Streaming';
+          }
+          
           return p;
         });
         setPlans(formatted); 
@@ -536,7 +572,7 @@ export default function App() {
                       className="card-badge"
                       style={{ background: `${product.color}18`, color: product.color, border: `1px solid ${product.color}30` }}
                     >
-                      {product.category}
+                      {product.category ? product.category.toUpperCase() : 'STREAMING'}
                     </span>
                   </div>
 
