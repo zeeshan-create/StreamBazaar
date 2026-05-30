@@ -410,19 +410,49 @@ export default function AdminDashboard() {
     }
   };
 
+  const processImageFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        // Convert to highest quality WebP
+        const convertedUrl = canvas.toDataURL('image/webp', 1.0);
+        
+        const newMedia = {
+          id: Date.now(),
+          name: file.name.split('.')[0],
+          url: convertedUrl,
+          date: new Date().toISOString().split('T')[0]
+        };
+        setMediaList(prev => [newMedia, ...prev]);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      const newMedia = {
-        id: mediaList.length + 1,
-        name: file.name.split('.')[0] + " upload",
-        url: "https://www.google.com/s2/favicons?domain=steampowered.com&sz=128",
-        date: new Date().toISOString().split('T')[0]
-      };
-      setMediaList(prev => [newMedia, ...prev]);
+      processImageFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const fileInputRef = useRef(null);
+  
+  const handleFileInput = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      processImageFile(e.target.files[0]);
     }
   };
 
@@ -1280,6 +1310,7 @@ export default function AdminDashboard() {
                 <div>
                   {/* Drag-and-drop Dropzone uploader */}
                   <div 
+                    onClick={() => fileInputRef.current?.click()}
                     onDragEnter={handleDrag}
                     onDragOver={handleDrag}
                     onDragLeave={handleDrag}
@@ -1295,9 +1326,16 @@ export default function AdminDashboard() {
                       cursor: 'pointer'
                     }}
                   >
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileInput} 
+                      accept="image/png, image/jpeg, image/webp" 
+                      style={{ display: 'none' }} 
+                    />
                     <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>📁</div>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.25rem' }}>Drag & Drop product asset covers here</h3>
-                    <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Supports JPG, PNG, and WebP images. Max size 2MB.</p>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Supports JPG, PNG, and WebP images. Or click to upload. Max size 2MB.</p>
                   </div>
 
                   {/* Media gallery grid */}
