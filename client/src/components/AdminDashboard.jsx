@@ -759,7 +759,7 @@ export default function AdminDashboard() {
                     <button 
                       className="btn-primary"
                       onClick={() => {
-                        setEditForm({ name: '', category: 'Streaming', color: '#6366f1', description: '', status: 'Available', plans: [{ label: '', quality: '', duration: '', price: '₹', type: '' }] });
+                        setEditForm({ name: '', category: 'Streaming', color: '#6366f1', description: 'default', status: 'Available', plans: [{ label: 'default', quality: '', duration: 'default', price: '₹', type: '' }] });
                         setShowAddForm(true);
                       }}
                       style={{ padding: '0.6rem 1.25rem', borderRadius: '10px' }}
@@ -850,17 +850,17 @@ export default function AdminDashboard() {
                                     <label>Description</label>
                                     <select 
                                       className="admin-form-input" 
-                                      value={DESC_OPTIONS.includes(editForm.description) ? editForm.description : (editForm.description ? 'Custom' : '')}
+                                      value={(editForm.description === 'default' || editForm.description === undefined || editForm.description === null) ? 'default' : (DESC_OPTIONS.includes(editForm.description) ? editForm.description : 'Custom')}
                                       onChange={e => {
                                         if (e.target.value === 'Custom') setEditForm({...editForm, description: ''});
                                         else setEditForm({...editForm, description: e.target.value});
                                       }}
                                     >
-                                      <option value="" disabled>Select a description</option>
+                                      <option value="default" disabled>Select a description</option>
                                       {DESC_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                       <option value="Custom">Custom...</option>
                                     </select>
-                                    {(!DESC_OPTIONS.includes(editForm.description) && editForm.description !== undefined && editForm.description !== '') && (
+                                    {(!['default', undefined, null].includes(editForm.description) && !DESC_OPTIONS.includes(editForm.description)) && (
                                       <input 
                                         className="admin-form-input" 
                                         style={{ marginTop: '0.5rem' }} 
@@ -887,18 +887,18 @@ export default function AdminDashboard() {
                                           <label style={{ fontSize: '0.85rem' }}>Plan Label</label>
                                           <select 
                                             className="admin-form-input" 
-                                            value={PLAN_LABELS.includes(plan.label) ? plan.label : (plan.label ? 'Custom' : '')}
+                                            value={(plan.label === 'default' || plan.label === undefined || plan.label === null) ? 'default' : (PLAN_LABELS.includes(plan.label) ? plan.label : 'Custom')}
                                             onChange={e => {
                                               const newPlans = [...editForm.plans];
                                               newPlans[idx] = { ...newPlans[idx], label: e.target.value === 'Custom' ? '' : e.target.value };
                                               setEditForm({...editForm, plans: newPlans});
                                             }}
                                           >
-                                            <option value="" disabled>Select label</option>
+                                            <option value="default" disabled>Select label</option>
                                             {PLAN_LABELS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                             <option value="Custom">Custom...</option>
                                           </select>
-                                          {(!PLAN_LABELS.includes(plan.label) && plan.label !== undefined && plan.label !== '') && (
+                                          {(!['default', undefined, null].includes(plan.label) && !PLAN_LABELS.includes(plan.label)) && (
                                             <input 
                                               className="admin-form-input" 
                                               style={{ marginTop: '0.5rem' }} 
@@ -918,18 +918,18 @@ export default function AdminDashboard() {
                                             <label style={{ fontSize: '0.85rem' }}>Duration</label>
                                             <select 
                                               className="admin-form-input" 
-                                              value={DURATION_OPTIONS.includes(plan.duration) ? plan.duration : (plan.duration ? 'Custom' : '')}
+                                              value={(plan.duration === 'default' || plan.duration === undefined || plan.duration === null) ? 'default' : (DURATION_OPTIONS.includes(plan.duration) ? plan.duration : 'Custom')}
                                               onChange={e => {
                                                 const newPlans = [...editForm.plans];
                                                 newPlans[idx] = { ...newPlans[idx], duration: e.target.value === 'Custom' ? '' : e.target.value };
                                                 setEditForm({...editForm, plans: newPlans});
                                               }}
                                             >
-                                              <option value="" disabled>Select</option>
+                                              <option value="default" disabled>Select</option>
                                               {DURATION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                               <option value="Custom">Custom...</option>
                                             </select>
-                                            {(!DURATION_OPTIONS.includes(plan.duration) && plan.duration !== undefined && plan.duration !== '') && (
+                                            {(!['default', undefined, null].includes(plan.duration) && !DURATION_OPTIONS.includes(plan.duration)) && (
                                               <input 
                                                 className="admin-form-input" 
                                                 style={{ marginTop: '0.5rem' }} 
@@ -955,7 +955,7 @@ export default function AdminDashboard() {
                                         </div>
                                       </div>
                                     ))}
-                                    <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'New Plan', quality: '', duration: '', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
+                                    <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'default', quality: '', duration: 'default', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
                                       <Plus size={14} /> Add Plan
                                     </button>
                                   </div>
@@ -1152,17 +1152,17 @@ export default function AdminDashboard() {
                               <label>Description</label>
                               <select 
                                 className="admin-form-input" 
-                                value={DESC_OPTIONS.includes(editForm.description) ? editForm.description : (editForm.description ? 'Custom' : '')}
+                                value={(editForm.description === 'default' || editForm.description === undefined || editForm.description === null) ? 'default' : (DESC_OPTIONS.includes(editForm.description) ? editForm.description : 'Custom')}
                                 onChange={e => {
                                   if (e.target.value === 'Custom') setEditForm({...editForm, description: ''});
                                   else setEditForm({...editForm, description: e.target.value});
                                 }}
                               >
-                                <option value="" disabled>Select a description</option>
+                                <option value="default" disabled>Select a description</option>
                                 {DESC_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                 <option value="Custom">Custom...</option>
                               </select>
-                              {(!DESC_OPTIONS.includes(editForm.description) && editForm.description !== undefined && editForm.description !== '') && (
+                              {(!['default', undefined, null].includes(editForm.description) && !DESC_OPTIONS.includes(editForm.description)) && (
                                 <input 
                                   className="admin-form-input" 
                                   style={{ marginTop: '0.5rem' }} 
@@ -1189,18 +1189,18 @@ export default function AdminDashboard() {
                                     <label style={{ fontSize: '0.85rem' }}>Plan Label</label>
                                     <select 
                                       className="admin-form-input" 
-                                      value={PLAN_LABELS.includes(plan.label) ? plan.label : (plan.label ? 'Custom' : '')}
+                                      value={(plan.label === 'default' || plan.label === undefined || plan.label === null) ? 'default' : (PLAN_LABELS.includes(plan.label) ? plan.label : 'Custom')}
                                       onChange={e => {
                                         const newPlans = [...editForm.plans];
                                         newPlans[idx] = { ...newPlans[idx], label: e.target.value === 'Custom' ? '' : e.target.value };
                                         setEditForm({...editForm, plans: newPlans});
                                       }}
                                     >
-                                      <option value="" disabled>Select label</option>
+                                      <option value="default" disabled>Select label</option>
                                       {PLAN_LABELS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                       <option value="Custom">Custom...</option>
                                     </select>
-                                    {(!PLAN_LABELS.includes(plan.label) && plan.label !== undefined && plan.label !== '') && (
+                                    {(!['default', undefined, null].includes(plan.label) && !PLAN_LABELS.includes(plan.label)) && (
                                       <input 
                                         className="admin-form-input" 
                                         style={{ marginTop: '0.5rem' }} 
@@ -1220,18 +1220,18 @@ export default function AdminDashboard() {
                                       <label style={{ fontSize: '0.85rem' }}>Duration</label>
                                       <select 
                                         className="admin-form-input" 
-                                        value={DURATION_OPTIONS.includes(plan.duration) ? plan.duration : (plan.duration ? 'Custom' : '')}
+                                        value={(plan.duration === 'default' || plan.duration === undefined || plan.duration === null) ? 'default' : (DURATION_OPTIONS.includes(plan.duration) ? plan.duration : 'Custom')}
                                         onChange={e => {
                                           const newPlans = [...editForm.plans];
                                           newPlans[idx] = { ...newPlans[idx], duration: e.target.value === 'Custom' ? '' : e.target.value };
                                           setEditForm({...editForm, plans: newPlans});
                                         }}
                                       >
-                                        <option value="" disabled>Select</option>
+                                        <option value="default" disabled>Select</option>
                                         {DURATION_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         <option value="Custom">Custom...</option>
                                       </select>
-                                      {(!DURATION_OPTIONS.includes(plan.duration) && plan.duration !== undefined && plan.duration !== '') && (
+                                      {(!['default', undefined, null].includes(plan.duration) && !DURATION_OPTIONS.includes(plan.duration)) && (
                                         <input 
                                           className="admin-form-input" 
                                           style={{ marginTop: '0.5rem' }} 
@@ -1257,7 +1257,7 @@ export default function AdminDashboard() {
                                   </div>
                                 </div>
                               ))}
-                              <button type="button" className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'New Plan', quality: '', duration: '', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
+                              <button type="button" className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'default', quality: '', duration: 'default', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
                                 <Plus size={14} /> Add Plan
                               </button>
                             </div>
