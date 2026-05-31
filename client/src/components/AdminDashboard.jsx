@@ -789,7 +789,7 @@ export default function AdminDashboard() {
                     <button 
                       className="btn-primary"
                       onClick={() => {
-                        setEditForm({ name: '', category: 'Streaming', color: '#6366f1', description: 'default', status: 'Available', plans: [{ label: 'default', quality: '', duration: 'default', price: '₹', type: '' }] });
+                        setEditForm({ name: '', category: 'Streaming', color: '#6366f1', description: 'default', status: 'Available', plans: [{ label: 'default', quality: '', duration: 'default', price: '₹', type: '', supportedDevices: ['TV', 'PC', 'iOS', 'Android'], image: '' }] });
                         setShowAddForm(true);
                       }}
                       style={{ padding: '0.6rem 1.25rem', borderRadius: '10px' }}
@@ -983,9 +983,61 @@ export default function AdminDashboard() {
                                             }} />
                                           </div>
                                         </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.85rem' }}>Platform/Device</label>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' }}>
+                                              {PLATFORMS.map(opt => {
+                                                const currentSupported = plan.supportedDevices || (plan.device ? [plan.device] : ['TV', 'PC', 'iOS', 'Android']);
+                                                const isSelected = currentSupported.includes(opt);
+                                                return (
+                                                  <div 
+                                                    key={opt}
+                                                    onClick={() => {
+                                                      const newPlans = [...editForm.plans];
+                                                      let newSupported = [...currentSupported];
+                                                      if (isSelected) {
+                                                        newSupported = newSupported.filter(d => d !== opt);
+                                                      } else {
+                                                        newSupported.push(opt);
+                                                      }
+                                                      newPlans[idx] = { ...newPlans[idx], supportedDevices: newSupported };
+                                                      setEditForm({...editForm, plans: newPlans});
+                                                    }}
+                                                    style={{
+                                                      padding: '0.2rem 0.6rem',
+                                                      fontSize: '0.75rem',
+                                                      borderRadius: '12px',
+                                                      cursor: 'pointer',
+                                                      background: isSelected ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
+                                                      color: isSelected ? 'white' : 'var(--text-muted)',
+                                                      border: '1px solid ' + (isSelected ? 'var(--color-primary)' : 'var(--color-border)')
+                                                    }}
+                                                  >
+                                                    {opt}
+                                                  </div>
+                                                )
+                                              })}
+                                            </div>
+                                          </div>
+                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.85rem' }}>Game Logo / Cover URL</label>
+                                            <input 
+                                              className="admin-form-input" 
+                                              placeholder="https://... (Optional)" 
+                                              value={plan.image || ''} 
+                                              onChange={e => {
+                                                const newPlans = [...editForm.plans];
+                                                newPlans[idx] = { ...newPlans[idx], image: e.target.value };
+                                                setEditForm({...editForm, plans: newPlans});
+                                              }} 
+                                            />
+                                          </div>
+                                        </div>
+
                                       </div>
                                     ))}
-                                    <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'default', quality: '', duration: 'default', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
+                                    <button className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'default', quality: '', duration: 'default', price: '₹', type: '', supportedDevices: ['TV', 'PC', 'iOS', 'Android'], image: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
                                       <Plus size={14} /> Add Plan
                                     </button>
                                   </div>
@@ -1285,9 +1337,61 @@ export default function AdminDashboard() {
                                       }} />
                                     </div>
                                   </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.85rem' }}>Platform/Device</label>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' }}>
+                                              {PLATFORMS.map(opt => {
+                                                const currentSupported = plan.supportedDevices || (plan.device ? [plan.device] : ['TV', 'PC', 'iOS', 'Android']);
+                                                const isSelected = currentSupported.includes(opt);
+                                                return (
+                                                  <div 
+                                                    key={opt}
+                                                    onClick={() => {
+                                                      const newPlans = [...editForm.plans];
+                                                      let newSupported = [...currentSupported];
+                                                      if (isSelected) {
+                                                        newSupported = newSupported.filter(d => d !== opt);
+                                                      } else {
+                                                        newSupported.push(opt);
+                                                      }
+                                                      newPlans[idx] = { ...newPlans[idx], supportedDevices: newSupported };
+                                                      setEditForm({...editForm, plans: newPlans});
+                                                    }}
+                                                    style={{
+                                                      padding: '0.2rem 0.6rem',
+                                                      fontSize: '0.75rem',
+                                                      borderRadius: '12px',
+                                                      cursor: 'pointer',
+                                                      background: isSelected ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
+                                                      color: isSelected ? 'white' : 'var(--text-muted)',
+                                                      border: '1px solid ' + (isSelected ? 'var(--color-primary)' : 'var(--color-border)')
+                                                    }}
+                                                  >
+                                                    {opt}
+                                                  </div>
+                                                )
+                                              })}
+                                            </div>
+                                          </div>
+                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '0.85rem' }}>Game Logo / Cover URL</label>
+                                            <input 
+                                              className="admin-form-input" 
+                                              placeholder="https://... (Optional)" 
+                                              value={plan.image || ''} 
+                                              onChange={e => {
+                                                const newPlans = [...editForm.plans];
+                                                newPlans[idx] = { ...newPlans[idx], image: e.target.value };
+                                                setEditForm({...editForm, plans: newPlans});
+                                              }} 
+                                            />
+                                          </div>
+                                        </div>
+
                                 </div>
                               ))}
-                              <button type="button" className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'default', quality: '', duration: 'default', price: '₹', type: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
+                              <button type="button" className="btn-ghost" onClick={() => setEditForm({...editForm, plans: [...(editForm.plans || []), { label: 'default', quality: '', duration: 'default', price: '₹', type: '', supportedDevices: ['TV', 'PC', 'iOS', 'Android'], image: '' }]})} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'fit-content', marginTop: '0.5rem' }}>
                                 <Plus size={14} /> Add Plan
                               </button>
                             </div>

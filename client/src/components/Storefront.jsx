@@ -11,6 +11,17 @@ import '../App.css';
 import ChatWidget from '../ChatWidget';
 import FomoToast from './FomoToast';
 
+
+const CustomIcons = {
+  Apple: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>,
+  Android: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.24 12.24a9 9 0 1 0-16.48 0"/><path d="M17 19H7"/><path d="M4.26 15.26 2 13"/><path d="M19.74 15.26 22 13"/><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M21 16v2a2 2 0 0 1-2 2h-1"/><path d="M3 16v2a2 2 0 0 0 2 2h1"/></svg>,
+  TV: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>,
+  PC: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>,
+  Laptop: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg>,
+  PlayStation: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="7" cy="12" r="2"/><circle cx="17" cy="12" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/><path d="M17 12h2a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><path d="M7 12H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2"/></svg>,
+  Xbox: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M6.5 6.5l11 11"/><path d="M17.5 6.5l-11 11"/></svg>,
+};
+
 const TELEGRAM_LINK = 'https://t.me/owner_trusted_streams';
 const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
 
@@ -27,8 +38,8 @@ const DOMAINS = {
   'prime': 'primevideo.com',
   'hoichoi tv': 'hoichoi.tv',
   'hoichoi': 'hoichoi.tv',
-  'discovery plus': 'discoveryplus.in',
-  'discovery': 'discoveryplus.in',
+  'discovery plus': 'discoveryplus.com',
+  'discovery': 'discoveryplus.com',
   'airtel xstream': 'airtelxstream.in',
   'airtel': 'airtelxstream.in',
   'apple music': 'music.apple.com',
@@ -174,10 +185,14 @@ const CATEGORIES = [
 ];
 
 const DEVICES = [
-  { id: 'Laptop',  label: 'Laptop',  emoji: '💻' },
-  { id: 'PC',      label: 'PC',      emoji: '🖥️' },
-  { id: 'iOS',     label: 'iOS',     emoji: '📱' },
+  { id: 'PC', label: 'PC', emoji: '🖥️' },
+  { id: 'Laptop', label: 'Laptop', emoji: '💻' },
+  { id: 'PlayStation', label: 'PlayStation', emoji: '🎮' },
+  { id: 'Xbox', label: 'Xbox', emoji: '🎮' },
   { id: 'Android', label: 'Android', emoji: '🤖' },
+  { id: 'iOS', label: 'iOS', emoji: '📱' },
+  { id: 'Tablet', label: 'Tablet', emoji: '📱' },
+  { id: 'TV', label: 'TV', emoji: '📺' },
 ];
 
 // Gaming products (Steam / PlayStation) only support PC devices
@@ -189,7 +204,7 @@ const DEVICES_GAMING = [
 const FEATURES = [
   { icon: '⚡', title: 'Instant Delivery',   desc: 'Get your login credentials within minutes of placing your order.' },
   { icon: '🔒', title: 'Secure Seat Access', desc: 'Private profile on shared accounts — your data stays safe.' },
-  { icon: '📱', title: '1 Device Access',    desc: 'Works on Laptop, PC, iOS and Android — your choice.' },
+  { icon: '📱', title: '1 Device Access',    desc: 'Works on TV, PC, iOS and Android — your choice.' },
   { icon: '🎯', title: 'Best Prices',        desc: 'Premium subscriptions at up to 90% off official prices.' },
   { icon: '💬', title: 'Telegram Support',   desc: 'Direct chat support for instant help, no bots, no wait.' },
   { icon: '🔄', title: 'Full Guarantee',     desc: 'Account stopped? We replace it immediately, no questions asked.' },
@@ -257,10 +272,8 @@ export default function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    window.scrollTo(0, 0);
-    const cacheBuster = Date.now(); // 100% instant cache bypass
+  const fetchPlans = useCallback(() => {
+    const cacheBuster = Date.now();
     fetch(`${API_BASE}/api/plans?v=${cacheBuster}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { 
@@ -284,6 +297,21 @@ export default function App() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+    
+    // Initial fetch
+    fetchPlans();
+    
+    // Set up real-time live polling (every 3 seconds) for instant updates across all clients
+    const interval = setInterval(() => {
+      fetchPlans();
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, [fetchPlans]);
 
   const handleKey = useCallback((e) => { if (e.key === 'Escape') setPopup(null); }, []);
   useEffect(() => {
@@ -331,7 +359,9 @@ export default function App() {
     setPopup(null);
   };
 
-  const CUSTOM_ICONS = {};
+  const CUSTOM_ICONS = {
+    'discovery': 'https://logo.clearbit.com/discoveryplus.com'
+  };
 
   const getFavicon = name => {
     const lowerName = name.toLowerCase();
@@ -345,6 +375,7 @@ export default function App() {
       // Smart domain fallback based on name
       domain = `${lowerName.replace(/[^a-z0-9]/g, '')}.com`;
     }
+    // Use high-quality Google Favicons API (sz=256 ensures high resolution)
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
   };
 
@@ -588,7 +619,7 @@ export default function App() {
                     animate="visible"
                   >
                     {product.plans.map((plan, i) => {
-                      const gameIcon = product.category === 'Gaming' ? getGameIcon(plan.label) : null;
+                      const gameIcon = (product.category === 'Gaming' || plan.image) ? (plan.image || getGameIcon(plan.label)) : null;
                       return (
                         <motion.div
                           key={i}
@@ -890,7 +921,7 @@ export default function App() {
               {/* Header */}
               <div className="popup-header">
                 <img
-                  src={popup.product.category === 'Gaming' ? (getGameIcon(popup.plan.label) || getFavicon(popup.product.name)) : getFavicon(popup.product.name)}
+                  src={popup.product.category === 'Gaming' || popup.plan.image ? (popup.plan.image || getGameIcon(popup.plan.label) || getFavicon(popup.product.name)) : getFavicon(popup.product.name)}
                   alt={popup.product.name}
                   className="popup-logo"
                   onError={e => { e.target.style.display = 'none'; }}
@@ -912,28 +943,50 @@ export default function App() {
               <div className="popup-device-label">Select Your Device</div>
               <motion.div
                 className="device-grid"
-                style={{ gridTemplateColumns: popup.product.category === 'Gaming' ? 'repeat(2,1fr)' : 'repeat(4,1fr)' }}
+                style={{ gridTemplateColumns: popup.product.category === 'Gaming' ? 'repeat(5,1fr)' : 'repeat(4,1fr)' }}
                 initial="hidden"
                 animate="visible"
               >
-                {(popup.product.category === 'Gaming' ? DEVICES_GAMING : DEVICES).map((d, i) => (
+                
+                
+                {(popup.product.category === 'Gaming' ? [
+                  { id: 'PC', label: 'PC', icon: CustomIcons.PC },
+                  { id: 'Laptop', label: 'Laptop', icon: CustomIcons.Laptop },
+                  { id: 'PS4', label: 'PS4', icon: CustomIcons.PlayStation },
+                  { id: 'PS5', label: 'PS5', icon: CustomIcons.PlayStation },
+                  { id: 'Xbox', label: 'Xbox', icon: CustomIcons.Xbox }
+                ] : [
+                  { id: 'TV', label: 'TV', icon: CustomIcons.TV },
+                  { id: 'PC', label: 'PC', icon: CustomIcons.PC },
+                  { id: 'iOS', label: 'iOS', icon: CustomIcons.Apple },
+                  { id: 'Android', label: 'Android', icon: CustomIcons.Android }
+                ]).map((d, i) => {
+                  const supported = popup.plan.supportedDevices || (popup.plan.device ? [popup.plan.device] : ['TV', 'PC', 'iOS', 'Android']);
+                  const available = supported.includes(d.id);
+                  return (
+
                   <motion.button
                     key={d.id}
                     custom={i}
                     variants={deviceItemVariants}
-                    className={`device-btn ${popup.device === d.id ? 'selected' : ''}`}
+                    className={`device-btn ${popup.device === d.id ? 'selected' : ''} ${available ? 'available' : 'out-of-stock'}`}
                     whileHover={{ scale: 1.08, y: -3, boxShadow: `0 8px 24px rgba(0,0,0,0.3)` }}
                     whileTap={{ scale: 0.92 }}
-                    onClick={() => setPopup(prev => ({ ...prev, device: d.id }))}
+                    onClick={() => { if(available) setPopup(prev => ({ ...prev, device: d.id })) }}
                   >
                     <motion.span
                       className="device-icon"
                       animate={popup.device === d.id ? { rotate: [0, -8, 8, 0], scale: [1, 1.25, 1] } : {}}
                       transition={{ duration: 0.35 }}
-                    >{d.emoji}</motion.span>
+                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.4rem' }}
+                    >
+                      <d.icon />
+                    </motion.span>
                     {d.label}
+                    {!available && <span className="oos-badge">Out of Stock</span>}
                   </motion.button>
-                ))}
+                );
+              })}
               </motion.div>
 
 
