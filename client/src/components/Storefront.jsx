@@ -980,7 +980,7 @@ export default function App() {
                       transition={{ duration: 0.35 }}
                       style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.4rem' }}
                     >
-                      <d.icon />
+                      {d.icon()}
                     </motion.span>
                     {d.label}
                     {!available && <span className="oos-badge">Out of Stock</span>}
