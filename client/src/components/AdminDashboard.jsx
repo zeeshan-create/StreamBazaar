@@ -207,8 +207,13 @@ const PLAN_LABELS = [
   "PlayStation", "Xbox"
 ];
 const DURATION_OPTIONS = [
-  "30 Days", "1 Month", "45 Days", "2 Months", "3 Months", "6 Months", "1 Year", "Lifetime"
+  '1 Month',
+  '3 Months',
+  '6 Months',
+  '12 Months'
 ];
+const PLATFORMS = ['TV', 'PC', 'iOS', 'Android', 'Laptop', 'PS4', 'PS5', 'Xbox'];
+
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
