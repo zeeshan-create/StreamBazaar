@@ -269,16 +269,84 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
     } else {
       setEditForm({ ...editForm, name: item.name });
     }
-    // Set custom icon after a tiny delay so it overrides onNameChange
-    setTimeout(() => {
-      const bestIcon = item.icon || `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
+
+    const hslToHex = (h, s, l) => {
+      l /= 100;
+      const a = s * Math.min(l, 1 - l) / 100;
+      const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    };
+    
+    const getAutoColor = (str) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      return hslToHex(Math.abs(hash) % 360, 85, 60);
+    };
+
+    const autoColor = getAutoColor(item.name);
+
+    // Extract color from image if possible
+    const bestIcon = item.icon || `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width; canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        let maxS = 0; let domR = 0, domG = 0, domB = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i+3] > 127) {
+            const pr = data[i], pg = data[i+1], pb = data[i+2];
+            r += pr; g += pg; b += pb; count++;
+            const max = Math.max(pr, pg, pb), min = Math.min(pr, pg, pb);
+            const s = max === 0 ? 0 : (max - min) / max;
+            if (s > maxS && max > 50) {
+              maxS = s; domR = pr; domG = pg; domB = pb;
+            }
+          }
+        }
+        let extractedColor = autoColor;
+        if (maxS > 0.2) {
+          extractedColor = '#' + [domR, domG, domB].map(x => x.toString(16).padStart(2, '0')).join('');
+        } else if (count > 0) {
+          extractedColor = '#' + [Math.floor(r/count), Math.floor(g/count), Math.floor(b/count)].map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+        
+        setEditForm(prev => ({ 
+          ...prev, 
+          name: item.name, 
+          customIcon: bestIcon,
+          color: extractedColor,
+          ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
+        }));
+      } catch(e) {
+        setEditForm(prev => ({ 
+          ...prev, 
+          name: item.name, 
+          customIcon: bestIcon,
+          color: (!prev.color || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a'].includes(prev.color.toLowerCase())) ? autoColor : prev.color,
+          ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
+        }));
+      }
+    };
+    img.onerror = () => {
       setEditForm(prev => ({ 
         ...prev, 
         name: item.name, 
         customIcon: bestIcon,
+        color: (!prev.color || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a'].includes(prev.color.toLowerCase())) ? autoColor : prev.color,
         ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
       }));
-    }, 10);
+    };
+    img.src = bestIcon;
     setSuggestions([]);
   };
 
@@ -306,7 +374,29 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         const dataUrl = canvas.toDataURL('image/webp', 0.9);
-        setEditForm(prev => ({ ...prev, customIcon: dataUrl }));
+        let extractedColor = editForm.color;
+        try {
+          const data = ctx.getImageData(0, 0, w, h).data;
+          let r = 0, g = 0, b = 0, count = 0;
+          let maxS = 0; let domR = 0, domG = 0, domB = 0;
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i+3] > 127) {
+              const pr = data[i], pg = data[i+1], pb = data[i+2];
+              r += pr; g += pg; b += pb; count++;
+              const max = Math.max(pr, pg, pb), min = Math.min(pr, pg, pb);
+              const s = max === 0 ? 0 : (max - min) / max;
+              if (s > maxS && max > 50) {
+                maxS = s; domR = pr; domG = pg; domB = pb;
+              }
+            }
+          }
+          if (maxS > 0.2) {
+            extractedColor = '#' + [domR, domG, domB].map(x => x.toString(16).padStart(2, '0')).join('');
+          } else if (count > 0) {
+            extractedColor = '#' + [Math.floor(r/count), Math.floor(g/count), Math.floor(b/count)].map(x => x.toString(16).padStart(2, '0')).join('');
+          }
+        } catch(e) {}
+        setEditForm(prev => ({ ...prev, customIcon: dataUrl, color: extractedColor }));
       };
       img.src = event.target.result;
     };

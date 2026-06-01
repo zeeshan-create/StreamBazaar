@@ -346,13 +346,18 @@ export default function App() {
 
   const filtered = plans.filter(p => {
     const q = searchTerm.toLowerCase();
-    const matchSearch = p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
-    const matchCat    = activeCategory === 'all' || p.category === activeCategory || (activeCategory === 'Gaming' && (p.category === 'Steam' || p.category === 'PlayStation' || p.category === 'Steam Gaming'));
+    const pCat = p.category ? p.category.trim().toLowerCase() : '';
+    const aCat = activeCategory.trim().toLowerCase();
+    
+    const matchSearch = p.name.toLowerCase().includes(q) || pCat.includes(q);
+    const matchCat    = aCat === 'all' || pCat === aCat || (aCat === 'gaming' && (pCat === 'steam' || pCat === 'playstation' || pCat === 'steam gaming' || pCat === 'game' || pCat === 'games'));
     return matchSearch && matchCat;
   }).sort((a, b) => {
     // Gaming cards always appear last
-    if (a.category === 'Gaming' && b.category !== 'Gaming') return 1;
-    if (a.category !== 'Gaming' && b.category === 'Gaming') return -1;
+    const aCat = a.category ? a.category.trim().toLowerCase() : '';
+    const bCat = b.category ? b.category.trim().toLowerCase() : '';
+    if (aCat === 'gaming' && bCat !== 'gaming') return 1;
+    if (aCat !== 'gaming' && bCat === 'gaming') return -1;
     return 0;
   });
 
@@ -585,7 +590,101 @@ export default function App() {
         ) : (
           <div className="ott-grid">
             <AnimatePresence mode="popLayout">
-              {filtered.map((product, idx) => (
+              {filtered.map((product, idx) => {
+                const isGaming = product.category && product.category.toLowerCase().includes('gam');
+                const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
+                const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17'].includes(c.toLowerCase());
+                const effectiveColor = isDarkColor(product.color) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : product.color;
+
+                if (isGaming) {
+                      return (
+                    <motion.div
+                      key={product._id || product.id}
+                      layout
+                      id={`card-${product._id || product.id}`}
+                      custom={idx}
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      style={{ 
+                        borderRadius: '24px', border: '2px solid transparent', 
+                        background: `linear-gradient(#0d0f17, #0d0f17) padding-box, linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(idx + 2) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(idx + 4) % VIBRANT_COLORS.length]}) border-box`, 
+                        padding: '1.25rem',
+                        '--card-accent': effectiveColor,
+                        display: 'flex', flexDirection: 'column', gap: '1.25rem'
+                      }}
+                      whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 20px 40px rgba(0,0,0,0.35)`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
+                    >
+                      {/* Game Header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                          <img 
+                            src={product.customIcon || getFavicon(product.name)} 
+                            alt={product.name} 
+                            style={{ width: '64px', height: '64px', borderRadius: '14px', objectFit: 'cover' }}
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                          <div>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: 'var(--text)' }}>{product.name}</h3>
+                            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', marginTop: '0.25rem', lineHeight: 1.4, maxWidth: '200px' }}>
+                              {product.description || "Offline game activation for PC. Full updates supported."}
+                            </p>
+                          </div>
+                        </div>
+                        <div style={{ padding: '0.25rem 0.75rem', borderRadius: '999px', border: `1px solid ${effectiveColor}40`, background: `${effectiveColor}15`, fontSize: '0.75rem', fontWeight: 700, color: effectiveColor, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
+                          STEAM
+                        </div>
+                      </div>
+
+                      {/* Game Plans */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {product.plans.map((plan, i) => (
+                          <motion.div
+                            key={i}
+                            style={{ 
+                              borderRadius: '18px', border: '1px solid rgba(255,255,255,0.08)', 
+                              background: 'rgba(255,255,255,0.03)', overflow: 'hidden',
+                              display: 'flex', cursor: 'pointer'
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              if (product.status && product.status !== 'Available') return;
+                              openPopup(product, plan);
+                            }}
+                          >
+                            <div style={{ width: '4px', background: effectiveColor }} />
+                            <div style={{ flex: 1, padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                              <div>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: 'var(--text)' }}>{plan.label}</h4>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                  <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '6px', background: `${effectiveColor}15`, color: effectiveColor, border: `1px solid ${effectiveColor}60`, whiteSpace: 'nowrap', fontWeight: 'bold' }}>{plan.duration}</span>
+                                  <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '6px', background: `${effectiveColor}15`, color: effectiveColor, border: `1px solid ${effectiveColor}60`, whiteSpace: 'nowrap', fontWeight: 'bold' }}>PC Game Seat Access</span>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ 
+                                  fontSize: '1.6rem', 
+                                  fontWeight: 700, 
+                                  letterSpacing: '-0.5px',
+                                  background: `linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(i + 2) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(i + 4) % VIBRANT_COLORS.length]})`,
+                                  WebkitBackgroundClip: 'text',
+                                  WebkitTextFillColor: 'transparent'
+                                }}>{plan.price}</div>
+                                <button style={{ padding: '0.6rem 1.25rem', borderRadius: '12px', background: '#2f3136', border: '1px solid #4a4d55', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
+                                  Buy
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  );
+                }
+
+                return (
                 <motion.div
                   key={product._id || product.id}
                   layout
@@ -596,14 +695,18 @@ export default function App() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  style={{ '--card-accent': product.color }}
-                  whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px ${product.color}88, 0 28px 60px -12px ${product.color}44`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
+                  style={{ 
+                    '--card-accent': effectiveColor,
+                    border: '2px solid transparent',
+                    background: `linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(idx + 1) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(idx + 3) % VIBRANT_COLORS.length]}) border-box`
+                  }}
+                  whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px ${effectiveColor}88, 0 28px 60px -12px ${effectiveColor}44`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                 >
                   {/* Card Header */}
                   <div className="card-header">
                     <div
                       className="card-logo-wrap"
-                      style={{ background: `${product.color}18`, border: `1px solid ${product.color}30` }}
+                      style={{ background: `${effectiveColor}18`, border: `1px solid ${effectiveColor}30` }}
                     >
                       {imgErr[product.name] ? (
                         <div style={{ fontSize: '1.5rem' }}>🎬</div>
@@ -633,7 +736,7 @@ export default function App() {
                     </div>
                     <span
                       className="card-badge"
-                      style={{ background: `${product.color}18`, color: product.color, border: `1px solid ${product.color}30` }}
+                      style={{ background: `${effectiveColor}18`, color: effectiveColor, border: `1px solid ${effectiveColor}30` }}
                     >
                       {product.category ? product.category.toUpperCase() : 'STREAMING'}
                     </span>
@@ -653,7 +756,7 @@ export default function App() {
                           custom={i}
                           variants={planRowVariants}
                           className="plan-row"
-                          style={{ background: `linear-gradient(90deg, ${product.color}15 0%, transparent 100%)`, borderLeft: `3px solid ${product.color}` }}
+                          style={{ background: `linear-gradient(90deg, ${effectiveColor}15 0%, transparent 100%)`, borderLeft: `3px solid ${effectiveColor}` }}
                           whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.2)', transition: { duration: 0.15 } }}
                           whileTap={{ scale: 0.97 }}
                           onClick={() => {
@@ -667,7 +770,7 @@ export default function App() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
                             <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>{plan.label}</span>
                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                              <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: `${product.color}20`, color: product.color, border: `1px solid ${product.color}40`, whiteSpace: 'nowrap' }}>
+                              <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: `${effectiveColor}20`, color: effectiveColor, border: `1px solid ${effectiveColor}40`, whiteSpace: 'nowrap' }}>
                                 {plan.duration}
                               </span>
                               {(!gameIcon && plan.quality && plan.quality.toLowerCase() !== plan.label.toLowerCase()) && (
@@ -679,10 +782,18 @@ export default function App() {
                           </div>
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
-                            <span className="plan-row-price" style={{ color: product.color, fontWeight: 'bold', fontSize: '1.05rem', letterSpacing: '0.5px' }}>{plan.price}</span>
+                            <span className="plan-row-price" style={{ 
+                                background: `linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(i + 1) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(i + 3) % VIBRANT_COLORS.length]})`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                fontWeight: '900', 
+                                fontSize: '1.15rem', 
+                                letterSpacing: '0.5px' 
+                              }}>{plan.price}</span>
                             <motion.span
                               className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
-                              whileHover={product.status === 'Available' ? { scale: 1.1, backgroundColor: `${product.color}40`, borderColor: product.color } : {}}
+                              style={{ border: `1px solid ${effectiveColor}50`, color: effectiveColor }}
+                              whileHover={product.status === 'Available' ? { scale: 1.05, backgroundColor: `${effectiveColor}30`, borderColor: effectiveColor, boxShadow: `0 0 10px ${effectiveColor}40` } : {}}
                             >
                               {product.status && product.status !== 'Available' ? product.status : 'Buy'}
                             </motion.span>
@@ -692,7 +803,7 @@ export default function App() {
                     })}
                   </motion.div>
                 </motion.div>
-              ))}
+              );})}
             </AnimatePresence>
 
             {!loading && filtered.length === 0 && (

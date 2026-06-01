@@ -14,6 +14,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "fast-average-color": "^9.5.2",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.395.0",
     "mongoose": "^9.6.2",
