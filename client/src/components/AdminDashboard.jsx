@@ -89,7 +89,6 @@ const DOMAINS = {
   'voot': 'voot.com',
   'sun nxt': 'sunnxt.com',
   'sunnxt': 'sunnxt.com',
-  'discovery': 'discoveryplus.in',
   'lionsgate': 'lionsgateplay.com',
   'epic on': 'epicon.in',
   'eros now': 'erosnow.com',
