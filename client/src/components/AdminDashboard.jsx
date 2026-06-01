@@ -332,7 +332,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
           ...prev, 
           name: item.name, 
           customIcon: bestIcon,
-          color: (!prev.color || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a'].includes(prev.color.toLowerCase())) ? autoColor : prev.color,
+          color: autoColor,
           ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
         }));
       }
@@ -342,7 +342,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         ...prev, 
         name: item.name, 
         customIcon: bestIcon,
-        color: (!prev.color || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a'].includes(prev.color.toLowerCase())) ? autoColor : prev.color,
+        color: autoColor,
         ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
       }));
     };

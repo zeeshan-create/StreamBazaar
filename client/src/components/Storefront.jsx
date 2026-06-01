@@ -615,8 +615,10 @@ export default function App() {
                       animate="visible"
                       exit="exit"
                       style={{ 
-                        borderRadius: '24px', border: '2px solid transparent', 
-                        background: `linear-gradient(#0d0f17, #0d0f17) padding-box, linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(idx + 2) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(idx + 4) % VIBRANT_COLORS.length]}) border-box`, 
+                        borderRadius: '24px', 
+                        border: `1px solid ${effectiveColor}80`, 
+                        background: '#0d0f17',
+                        boxShadow: `0 0 20px ${effectiveColor}20, inset 0 0 20px ${effectiveColor}10`,
                         padding: '1.25rem',
                         '--card-accent': effectiveColor,
                         display: 'flex', flexDirection: 'column', gap: '1.25rem'
@@ -704,8 +706,9 @@ export default function App() {
                   exit="exit"
                   style={{ 
                     '--card-accent': effectiveColor,
-                    border: '2px solid transparent',
-                    background: `linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(idx + 1) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(idx + 3) % VIBRANT_COLORS.length]}) border-box`
+                    border: `1px solid ${effectiveColor}60`,
+                    background: 'var(--card)',
+                    boxShadow: `0 0 15px ${effectiveColor}15, inset 0 0 15px ${effectiveColor}10`
                   }}
                   whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px ${effectiveColor}88, 0 28px 60px -12px ${effectiveColor}44`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                 >
