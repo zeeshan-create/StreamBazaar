@@ -3,8 +3,8 @@ const fs = require('fs');
 let code = fs.readFileSync('client/src/components/AdminDashboard.jsx', 'utf8');
 
 const newLogoUploader = `const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
-  const [dragActive, setDragActive] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
+  const [dragActive, setDragActive] = React.useState(false);
+  const [suggestions, setSuggestions] = React.useState([]);
   
   const handleSearch = async (val) => {
     if (onNameChange) {
@@ -109,12 +109,32 @@ const newLogoUploader = `const LogoUploader = ({ editForm, setEditForm, getFavic
   );
 };`;
 
-// Replace the entire old LogoUploader definition
-code = code.replace(/const LogoUploader = \(\{ editForm, setEditForm, getFavicon \}\) => \{[\s\S]*?\}\s*;\s*(?=\nconst)/, newLogoUploader + '\n');
+if (!code.includes('const LogoUploader =')) {
+  code = code.replace(/export default function AdminDashboard\(\) \{/, newLogoUploader + '\n\nexport default function AdminDashboard() {');
+} else {
+  code = code.replace(/const LogoUploader = \(\{ editForm, setEditForm, getFavicon, onNameChange \}\) => \{[\s\S]*?\}\s*;\s*(?=\nexport default)/, newLogoUploader + '\n');
+}
 
-const usageRegex = /<LogoUploader editForm=\{editForm\} setEditForm=\{setEditForm\} getFavicon=\{getFavicon\} \/>\s*<div className="admin-form-group">\s*<label>(?:Service Name|Service\/Game Title)<\/label>\s*<div style=\{\{ display: 'flex', alignItems: 'center', gap: '10px' \}\}>\s*\{\(editForm\.customIcon \|\| getFavicon\(editForm\.name\)\) && \(\s*<img[^>]+>\s*\)\}\s*<input className="admin-form-input" style=\{\{ flex: 1 \}\} value=\{editForm\.name\} onChange=\{e => \{([\s\S]*?)\}\} \/>\s*<\/div>\s*<\/div>/g;
+// Regex to replace the Service Name (Edit Modal)
+const editRegex = /<div className="admin-form-group">\s*<label>Service Name<\/label>\s*<div style=\{\{ display: 'flex', alignItems: 'center', gap: '10px' \}\}>\s*\{\(getFavicon\(editForm\.name\) \|\| getGameIcon\(editForm\.name\)\) && \(\s*<img[^>]*>\s*\)\}\s*<input className="admin-form-input" style=\{\{ flex: 1 \}\} value=\{editForm\.name\} onChange=\{e => \{([\s\S]*?)\}\} \/>\s*<\/div>\s*<\/div>/;
 
-code = code.replace(usageRegex, (match, onChangeLogic) => {
+// Regex to replace the Service/Game Title (Add Modal)
+const addRegex = /<div className="admin-form-group">\s*<label>Service\/Game Title<\/label>\s*<div style=\{\{ display: 'flex', alignItems: 'center', gap: '10px' \}\}>\s*\{\(getFavicon\(editForm\.name\) \|\| getGameIcon\(editForm\.name\)\) && \(\s*<img[^>]*>\s*\)\}\s*<input className="admin-form-input" style=\{\{ flex: 1 \}\} placeholder="[^"]*" value=\{editForm\.name \|\| ''\} onChange=\{e => \{([\s\S]*?)\}\} \/>\s*<\/div>\s*<\/div>/;
+
+let count = 0;
+code = code.replace(editRegex, (match, onChangeLogic) => {
+  count++;
+  const extractedLogic = onChangeLogic.replace(/const val = e\.target\.value;/, 'const val = e_val;');
+  return `<LogoUploader 
+    editForm={editForm} 
+    setEditForm={setEditForm} 
+    getFavicon={getFavicon} 
+    onNameChange={(e_val) => {${extractedLogic}}} 
+  />`;
+});
+
+code = code.replace(addRegex, (match, onChangeLogic) => {
+  count++;
   const extractedLogic = onChangeLogic.replace(/const val = e\.target\.value;/, 'const val = e_val;');
   return `<LogoUploader 
     editForm={editForm} 
@@ -125,4 +145,5 @@ code = code.replace(usageRegex, (match, onChangeLogic) => {
 });
 
 fs.writeFileSync('client/src/components/AdminDashboard.jsx', code);
-console.log('Successfully refactored LogoUploader!');
+console.log('Successfully refactored LogoUploader! Replaced ' + count + ' inputs.');
+
