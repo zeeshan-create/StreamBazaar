@@ -13,17 +13,6 @@ const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
 
-app.get('/api/search-games', async (req, res) => {
-  const query = req.query.q;
-  if (!query) return res.json([]);
-  try {
-    const steamRes = await fetch(`https://steamcommunity.com/actions/SearchApps/${encodeURIComponent(query)}`);
-    const data = await steamRes.json();
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to search games' });
-  }
-});
 
 
 app.get('/api/plans', async (req, res) => {

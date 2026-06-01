@@ -165,7 +165,10 @@ const BRAND_CATEGORIES = {
   'hoichoi': 'Streaming'
 };
 
-const CUSTOM_ICONS = {};
+const CUSTOM_ICONS = {
+  'airtel': 'https://icon.horse/icon/airtelxstream.in',
+  'discovery': 'https://icon.horse/icon/discoveryplus.in'
+};
 
 const getFavicon = (serviceName) => {
   if (!serviceName) return null;
@@ -238,6 +241,7 @@ export default function AdminDashboard() {
 
   // Tab Filtering & Views
   const [productView, setProductView] = useState('grid'); // grid, list
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   
@@ -477,9 +481,13 @@ export default function AdminDashboard() {
   };
 
   const filteredServices = services.filter(s => {
-    return s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
-           s.category.toLowerCase().includes(debouncedSearch.toLowerCase());
-  });
+    const sName = s.name || '';
+    const sCat = s.category || '';
+    const matchesSearch = sName.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
+                          sCat.toLowerCase().includes(debouncedSearch.toLowerCase());
+    const matchesCategory = activeCategoryFilter === 'All' || s.category === activeCategoryFilter;
+    return matchesSearch && matchesCategory;
+  }).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
   return (
     <div className="admin-layout-wrapper">
@@ -790,6 +798,29 @@ export default function AdminDashboard() {
                         List Layout
                       </button>
                     </div>
+                    
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', background: 'var(--card)', padding: '4px', borderRadius: '12px' }}>
+                      {['All', 'Streaming', 'VPN', 'Gaming', 'AI+'].map(cat => (
+                        <button 
+                          key={cat}
+                          onClick={() => setActiveCategoryFilter(cat)}
+                          style={{
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '8px',
+                            border: 'none',
+                            background: activeCategoryFilter === cat ? 'var(--color-primary)' : 'transparent',
+                            color: activeCategoryFilter === cat ? 'white' : 'var(--color-text-muted)',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+
 
                     <button 
                       className="btn-primary"
@@ -1055,8 +1086,13 @@ export default function AdminDashboard() {
                               ) : (
                                 <div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: `${s.color}22`, border: `1px solid ${s.color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                      <Package size={22} style={{ color: s.color }} />
+                                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: `${s.color}22`, border: `1px solid ${s.color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                      {s.category === 'Gaming' ? (
+                                        <img src={s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                      ) : (
+                                        <img src={s.customIcon || getFavicon(s.name)} style={{ width: '28px', height: '28px', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                      )}
+                                      <Package size={22} style={{ color: s.color, display: 'none' }} />
                                     </div>
                                     <div>
                                       <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>{s.name}</h3>

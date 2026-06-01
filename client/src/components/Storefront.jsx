@@ -152,20 +152,39 @@ const BRAND_CATEGORIES = {
 
 const GAME_IMGS = {
   'wwe 2k25': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
+  'wwe bundles': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
   'forza horizon 5': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_184x69.jpg',
   'gta v': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_184x69.jpg',
+  'gta trilogy': 'https://cdn.akamai.steamstatic.com/steam/apps/1546930/capsule_184x69.jpg',
   'spider-man 2': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
+  'spider-man series': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
   'uncharted': 'https://cdn.akamai.steamstatic.com/steam/apps/1659420/capsule_184x69.jpg',
   'crimson desert': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=120&auto=format&fit=crop&q=60',
-  'the last of us ii': 'https://cdn.akamai.steamstatic.com/steam/apps/1888930/capsule_184x69.jpg',
+  'the last of us': 'https://cdn.akamai.steamstatic.com/steam/apps/1888930/capsule_184x69.jpg',
   'black myth wukong': 'https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_184x69.jpg',
   'ghost of tsushima': 'https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_184x69.jpg',
   'elden ring': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg',
   'resident evil': 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/capsule_184x69.jpg',
   'hogwarts legacy': 'https://cdn.akamai.steamstatic.com/steam/apps/990080/capsule_184x69.jpg',
   'god of war': 'https://cdn.akamai.steamstatic.com/steam/apps/1593500/capsule_184x69.jpg',
+  'cyberpunk 2077': 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_184x69.jpg',
+  'pragmata': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg',
+  'assassin\'s creed': 'https://cdn.akamai.steamstatic.com/steam/apps/2208920/capsule_184x69.jpg',
+  'khazan': 'https://cdn.akamai.steamstatic.com/steam/apps/2801450/capsule_184x69.jpg', // Placeholder
+  'f1 25': 'https://cdn.akamai.steamstatic.com/steam/apps/2465800/capsule_184x69.jpg',
+  'stellar blade': 'https://cdn.akamai.steamstatic.com/steam/apps/2522250/capsule_184x69.jpg', // Placeholder
+  'mafia': 'https://cdn.akamai.steamstatic.com/steam/apps/1030840/capsule_184x69.jpg',
+  'tekken 7': 'https://cdn.akamai.steamstatic.com/steam/apps/389730/capsule_184x69.jpg',
+  'tekken 8': 'https://cdn.akamai.steamstatic.com/steam/apps/1778820/capsule_184x69.jpg',
+  'expedition 33': 'https://cdn.akamai.steamstatic.com/steam/apps/2690040/capsule_184x69.jpg',
+  'red dead redemption': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
+  'hitman': 'https://cdn.akamai.steamstatic.com/steam/apps/1659040/capsule_184x69.jpg',
+  'rockstar pack': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
+  'far cry': 'https://cdn.akamai.steamstatic.com/steam/apps/2369390/capsule_184x69.jpg',
+  'poppy playtime': 'https://cdn.akamai.steamstatic.com/steam/apps/1721470/capsule_184x69.jpg',
+  'minecraft': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg', // placeholder
+  'special steam accounts': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg', // placeholder
 };
-
 const getGameIcon = (label) => {
   const lowercase = label.toLowerCase();
   for (const key in GAME_IMGS) {
@@ -220,22 +239,28 @@ const overlayVariants = {
   exit:    { opacity: 0, transition: { duration: 0.18 } },
 };
 const modalVariants = {
-  hidden:  { opacity: 0, scale: 0.82, y: 36, rotateX: 8 },
-  visible: { opacity: 1, scale: 1,    y: 0,  rotateX: 0, transition: { type: 'spring', stiffness: 380, damping: 26, mass: 0.8 } },
-  exit:    { opacity: 0, scale: 0.88, y: 20, transition: { duration: 0.16, ease: 'easeIn' } },
+  hidden:  { opacity: 0, scale: 0.75, y: 50, rotateX: -15, filter: 'blur(8px)' },
+  visible: { opacity: 1, scale: 1,    y: 0,  rotateX: 0, filter: 'blur(0px)', transition: { type: 'spring', stiffness: 450, damping: 28, mass: 0.6 } },
+  exit:    { opacity: 0, scale: 0.85, y: 30, filter: 'blur(4px)', transition: { duration: 0.15, ease: 'easeIn' } },
 };
 const deviceItemVariants = {
   hidden:  { opacity: 0, y: 14, scale: 0.85 },
   visible: (i) => ({ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 22, delay: i * 0.06 } }),
 };
 const cardVariants = {
-  hidden:  { opacity: 0, y: 28, scale: 0.95 },
-  visible: (i) => ({ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 260, damping: 22, delay: i * 0.04 } }),
-  exit:    { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
+  hidden:  { opacity: 0, y: 40, scale: 0.92, rotateX: 10 },
+  visible: (i) => ({ 
+    opacity: 1, y: 0, scale: 1, rotateX: 0, 
+    transition: { type: 'spring', stiffness: 300, damping: 20, mass: 0.8, delay: i * 0.05 } 
+  }),
+  exit:    { opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2, ease: 'easeIn' } },
 };
 const planRowVariants = {
-  hidden:  { opacity: 0, x: -12 },
-  visible: (i) => ({ opacity: 1, x: 0, transition: { duration: 0.28, delay: i * 0.05, ease: 'easeOut' } }),
+  hidden:  { opacity: 0, x: -20, filter: 'blur(4px)' },
+  visible: (i) => ({ 
+    opacity: 1, x: 0, filter: 'blur(0px)', 
+    transition: { type: 'spring', stiffness: 400, damping: 25, delay: i * 0.06 } 
+  }),
 };
 
 export default function App() {
@@ -322,7 +347,7 @@ export default function App() {
   const filtered = plans.filter(p => {
     const q = searchTerm.toLowerCase();
     const matchSearch = p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
-    const matchCat    = activeCategory === 'all' || p.category === activeCategory;
+    const matchCat    = activeCategory === 'all' || p.category === activeCategory || (activeCategory === 'Gaming' && (p.category === 'Steam' || p.category === 'PlayStation' || p.category === 'Steam Gaming'));
     return matchSearch && matchCat;
   }).sort((a, b) => {
     // Gaming cards always appear last
@@ -335,24 +360,21 @@ export default function App() {
     setPopup({ product, plan, device: null });
   };
 
-  const handleBuy = async () => {
+  const handleBuy = () => {
     if (!popup || !popup.device) return;
     const { product, plan, device } = popup;
     
-    try {
-      await fetch(`${API_BASE}/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product: product.name,
-          plan: plan.label,
-          device: device,
-          price: plan.price
-        })
-      });
-    } catch (err) {
-      console.error('Failed to log actual checkout click:', err);
-    }
+    // Fire and forget, no await to prevent lag on checkout
+    fetch(`${API_BASE}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product: product.name,
+        plan: plan.label,
+        device: device,
+        price: plan.price
+      })
+    }).catch(err => console.error('Failed to log actual checkout click:', err));
 
     const msg = `Hi! I want to buy ${product.name} — ${plan.label} — Device: ${device} — Price: ${plan.price}`;
     window.open(`${TELEGRAM_LINK}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -360,15 +382,20 @@ export default function App() {
   };
 
   const CUSTOM_ICONS = {
-    'discovery': 'https://logo.clearbit.com/discoveryplus.com'
+    'airtel': 'https://icon.horse/icon/airtelxstream.in',
+    'discovery': 'https://icon.horse/icon/discoveryplus.in'
   };
 
-  const getFavicon = name => {
+    const getFavicon = name => {
+    if (!name) return null;
     const lowerName = name.toLowerCase();
     
     // Check custom overrides first
     const matchedCustom = Object.keys(CUSTOM_ICONS).find(k => lowerName.includes(k));
     if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
+
+    const gameIcon = getGameIcon(name);
+    if (gameIcon) return gameIcon;
 
     let domain = DOMAINS[lowerName];
     if (!domain) {
@@ -510,7 +537,7 @@ export default function App() {
                          }
                       }, 100);
                    }}>
-                     <img src={getFavicon(product.name)} className="search-result-logo" alt={product.name} />
+                     <img src={product.customIcon || getFavicon(product.name)} className="search-result-logo" alt={product.name} />
                      <div className="search-result-info">
                        <div className="search-result-name">{product.name}</div>
                        <div className="search-result-price">Starts at {product.plans[0].price}</div>
@@ -570,7 +597,7 @@ export default function App() {
                   animate="visible"
                   exit="exit"
                   style={{ '--card-accent': product.color }}
-                  whileHover={{ y: -6, boxShadow: `0 0 0 1px ${product.color}55, 0 24px 56px -10px ${product.color}33`, transition: { duration: 0.2 } }}
+                  whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px ${product.color}88, 0 28px 60px -12px ${product.color}44`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                 >
                   {/* Card Header */}
                   <div className="card-header">
@@ -582,7 +609,7 @@ export default function App() {
                         <div style={{ fontSize: '1.5rem' }}>🎬</div>
                       ) : (
                         <img
-                          src={getFavicon(product.name)}
+                          src={product.customIcon || getFavicon(product.name)}
                           alt={product.name}
                           className="card-logo"
                           onError={() => setImgErr(p => ({ ...p, [product.name]: true }))}
@@ -921,7 +948,7 @@ export default function App() {
               {/* Header */}
               <div className="popup-header">
                 <img
-                  src={popup.product.category === 'Gaming' || popup.plan.image ? (popup.plan.image || getGameIcon(popup.plan.label) || getFavicon(popup.product.name)) : getFavicon(popup.product.name)}
+                  src={popup.product.category === 'Gaming' || popup.plan.image ? (popup.plan.image || getGameIcon(popup.plan.label) || (popup.product.customIcon || getFavicon(popup.product.name))) : (popup.product.customIcon || getFavicon(popup.product.name))}
                   alt={popup.product.name}
                   className="popup-logo"
                   onError={e => { e.target.style.display = 'none'; }}
