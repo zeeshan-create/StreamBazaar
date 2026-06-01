@@ -1125,8 +1125,8 @@ export default function AdminDashboard() {
                                   <div className="admin-form-group">
                                     <label>Accent Color</label>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                      <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: editForm.color || '#333' }}></div>
-                                      <input className="admin-form-input" style={{ flex: 1 }} value={editForm.color} onChange={e => setEditForm({...editForm, color: e.target.value})} />
+                                      <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.color || '').trim())) ? '#' + editForm.color.trim() : editForm.color || '#333' }}></div>
+                                      <input className="admin-form-input" style={{ flex: 1 }} value={editForm.color || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, color: val}); }} />
                                     </div>
                                   </div>
                                   <div className="admin-form-group">
@@ -1477,8 +1477,8 @@ export default function AdminDashboard() {
                             <div className="admin-form-group">
                               <label>Accent Hex Color</label>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: editForm.color || '#333' }}></div>
-                                <input className="admin-form-input" style={{ flex: 1 }} placeholder="#e50914" value={editForm.color || ''} onChange={e => setEditForm({...editForm, color: e.target.value})} />
+                                <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.color || '').trim())) ? '#' + editForm.color.trim() : editForm.color || '#333' }}></div>
+                                <input className="admin-form-input" style={{ flex: 1 }} placeholder="#e50914" value={editForm.color || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, color: val}); }} />
                               </div>
                             </div>
                             <div className="admin-form-group">

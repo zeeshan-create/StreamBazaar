@@ -593,8 +593,15 @@ export default function App() {
               {filtered.map((product, idx) => {
                 const isGaming = product.category && product.category.toLowerCase().includes('gam');
                 const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
-                const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17'].includes(c.toLowerCase());
-                const effectiveColor = isDarkColor(product.color) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : product.color;
+                const sanitizeColor = (c) => {
+                  if (!c) return null;
+                  c = c.trim();
+                  if (/^[0-9A-Fa-f]{3,6}$/.test(c)) return '#' + c;
+                  return c;
+                };
+                const rawColor = sanitizeColor(product.color);
+                const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
+                const effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : rawColor;
 
                 if (isGaming) {
                       return (
