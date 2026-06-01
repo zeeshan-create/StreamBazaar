@@ -1154,7 +1154,7 @@ export default function AdminDashboard() {
                                             }} />
                                           </div>
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                                           <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                             <label style={{ fontSize: '0.85rem' }}>Platform/Device</label>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' }}>
@@ -1191,19 +1191,7 @@ export default function AdminDashboard() {
                                               })}
                                             </div>
                                           </div>
-                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
-                                            <label style={{ fontSize: '0.85rem' }}>Game Logo / Cover URL</label>
-                                            <input 
-                                              className="admin-form-input" 
-                                              placeholder="https://... (Optional)" 
-                                              value={plan.image || ''} 
-                                              onChange={e => {
-                                                const newPlans = [...editForm.plans];
-                                                newPlans[idx] = { ...newPlans[idx], image: e.target.value };
-                                                setEditForm({...editForm, plans: newPlans});
-                                              }} 
-                                            />
-                                          </div>
+                                          
                                         </div>
 
                                       </div>
@@ -1510,7 +1498,7 @@ export default function AdminDashboard() {
                                       }} />
                                     </div>
                                   </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                                           <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                             <label style={{ fontSize: '0.85rem' }}>Platform/Device</label>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' }}>
@@ -1547,6 +1535,8 @@ export default function AdminDashboard() {
                                               })}
                                             </div>
                                           </div>
+                                          
+                                        </div>
 
                                 </div>
                               ))}
