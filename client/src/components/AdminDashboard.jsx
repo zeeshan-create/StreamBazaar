@@ -1547,20 +1547,6 @@ export default function AdminDashboard() {
                                               })}
                                             </div>
                                           </div>
-                                          <div className="admin-form-group" style={{ marginBottom: 0 }}>
-                                            <label style={{ fontSize: '0.85rem' }}>Game Logo / Cover URL</label>
-                                            <input 
-                                              className="admin-form-input" 
-                                              placeholder="https://... (Optional)" 
-                                              value={plan.image || ''} 
-                                              onChange={e => {
-                                                const newPlans = [...editForm.plans];
-                                                newPlans[idx] = { ...newPlans[idx], image: e.target.value };
-                                                setEditForm({...editForm, plans: newPlans});
-                                              }} 
-                                            />
-                                          </div>
-                                        </div>
 
                                 </div>
                               ))}
