@@ -231,25 +231,54 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
 
     if (val.length > 2) {
       try {
-        const res = await fetch(`https://api.brandfetch.io/v2/search/${val}`);
-        const data = await res.json();
-        setSuggestions(data);
+        const [brandRes, gameRes] = await Promise.all([
+          fetch(`https://api.brandfetch.io/v2/search/${val}`).catch(() => ({ json: () => [] })),
+          fetch(window.location.hostname === 'localhost' ? `http://localhost:5000/api/search-games?q=${val}` : `/api/search-games?q=${val}`).catch(() => ({ json: () => [] }))
+        ]);
+        
+        const brandData = await brandRes.json();
+        const gameData = await gameRes.json();
+        
+        let combined = [];
+        if (Array.isArray(brandData)) {
+          combined = [...combined, ...brandData.map(b => ({
+            name: b.name,
+            domain: b.domain,
+            icon: b.icon,
+            type: 'OTT/Brand'
+          }))];
+        }
+        if (Array.isArray(gameData)) {
+          combined = [...combined, ...gameData.map(g => ({
+            name: g.name,
+            domain: 'Steam Game',
+            icon: g.logo || g.icon,
+            type: 'Game'
+          }))];
+        }
+        
+        setSuggestions(combined);
       } catch (err) {}
     } else {
       setSuggestions([]);
     }
   };
 
-  const handleSelect = (company) => {
+  const handleSelect = (item) => {
     if (onNameChange) {
-      onNameChange(company.name);
+      onNameChange(item.name);
     } else {
-      setEditForm({ ...editForm, name: company.name });
+      setEditForm({ ...editForm, name: item.name });
     }
     // Set custom icon after a tiny delay so it overrides onNameChange
     setTimeout(() => {
-      const bestIcon = company.icon || `https://www.google.com/s2/favicons?domain=${company.domain}&sz=256`;
-      setEditForm(prev => ({ ...prev, name: company.name, customIcon: bestIcon }));
+      const bestIcon = item.icon || `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
+      setEditForm(prev => ({ 
+        ...prev, 
+        name: item.name, 
+        customIcon: bestIcon,
+        ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
+      }));
     }, 10);
     setSuggestions([]);
   };
@@ -297,11 +326,14 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
              <input className="admin-form-input" style={{ width: '100%' }} placeholder="Enter name to search brand (e.g. Netflix, Spotify)..." value={editForm.name || ''} onChange={e => handleSearch(e.target.value)} />
              {suggestions.length > 0 && (
                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--color-surface)', border: '1px solid var(--color-border)', zIndex: 10, maxHeight: '200px', overflowY: 'auto', borderRadius: '8px', marginTop: '4px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
-                 {suggestions.map(s => (
-                    <div key={s.brandId || s.domain} onClick={() => handleSelect(s)} style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--color-background)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                       <img src={s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`} style={{ width: '28px', height: '28px', borderRadius: '6px', objectFit: 'contain', background: '#fff' }} alt={s.name} onError={e => e.target.style.display='none'} />
-                       <span style={{ fontWeight: '500' }}>{s.name}</span>
-                       <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{s.domain}</span>
+                 {suggestions.map((s, idx) => (
+                    <div key={idx} onClick={() => handleSelect(s)} style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--color-background)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                       <img src={s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`} style={{ width: s.type === 'Game' ? '56px' : '28px', height: '28px', borderRadius: '4px', objectFit: 'contain', background: '#111' }} alt={s.name} onError={e => e.target.style.display='none'} />
+                       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                         <span style={{ fontWeight: '600' }}>{s.name}</span>
+                         <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{s.domain}</span>
+                       </div>
+                       <span style={{ fontSize: '10px', padding: '2px 6px', background: s.type === 'Game' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(99, 102, 241, 0.2)', color: s.type === 'Game' ? '#4ade80' : '#818cf8', borderRadius: '4px' }}>{s.type}</span>
                     </div>
                  ))}
                </div>
