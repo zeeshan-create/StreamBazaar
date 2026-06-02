@@ -1718,17 +1718,17 @@ select option {
 }
 
 .device-btn.out-of-stock {
-  opacity: 0.6;
   cursor: not-allowed;
-  filter: grayscale(100%);
   position: relative;
   transition: all 0.3s ease;
 }
 
+.device-btn.out-of-stock .device-icon {
+  filter: grayscale(100%);
+  opacity: 0.35;
+}
+
 .device-btn.out-of-stock:hover {
-  /* "Bahar ki side per animation jab cross mouse Ho" */
-  box-shadow: 0 0 15px rgba(255, 50, 50, 0.5), 0 0 5px rgba(255, 50, 50, 0.3);
-  border-color: rgba(255, 50, 50, 0.4);
   animation: shake 0.4s ease-in-out;
 }
 
