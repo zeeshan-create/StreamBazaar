@@ -742,24 +742,31 @@ export default function App() {
                   whileTap={{ scale: 0.97, y: 0 }}
                 >
                   {/* Card Header */}
-                  <div className="card-header">
+                  <div className="card-header" style={{ alignItems: product.category === 'Gaming' ? 'flex-start' : 'center', gap: '0.85rem' }}>
                     <div
                       className="card-logo-wrap"
-                      style={{ background: `${effectiveColor}18`, border: `1px solid ${effectiveColor}30` }}
+                      style={{ 
+                        background: `${effectiveColor}18`, 
+                        border: `1px solid ${effectiveColor}30`,
+                        width: product.category === 'Gaming' ? '65px' : '52px',
+                        height: product.category === 'Gaming' ? '86px' : '52px',
+                        borderRadius: product.category === 'Gaming' ? '10px' : '14px',
+                        boxShadow: product.category === 'Gaming' ? '0 4px 12px rgba(0,0,0,0.3)' : 'none'
+                      }}
                     >
                       {(() => {
                         if (imgErr[product.name]) return <div style={{ fontSize: '1.5rem' }}>🎬</div>;
-                        const isEpicGame = (product.category === 'Gaming' || product.name?.toLowerCase().includes('epic')) && ((product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames') || product.customIcon.includes('epic'))) || !product.customIcon);
-                        const imgUrl = product.category === 'Gaming' ? (product.customIcon || product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : (product.customIcon || getFavicon(product.name));
+                        const isGaming = product.category === 'Gaming';
+                        const imgUrl = isGaming ? (product.customIcon || product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : (product.customIcon || getFavicon(product.name));
                         return (
                           <img
                             src={imgUrl}
                             alt={product.name}
                             style={{ 
-                              width: isEpicGame ? '38px' : '44px',
-                              height: isEpicGame ? '50px' : '44px',
-                              objectFit: isEpicGame ? 'cover' : 'contain',
-                              borderRadius: '8px'
+                              width: isGaming ? '65px' : '44px',
+                              height: isGaming ? '86px' : '44px',
+                              objectFit: isGaming ? 'cover' : 'contain',
+                              borderRadius: isGaming ? '10px' : '8px'
                             }}
                             onError={() => setImgErr(p => ({ ...p, [product.name]: true }))}
                           />
@@ -767,7 +774,14 @@ export default function App() {
                       })()}
                     </div>
                     <div className="card-title-area">
-                      <div className="card-name">
+                      <div 
+                        className="card-name"
+                        style={{
+                          whiteSpace: product.category === 'Gaming' ? 'normal' : 'nowrap',
+                          lineHeight: product.category === 'Gaming' ? '1.2' : 'inherit',
+                          fontSize: product.category === 'Gaming' ? '1.02rem' : '1.1rem'
+                        }}
+                      >
                         {product.name}
                         {product.status && product.status !== 'Available' && (
                           <span className="status-badge-inline" style={{ 
@@ -779,13 +793,15 @@ export default function App() {
                           </span>
                         )}
                       </div>
-                      <div className="card-desc">{product.description || (product.category === 'Gaming' ? 'Offline PC Access.' : '')}</div>
+                      <div className="card-desc" style={{ marginTop: product.category === 'Gaming' ? '0.2rem' : '0' }}>
+                        {product.description || (product.category === 'Gaming' ? 'Offline PC Access.' : '')}
+                      </div>
                     </div>
                     {(() => {
                       const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames') || product.customIcon.includes('epic'))) || (product.name && product.name.toLowerCase().includes('epic'));
                       if (product.category === 'Gaming') {
                          return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '0.2rem 0.5rem', borderRadius: '50px', border: `1px solid ${effectiveColor}40`, background: `${effectiveColor}15`, fontSize: '0.65rem', fontWeight: 700, color: effectiveColor, whiteSpace: 'nowrap', letterSpacing: '0.5px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '0.2rem 0.5rem', borderRadius: '50px', border: `1px solid ${effectiveColor}40`, background: `${effectiveColor}15`, fontSize: '0.65rem', fontWeight: 700, color: effectiveColor, whiteSpace: 'nowrap', letterSpacing: '0.5px', alignSelf: 'flex-start', marginTop: '2px' }}>
                               {isEpicGame ? (
                                 <>
                                   <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 0L1.75 3v13.5L12 24l10.25-7.5V3L12 0zm7.25 15.5l-7.25 5.3-7.25-5.3V5.5l7.25-2.1 7.25 2.1v10z"/></svg>
