@@ -14,11 +14,13 @@
   "type": "commonjs",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "canvas": "^3.2.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.6.2",
     "nedb-promises": "^6.2.3",
-    "node-appwrite": "^25.2.0"
+    "node-appwrite": "^25.2.0",
+    "node-vibrant": "^4.0.4"
   }
 }

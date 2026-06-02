@@ -603,8 +603,8 @@ export default function App() {
                 const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
                 const effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : rawColor;
 
-                if (isGaming) {
-                      return (
+                if (false && isGaming) {
+                  return (
                     <motion.div
                       key={product._id || product.id}
                       layout
@@ -624,16 +624,29 @@ export default function App() {
                         display: 'flex', flexDirection: 'column', gap: '1.25rem'
                       }}
                       whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 20px 40px rgba(0,0,0,0.35)`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
+                      whileTap={{ scale: 0.97, y: 0 }}
                     >
                       {/* Game Header */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div style={{ display: 'flex', gap: '1rem' }}>
-                          <img 
-                            src={product.customIcon || getFavicon(product.name)} 
-                            alt={product.name} 
-                            style={{ width: '64px', height: '64px', borderRadius: '14px', objectFit: 'cover' }}
-                            onError={(e) => { e.target.style.display = 'none'; }}
-                          />
+                          {(() => {
+                            const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames'))) || (product.name && product.name.toLowerCase().includes('epic'));
+                            return (
+                              <img 
+                                src={product.customIcon || getGameIcon(product.name) || getFavicon(product.name)} 
+                                alt={product.name} 
+                                style={{ 
+                                  width: '68px', 
+                                  height: isEpicGame ? '92px' : '68px', 
+                                  borderRadius: '12px', 
+                                  objectFit: 'cover',
+                                  boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                                  border: '1px solid rgba(255,255,255,0.1)'
+                                }}
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                              />
+                            );
+                          })()}
                           <div>
                             <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: 'var(--text)' }}>{product.name}</h3>
                             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', marginTop: '0.25rem', lineHeight: 1.4, maxWidth: '200px' }}>
@@ -641,9 +654,24 @@ export default function App() {
                             </p>
                           </div>
                         </div>
-                        <div style={{ padding: '0.25rem 0.75rem', borderRadius: '999px', border: `1px solid ${effectiveColor}40`, background: `${effectiveColor}15`, fontSize: '0.75rem', fontWeight: 700, color: effectiveColor, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
-                          STEAM
-                        </div>
+                        {(() => {
+                          const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames'))) || (product.name && product.name.toLowerCase().includes('epic'));
+                          return (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '0.25rem 0.75rem', borderRadius: '999px', border: `1px solid ${effectiveColor}40`, background: `${effectiveColor}15`, fontSize: '0.75rem', fontWeight: 700, color: effectiveColor, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
+                              {isEpicGame ? (
+                                <>
+                                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 0L1.75 3v13.5L12 24l10.25-7.5V3L12 0zm7.25 15.5l-7.25 5.3-7.25-5.3V5.5l7.25-2.1 7.25 2.1v10z"/></svg>
+                                  EPIC GAMES
+                                </>
+                              ) : (
+                                <>
+                                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 .002C5.378.002.001 5.378.001 12c0 5.485 3.68 10.113 8.745 11.583l1.834-2.617c-.12-.047-.234-.1-.34-.17a1.996 1.996 0 0 1-1.042-2.196l-3.238-1.57a3.468 3.468 0 0 1-.365-2.072 3.486 3.486 0 1 1 5.568-1.393l3.187 1.545a1.986 1.986 0 0 1 2.894 1.13c.287.97.027 2.016-.677 2.723l1.833 2.616c5.064-1.47 8.745-6.098 8.745-11.583 0-6.622-5.377-11.998-12-11.998zm-7.6 15.485c-.88-.002-1.6-.723-1.6-1.602 0-.882.72-1.602 1.6-1.602.88.002 1.6.723 1.6 1.602 0 .88-.72 1.6-1.6 1.602z"/></svg>
+                                  STEAM
+                                </>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Game Plans */}
@@ -711,6 +739,7 @@ export default function App() {
                     boxShadow: `0 0 15px ${effectiveColor}15, inset 0 0 15px ${effectiveColor}10`
                   }}
                   whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px ${effectiveColor}88, 0 28px 60px -12px ${effectiveColor}44`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
+                  whileTap={{ scale: 0.97, y: 0 }}
                 >
                   {/* Card Header */}
                   <div className="card-header">
@@ -718,16 +747,24 @@ export default function App() {
                       className="card-logo-wrap"
                       style={{ background: `${effectiveColor}18`, border: `1px solid ${effectiveColor}30` }}
                     >
-                      {imgErr[product.name] ? (
-                        <div style={{ fontSize: '1.5rem' }}>🎬</div>
-                      ) : (
-                        <img
-                          src={product.customIcon || getFavicon(product.name)}
-                          alt={product.name}
-                          className="card-logo"
-                          onError={() => setImgErr(p => ({ ...p, [product.name]: true }))}
-                        />
-                      )}
+                      {(() => {
+                        if (imgErr[product.name]) return <div style={{ fontSize: '1.5rem' }}>🎬</div>;
+                        const isEpicGame = (product.category === 'Gaming' || product.name?.toLowerCase().includes('epic')) && ((product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames') || product.customIcon.includes('epic'))) || !product.customIcon);
+                        const imgUrl = product.category === 'Gaming' ? (product.customIcon || product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : (product.customIcon || getFavicon(product.name));
+                        return (
+                          <img
+                            src={imgUrl}
+                            alt={product.name}
+                            style={{ 
+                              width: isEpicGame ? '38px' : '44px',
+                              height: isEpicGame ? '50px' : '44px',
+                              objectFit: isEpicGame ? 'cover' : 'contain',
+                              borderRadius: '8px'
+                            }}
+                            onError={() => setImgErr(p => ({ ...p, [product.name]: true }))}
+                          />
+                        );
+                      })()}
                     </div>
                     <div className="card-title-area">
                       <div className="card-name">
@@ -742,14 +779,36 @@ export default function App() {
                           </span>
                         )}
                       </div>
-                      <div className="card-desc">{product.description}</div>
+                      <div className="card-desc">{product.description || (product.category === 'Gaming' ? 'Offline PC Access.' : '')}</div>
                     </div>
-                    <span
-                      className="card-badge"
-                      style={{ background: `${effectiveColor}18`, color: effectiveColor, border: `1px solid ${effectiveColor}30` }}
-                    >
-                      {product.category ? product.category.toUpperCase() : 'STREAMING'}
-                    </span>
+                    {(() => {
+                      const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames') || product.customIcon.includes('epic'))) || (product.name && product.name.toLowerCase().includes('epic'));
+                      if (product.category === 'Gaming') {
+                         return (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '0.2rem 0.5rem', borderRadius: '50px', border: `1px solid ${effectiveColor}40`, background: `${effectiveColor}15`, fontSize: '0.65rem', fontWeight: 700, color: effectiveColor, whiteSpace: 'nowrap', letterSpacing: '0.5px' }}>
+                              {isEpicGame ? (
+                                <>
+                                  <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 0L1.75 3v13.5L12 24l10.25-7.5V3L12 0zm7.25 15.5l-7.25 5.3-7.25-5.3V5.5l7.25-2.1 7.25 2.1v10z"/></svg>
+                                  EPIC
+                                </>
+                              ) : (
+                                <>
+                                  <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 .002C5.378.002.001 5.378.001 12c0 5.485 3.68 10.113 8.745 11.583l1.834-2.617c-.12-.047-.234-.1-.34-.17a1.996 1.996 0 0 1-1.042-2.196l-3.238-1.57a3.468 3.468 0 0 1-.365-2.072 3.486 3.486 0 1 1 5.568-1.393l3.187 1.545a1.986 1.986 0 0 1 2.894 1.13c.287.97.027 2.016-.677 2.723l1.833 2.616c5.064-1.47 8.745-6.098 8.745-11.583 0-6.622-5.377-11.998-12-11.998zm-7.6 15.485c-.88-.002-1.6-.723-1.6-1.602 0-.882.72-1.602 1.6-1.602.88.002 1.6.723 1.6 1.602 0 .88-.72 1.6-1.6 1.602z"/></svg>
+                                  STEAM
+                                </>
+                              )}
+                            </div>
+                         );
+                      }
+                      return (
+                        <span
+                          className="card-badge"
+                          style={{ background: `${effectiveColor}18`, color: effectiveColor, border: `1px solid ${effectiveColor}30` }}
+                        >
+                          {product.category ? product.category.toUpperCase() : 'STREAMING'}
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   {/* Plans */}

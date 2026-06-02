@@ -8,6 +8,7 @@ import {
   DollarSign, Activity, Lock, RefreshCw, Smartphone, Monitor
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Vibrant } from 'node-vibrant/browser';
 import '../App.css';
 
 const API_BASE = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
@@ -250,8 +251,8 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         if (Array.isArray(gameData)) {
           combined = [...combined, ...gameData.map(g => ({
             name: g.name,
-            domain: 'Steam Game',
-            icon: g.logo || g.icon,
+            domain: g.domain || 'Steam Game',
+            icon: g.icon || g.logo,
             type: 'Game'
           }))];
         }
@@ -270,61 +271,23 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
       setEditForm({ ...editForm, name: item.name });
     }
 
-    const hslToHex = (h, s, l) => {
-      l /= 100;
-      const a = s * Math.min(l, 1 - l) / 100;
-      const f = n => {
-        const k = (n + h / 30) % 12;
-        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * color).toString(16).padStart(2, '0');
-      };
-      return `#${f(0)}${f(8)}${f(4)}`;
-    };
-    
-    const getAutoColor = (str) => {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-      return hslToHex(Math.abs(hash) % 360, 85, 60);
-    };
+    const autoColor = '#6366f1'; // Default fallback
 
-    const autoColor = getAutoColor(item.name);
-
-    // Extract color from image if possible
     const bestIcon = item.icon || `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
     const img = new Image();
     img.crossOrigin = "Anonymous";
-    img.onload = () => {
+    img.onload = async () => {
       try {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width; canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        let r = 0, g = 0, b = 0, count = 0;
-        let maxS = 0; let domR = 0, domG = 0, domB = 0;
-        for (let i = 0; i < data.length; i += 4) {
-          if (data[i+3] > 127) {
-            const pr = data[i], pg = data[i+1], pb = data[i+2];
-            r += pr; g += pg; b += pb; count++;
-            const max = Math.max(pr, pg, pb), min = Math.min(pr, pg, pb);
-            const s = max === 0 ? 0 : (max - min) / max;
-            if (s > maxS && max > 50) {
-              maxS = s; domR = pr; domG = pg; domB = pb;
-            }
-          }
-        }
-        let extractedColor = autoColor;
-        if (maxS > 0.2) {
-          extractedColor = '#' + [domR, domG, domB].map(x => x.toString(16).padStart(2, '0')).join('');
-        } else if (count > 0) {
-          extractedColor = '#' + [Math.floor(r/count), Math.floor(g/count), Math.floor(b/count)].map(x => x.toString(16).padStart(2, '0')).join('');
-        }
+        const palette = await Vibrant.from(img).getPalette();
+        const primary = palette.Vibrant ? palette.Vibrant.hex : autoColor;
+        const secondary = palette.DarkVibrant ? palette.DarkVibrant.hex : (palette.Muted ? palette.Muted.hex : autoColor);
         
         setEditForm(prev => ({ 
           ...prev, 
           name: item.name, 
           customIcon: bestIcon,
-          color: extractedColor,
+          primaryColor: primary,
+          secondaryColor: secondary,
           ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
         }));
       } catch(e) {
@@ -332,7 +295,8 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
           ...prev, 
           name: item.name, 
           customIcon: bestIcon,
-          color: autoColor,
+          primaryColor: autoColor,
+          secondaryColor: autoColor,
           ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
         }));
       }
@@ -342,7 +306,8 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         ...prev, 
         name: item.name, 
         customIcon: bestIcon,
-        color: autoColor,
+        primaryColor: autoColor,
+        secondaryColor: autoColor,
         ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
       }));
     };
@@ -362,7 +327,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
         const canvas = document.createElement('canvas');
         const MAX = 256;
         let w = img.width;
@@ -374,29 +339,18 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         const dataUrl = canvas.toDataURL('image/webp', 0.9);
-        let extractedColor = editForm.color;
+        
+        let extractedPrimary = editForm.primaryColor || '#6366f1';
+        let extractedSecondary = editForm.secondaryColor || '#6366f1';
+        
         try {
-          const data = ctx.getImageData(0, 0, w, h).data;
-          let r = 0, g = 0, b = 0, count = 0;
-          let maxS = 0; let domR = 0, domG = 0, domB = 0;
-          for (let i = 0; i < data.length; i += 4) {
-            if (data[i+3] > 127) {
-              const pr = data[i], pg = data[i+1], pb = data[i+2];
-              r += pr; g += pg; b += pb; count++;
-              const max = Math.max(pr, pg, pb), min = Math.min(pr, pg, pb);
-              const s = max === 0 ? 0 : (max - min) / max;
-              if (s > maxS && max > 50) {
-                maxS = s; domR = pr; domG = pg; domB = pb;
-              }
-            }
-          }
-          if (maxS > 0.2) {
-            extractedColor = '#' + [domR, domG, domB].map(x => x.toString(16).padStart(2, '0')).join('');
-          } else if (count > 0) {
-            extractedColor = '#' + [Math.floor(r/count), Math.floor(g/count), Math.floor(b/count)].map(x => x.toString(16).padStart(2, '0')).join('');
-          }
+          const palette = await Vibrant.from(img).getPalette();
+          if (palette.Vibrant) extractedPrimary = palette.Vibrant.hex;
+          if (palette.DarkVibrant) extractedSecondary = palette.DarkVibrant.hex;
+          else if (palette.Muted) extractedSecondary = palette.Muted.hex;
         } catch(e) {}
-        setEditForm(prev => ({ ...prev, customIcon: dataUrl, color: extractedColor }));
+        
+        setEditForm(prev => ({ ...prev, customIcon: dataUrl, primaryColor: extractedPrimary, secondaryColor: extractedSecondary }));
       };
       img.src = event.target.result;
     };
@@ -408,19 +362,43 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
       <div className="admin-form-group">
         <label>Service/Game Title (Auto-Search)</label>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
-          {(editForm.customIcon || getFavicon(editForm.name)) && (
-            <img src={editForm.customIcon || getFavicon(editForm.name)} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'contain', background: '#222' }} alt="Preview" />
-          )}
+          {(editForm.customIcon || getFavicon(editForm.name)) && (() => {
+            const isVerticalGame = (editForm.category === 'Gaming' || editForm.name?.toLowerCase().includes('epic')) && ((editForm.customIcon && (editForm.customIcon.includes('lutris') || editForm.customIcon.includes('igdb') || editForm.customIcon.includes('epicgames') || editForm.customIcon.includes('epic'))) || !editForm.customIcon);
+            return (
+              <img 
+                src={editForm.customIcon || getFavicon(editForm.name)} 
+                style={{ 
+                  width: '32px', 
+                  height: isVerticalGame ? '44px' : '32px', 
+                  borderRadius: '4px', 
+                  objectFit: 'cover', 
+                  background: '#222' 
+                }} 
+                alt="Preview" 
+              />
+            );
+          })()}
           <div style={{ flex: 1, position: 'relative' }}>
              <input className="admin-form-input" style={{ width: '100%' }} placeholder="Enter name to search brand (e.g. Netflix, Spotify)..." value={editForm.name || ''} onChange={e => handleSearch(e.target.value)} />
              {suggestions.length > 0 && (
                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--color-surface)', border: '1px solid var(--color-border)', zIndex: 10, maxHeight: '200px', overflowY: 'auto', borderRadius: '8px', marginTop: '4px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
                  {suggestions.map((s, idx) => (
                     <div key={idx} onClick={() => handleSelect(s)} style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--color-background)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                       <img src={s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`} style={{ width: s.type === 'Game' ? '56px' : '28px', height: '28px', borderRadius: '4px', objectFit: 'contain', background: '#111' }} alt={s.name} onError={e => e.target.style.display='none'} />
+                       <img 
+                         src={s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`} 
+                         style={{ 
+                           width: s.type === 'Game' ? (s.domain === 'Epic Games' ? '28px' : '56px') : '28px', 
+                           height: s.type === 'Game' ? (s.domain === 'Epic Games' ? '38px' : '24px') : '28px', 
+                           borderRadius: '4px', 
+                           objectFit: 'cover', 
+                           background: '#111' 
+                         }} 
+                         alt={s.name} 
+                         onError={e => e.target.style.display='none'} 
+                       />
                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                         <span style={{ fontWeight: '600' }}>{s.name}</span>
-                         <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{s.domain}</span>
+                          <span style={{ fontWeight: '600' }}>{s.name}</span>
+                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{s.domain}</span>
                        </div>
                        <span style={{ fontSize: '10px', padding: '2px 6px', background: s.type === 'Game' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(99, 102, 241, 0.2)', color: s.type === 'Game' ? '#4ade80' : '#818cf8', borderRadius: '4px' }}>{s.type}</span>
                     </div>
@@ -534,7 +512,21 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`${API_BASE}/plans?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
-      setServices(data);
+      const normalized = data.map(p => {
+        let cat = p.category ? p.category.trim() : '';
+        const catLower = cat.toLowerCase();
+        if (catLower.includes('gam') || catLower === 'steam' || catLower === 'playstation' || catLower === 'xbox') {
+          p.category = 'Gaming';
+        } else if (catLower === 'vpn') {
+          p.category = 'VPN';
+        } else if (catLower.includes('ai')) {
+          p.category = 'AI+';
+        } else if (!p.category || p.category.trim() === '') {
+          p.category = 'Streaming';
+        }
+        return p;
+      });
+      setServices(normalized);
       setLoading(false);
 
       // Fetch dynamic buyer orders
@@ -1053,7 +1045,7 @@ export default function AdminDashboard() {
                     <button 
                       className="btn-primary"
                       onClick={() => {
-                        setEditForm({ name: '', category: 'Streaming', color: '#6366f1', description: 'default', status: 'Available', plans: [{ label: 'default', quality: '', duration: 'default', price: '₹', type: '', supportedDevices: ['TV', 'PC', 'iOS', 'Android'], image: '' }] });
+                        setEditForm({ name: '', category: 'Streaming', primaryColor: '#6366f1', secondaryColor: '#4f46e5', description: 'default', status: 'Available', plans: [{ label: 'default', quality: '', duration: 'default', price: '₹', type: '', supportedDevices: ['TV', 'PC', 'iOS', 'Android'], image: '' }] });
                         setShowAddForm(true);
                       }}
                       style={{ padding: '0.6rem 1.25rem', borderRadius: '10px' }}
@@ -1080,16 +1072,16 @@ export default function AdminDashboard() {
                                         const val = e_val;
                                         const lowerVal = val.toLowerCase();
                                         let newCategory = editForm.category;
-                                        let newColor = editForm.color;
+                                        let newPrimary = editForm.primaryColor; let newSecondary = editForm.secondaryColor;
                                         
                                         const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
                                         if (matchedBrand) {
                                           const catIsDefault = !editForm.category || editForm.category === 'Streaming';
-                                          const colorIsDefault = !editForm.color || editForm.color === '#6366f1' || editForm.color === '#000000';
+                                          const colorIsDefault = !editForm.primaryColor || editForm.primaryColor === '#6366f1' || editForm.primaryColor === '#000000';
                                           if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
-                                          if (colorIsDefault && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
+                                          if (colorIsDefault && BRAND_COLORS[matchedBrand]) { newPrimary = BRAND_COLORS[matchedBrand]; newSecondary = BRAND_COLORS[matchedBrand]; }
                                         }
-                                        setEditForm({...editForm, name: val, category: newCategory, color: newColor});
+                                        setEditForm({...editForm, name: val, category: newCategory, primaryColor: newPrimary, secondaryColor: newSecondary});
                                       }} 
   />
                                   <div className="admin-form-group">
@@ -1123,10 +1115,22 @@ export default function AdminDashboard() {
                                     )}
                                   </div>
                                   <div className="admin-form-group">
-                                    <label>Accent Color</label>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                      <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.color || '').trim())) ? '#' + editForm.color.trim() : editForm.color || '#333' }}></div>
-                                      <input className="admin-form-input" style={{ flex: 1 }} value={editForm.color || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, color: val}); }} />
+                                    <label>Brand Colors (Auto-Extracted)</label>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                      <div>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Primary Color</label>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.25rem' }}>
+                                          <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.primaryColor || '').trim())) ? '#' + editForm.primaryColor.trim() : editForm.primaryColor || '#333' }}></div>
+                                          <input className="admin-form-input" style={{ flex: 1 }} placeholder="#e50914" value={editForm.primaryColor || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, primaryColor: val}); }} />
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Secondary Color</label>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.25rem' }}>
+                                          <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.secondaryColor || '').trim())) ? '#' + editForm.secondaryColor.trim() : editForm.secondaryColor || '#333' }}></div>
+                                          <input className="admin-form-input" style={{ flex: 1 }} placeholder="#7a0010" value={editForm.secondaryColor || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, secondaryColor: val}); }} />
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                   <div className="admin-form-group">
@@ -1301,7 +1305,7 @@ export default function AdminDashboard() {
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                                     <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: `${s.color}22`, border: `1px solid ${s.color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                       {s.category === 'Gaming' ? (
-                                        <img src={s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                        <img src={s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
                                       ) : (
                                         <img src={s.customIcon || getFavicon(s.name)} style={{ width: '28px', height: '28px', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
                                       )}
@@ -1431,17 +1435,17 @@ export default function AdminDashboard() {
                                   const lowerVal = val.toLowerCase();
                                   
                                   let newCategory = editForm.category;
-                                  let newColor = editForm.color;
+                                  let newPrimary = editForm.primaryColor; let newSecondary = editForm.secondaryColor;
                                   
                                   const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
                                   if (matchedBrand) {
                                     const catIsDefault = !editForm.category || editForm.category === 'Streaming';
-                                    const colorIsDefault = !editForm.color || editForm.color === '#6366f1' || editForm.color === '#000000';
+                                    const colorIsDefault = !editForm.primaryColor || editForm.primaryColor === '#6366f1' || editForm.primaryColor === '#000000';
                                     if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
-                                    if (colorIsDefault && BRAND_COLORS[matchedBrand]) newColor = BRAND_COLORS[matchedBrand];
+                                    if (colorIsDefault && BRAND_COLORS[matchedBrand]) { newPrimary = BRAND_COLORS[matchedBrand]; newSecondary = BRAND_COLORS[matchedBrand]; }
                                   }
                                   
-                                  setEditForm({...editForm, name: val, category: newCategory, color: newColor});
+                                  setEditForm({...editForm, name: val, category: newCategory, primaryColor: newPrimary, secondaryColor: newSecondary});
                                 }} 
   />
                             <div className="admin-form-group">
@@ -1475,10 +1479,22 @@ export default function AdminDashboard() {
                               )}
                             </div>
                             <div className="admin-form-group">
-                              <label>Accent Hex Color</label>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.color || '').trim())) ? '#' + editForm.color.trim() : editForm.color || '#333' }}></div>
-                                <input className="admin-form-input" style={{ flex: 1 }} placeholder="#e50914" value={editForm.color || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, color: val}); }} />
+                              <label>Brand Colors (Auto-Extracted)</label>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                  <label style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Primary Color</label>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.25rem' }}>
+                                    <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.primaryColor || '').trim())) ? '#' + editForm.primaryColor.trim() : editForm.primaryColor || '#333' }}></div>
+                                    <input className="admin-form-input" style={{ flex: 1 }} placeholder="#e50914" value={editForm.primaryColor || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, primaryColor: val}); }} />
+                                  </div>
+                                </div>
+                                <div>
+                                  <label style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Secondary Color</label>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.25rem' }}>
+                                    <div style={{ width: '30px', height: '30px', borderRadius: '4px', backgroundColor: (/^[0-9A-Fa-f]{3,6}$/.test((editForm.secondaryColor || '').trim())) ? '#' + editForm.secondaryColor.trim() : editForm.secondaryColor || '#333' }}></div>
+                                    <input className="admin-form-input" style={{ flex: 1 }} placeholder="#7a0010" value={editForm.secondaryColor || ''} onChange={e => { let val = e.target.value; if (val.length > 0 && !val.startsWith('#') && /^[0-9A-Fa-f]*$/.test(val)) val = '#' + val; setEditForm({...editForm, secondaryColor: val}); }} />
+                                  </div>
+                                </div>
                               </div>
                             </div>
                             <div className="admin-form-group">

@@ -13,12 +13,142 @@ const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
 
+const POPULAR_EGS_GAMES = [
+  {
+    name: "Marvel's Spider-Man Remastered",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co4w1w.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Marvel's Spider-Man: Miles Morales",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co582f.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Marvel's Spider-Man 2",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co6mkv.jpg',
+    type: 'Game'
+  },
+  {
+    name: "God of War",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co1tpx.jpg',
+    type: 'Game'
+  },
+  {
+    name: "God of War Ragnarök",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co582b.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Grand Theft Auto V",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co2lbd.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Red Dead Redemption 2",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co1q1f.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Elden Ring",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co4p96.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Black Myth: Wukong",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co7d6v.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Cyberpunk 2077",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co2mo1.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Alan Wake 2",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co6mkh.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Hogwarts Legacy",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co6525.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Ghost of Tsushima DIRECTOR'S CUT",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co843a.jpg',
+    type: 'Game'
+  },
+  {
+    name: "The Last of Us Part I",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co55h3.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Uncharted: Legacy of Thieves Collection",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co3w40.jpg',
+    type: 'Game'
+  },
+  {
+    name: "EA SPORTS FC 25",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co8g5w.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Horizon Forbidden West Complete Edition",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co7m30.jpg',
+    type: 'Game'
+  },
+  {
+    name: "WWE 2K24",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co7ss3.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Forza Horizon 5",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co3w7y.jpg',
+    type: 'Game'
+  },
+  {
+    name: "Assassin's Creed Mirage",
+    domain: 'Epic Games',
+    icon: 'https://lutris.net/media/igdb/cover_big/co6845.jpg',
+    type: 'Game'
+  }
+];
+
   app.get('/api/search-games', async (req, res) => {
     const q = req.query.q;
     if (!q) return res.json([]);
     
     try {
       let results = [];
+      const qLower = q.toLowerCase();
+
+      // 0. Match local high-fidelity Epic Games Store fallback database
+      const localMatches = POPULAR_EGS_GAMES.filter(g => g.name.toLowerCase().includes(qLower));
+      if (localMatches.length > 0) {
+        results = [...results, ...localMatches];
+      }
       
       // 1. Fetch Steam Games
       try {
@@ -36,6 +166,32 @@ app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
         }
       } catch (err) {
         console.log('Steam search error:', err.message);
+      }
+
+      // 1.5. Fetch Epic Games (Lutris/IGDB)
+      try {
+        const lutrisRes = await fetch(`https://lutris.net/api/games?search=${encodeURIComponent(q)}`);
+        const lutrisData = await lutrisRes.json();
+        if (lutrisData && lutrisData.results && lutrisData.results.length > 0) {
+          const epicResults = lutrisData.results.slice(0, 4).map(item => {
+            let iconUrl = item.coverart || item.banner_url || `https://www.google.com/s2/favicons?domain=epicgames.com&sz=256`;
+            if (iconUrl && iconUrl.startsWith('/')) {
+              iconUrl = 'https://lutris.net' + iconUrl;
+            }
+            return {
+              name: item.name,
+              domain: 'Epic Games',
+              icon: iconUrl,
+              type: 'Game'
+            };
+          });
+          
+          // Deduplicate based on name with localMatches
+          const filteredEpicResults = epicResults.filter(er => !results.some(r => r.name.toLowerCase() === er.name.toLowerCase()));
+          results = [...results, ...filteredEpicResults];
+        }
+      } catch (err) {
+        console.log('Lutris/Epic search error:', err.message);
       }
       
       // 2. Fetch OTT Brands
