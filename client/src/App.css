@@ -674,17 +674,20 @@ nav {
   overflow: visible !important;
 }
 .device-btn.out-of-stock {
-  opacity: 0.4;
   cursor: not-allowed;
-  border-color: rgba(239, 68, 68, 0.2) !important;
-  background: rgba(239, 68, 68, 0.01) !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  background: rgba(239, 68, 68, 0.02) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+.device-btn.out-of-stock .device-icon {
+  opacity: 0.35;
 }
 .device-btn.out-of-stock:hover {
   transform: none !important;
   box-shadow: none !important;
-  border-color: rgba(239, 68, 68, 0.2) !important;
-  color: var(--text-dim) !important;
-  background: rgba(239, 68, 68, 0.01) !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(239, 68, 68, 0.02) !important;
 }
 .device-btn.selected {
   border-color: var(--popup-color, #7c3aed);
@@ -716,11 +719,11 @@ nav {
 
 /* OUT OF STOCK Red Light Glow Badge */
 .device-status-badge.oos {
-  background: rgba(239, 68, 68, 0.95);
-  color: #fff;
-  border: 1px solid #ef4444;
-  text-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6), inset 0 0 4px rgba(255,255,255,0.2);
+  background: #ef4444 !important;
+  color: #fff !important;
+  border: 1px solid #ff6b6b !important;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.95), inset 0 0 4px rgba(255,255,255,0.3) !important;
 }
 
 /* AVAILABLE Green Light Glow Badge */
