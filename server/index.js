@@ -9,6 +9,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+};
+
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
@@ -150,30 +163,33 @@ const POPULAR_EGS_GAMES = [
         results = [...results, ...localMatches];
       }
       
-      // 1. Fetch Steam Games
+      // 1. Fetch Steam Games (Using official storefront search for rate-limit resilience)
       try {
-        const steamRes = await fetch(`https://steamcommunity.com/actions/SearchApps/${encodeURIComponent(q)}`);
+        const steamRes = await fetchWithTimeout(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(q)}&l=english&cc=US`, {}, 3000);
         const steamData = await steamRes.json();
         
-        if (steamData && steamData.length > 0) {
-          const gameResults = steamData.slice(0, 4).map(item => ({
+        if (steamData && steamData.items && steamData.items.length > 0) {
+          const gameResults = steamData.items.slice(0, 5).map(item => ({
             name: item.name,
             domain: 'Steam Game',
-            icon: `https://cdn.akamai.steamstatic.com/steam/apps/${item.appid}/capsule_184x69.jpg`,
+            icon: `https://cdn.cloudflare.steamstatic.com/steam/apps/${item.id}/library_600x900_2x.jpg`,
             type: 'Game'
           }));
-          results = [...results, ...gameResults];
+          
+          // Deduplicate based on name
+          const uniqueSteamResults = gameResults.filter(gr => !results.some(r => r.name.toLowerCase() === gr.name.toLowerCase()));
+          results = [...results, ...uniqueSteamResults];
         }
       } catch (err) {
-        console.log('Steam search error:', err.message);
+        console.log('Steam store search error:', err.message);
       }
 
       // 1.5. Fetch Epic Games (Lutris/IGDB)
       try {
-        const lutrisRes = await fetch(`https://lutris.net/api/games?search=${encodeURIComponent(q)}`);
+        const lutrisRes = await fetchWithTimeout(`https://lutris.net/api/games?search=${encodeURIComponent(q)}`, {}, 3000);
         const lutrisData = await lutrisRes.json();
         if (lutrisData && lutrisData.results && lutrisData.results.length > 0) {
-          const epicResults = lutrisData.results.slice(0, 4).map(item => {
+          const epicResults = lutrisData.results.slice(0, 5).map(item => {
             let iconUrl = item.coverart || item.banner_url || `https://www.google.com/s2/favicons?domain=epicgames.com&sz=256`;
             if (iconUrl && iconUrl.startsWith('/')) {
               iconUrl = 'https://lutris.net' + iconUrl;
@@ -186,7 +202,7 @@ const POPULAR_EGS_GAMES = [
             };
           });
           
-          // Deduplicate based on name with localMatches
+          // Deduplicate based on name
           const filteredEpicResults = epicResults.filter(er => !results.some(r => r.name.toLowerCase() === er.name.toLowerCase()));
           results = [...results, ...filteredEpicResults];
         }
@@ -196,7 +212,7 @@ const POPULAR_EGS_GAMES = [
       
       // 2. Fetch OTT Brands
       try {
-        const brandRes = await fetch(`https://api.brandfetch.io/v2/search/${encodeURIComponent(q)}`);
+        const brandRes = await fetchWithTimeout(`https://api.brandfetch.io/v2/search/${encodeURIComponent(q)}`, {}, 3000);
         const brandData = await brandRes.json();
         
         if (brandData && brandData.length > 0) {

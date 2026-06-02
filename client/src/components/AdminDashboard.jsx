@@ -363,16 +363,17 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         <label>Service/Game Title (Auto-Search)</label>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
           {(editForm.customIcon || getFavicon(editForm.name)) && (() => {
-            const isVerticalGame = (editForm.category === 'Gaming' || editForm.name?.toLowerCase().includes('epic')) && ((editForm.customIcon && (editForm.customIcon.includes('lutris') || editForm.customIcon.includes('igdb') || editForm.customIcon.includes('epicgames') || editForm.customIcon.includes('epic'))) || !editForm.customIcon);
+            const isGaming = editForm.category === 'Gaming';
             return (
               <img 
                 src={editForm.customIcon || getFavicon(editForm.name)} 
                 style={{ 
-                  width: '32px', 
-                  height: isVerticalGame ? '44px' : '32px', 
-                  borderRadius: '4px', 
+                  width: isGaming ? '48px' : '32px', 
+                  height: isGaming ? '64px' : '32px', 
+                  borderRadius: isGaming ? '6px' : '4px', 
                   objectFit: 'cover', 
-                  background: '#222' 
+                  background: '#222',
+                  boxShadow: isGaming ? '0 2px 8px rgba(0,0,0,0.4)' : 'none'
                 }} 
                 alt="Preview" 
               />
@@ -387,8 +388,8 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                        <img 
                          src={s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`} 
                          style={{ 
-                           width: s.type === 'Game' ? (s.domain === 'Epic Games' ? '28px' : '56px') : '28px', 
-                           height: s.type === 'Game' ? (s.domain === 'Epic Games' ? '38px' : '24px') : '28px', 
+                           width: s.type === 'Game' ? '32px' : '28px', 
+                           height: s.type === 'Game' ? '42px' : '28px', 
                            borderRadius: '4px', 
                            objectFit: 'cover', 
                            background: '#111' 
