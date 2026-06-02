@@ -1193,8 +1193,8 @@ export default function App() {
                     custom={i}
                     variants={deviceItemVariants}
                     className={`device-btn ${popup.device === d.id ? 'selected' : ''} ${available ? 'available' : 'out-of-stock'}`}
-                    whileHover={{ scale: 1.08, y: -3, boxShadow: `0 8px 24px rgba(0,0,0,0.3)` }}
-                    whileTap={{ scale: 0.92 }}
+                    whileHover={available ? { scale: 1.08, y: -3, boxShadow: `0 8px 24px rgba(0,0,0,0.3)` } : {}}
+                    whileTap={available ? { scale: 0.92 } : {}}
                     onClick={() => { if(available) setPopup(prev => ({ ...prev, device: d.id })) }}
                   >
                     <motion.span
@@ -1206,7 +1206,11 @@ export default function App() {
                       {d.icon()}
                     </motion.span>
                     {d.label}
-                    {!available && <span className="oos-badge">Out of Stock</span>}
+                    {available ? (
+                      <span className="device-status-badge available">Available</span>
+                    ) : (
+                      <span className="device-status-badge oos">Out of Stock</span>
+                    )}
                   </motion.button>
                 );
               })}
