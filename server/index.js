@@ -22,6 +22,41 @@ const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
   }
 };
 
+let twitchTokenInfo = null;
+
+async function getTwitchToken() {
+  const clientId = process.env.TWITCH_CLIENT_ID;
+  const clientSecret = process.env.TWITCH_CLIENT_SECRET;
+  
+  if (!clientId || !clientSecret) {
+    return null;
+  }
+  
+  if (twitchTokenInfo && twitchTokenInfo.accessToken && twitchTokenInfo.expiresAt > Date.now() + 60000) {
+    return twitchTokenInfo.accessToken;
+  }
+  
+  try {
+    const res = await fetchWithTimeout(`https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`, {
+      method: 'POST'
+    }, 4000);
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.access_token) {
+        twitchTokenInfo = {
+          accessToken: data.access_token,
+          expiresAt: Date.now() + (data.expires_in * 1000)
+        };
+        return data.access_token;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to retrieve Twitch OAuth token:', err.message);
+  }
+  return null;
+}
+
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => res.send('StreamBazaar API v2 (NeDB Connected)'));
@@ -233,7 +268,7 @@ const POPULAR_EGS_GAMES = [
           const gameResults = steamData.items.slice(0, 5).map(item => ({
             name: item.name,
             domain: 'Steam Game',
-            icon: `https://cdn.cloudflare.steamstatic.com/steam/apps/${item.id}/library_600x900_2x.jpg`,
+            icon: `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg`,
             type: 'Game'
           }));
           
@@ -243,6 +278,70 @@ const POPULAR_EGS_GAMES = [
         }
       } catch (err) {
         console.log('Steam store search error:', err.message);
+      }
+
+      // 1.1. Fetch RAWG Games (if API key is present)
+      try {
+        const rawgKey = process.env.RAWG_API_KEY;
+        if (rawgKey) {
+          const rawgRes = await fetchWithTimeout(`https://api.rawg.io/api/games?search=${encodeURIComponent(q)}&key=${rawgKey}`, {}, 3000);
+          if (rawgRes.ok) {
+            const rawgData = await rawgRes.json();
+            if (rawgData && Array.isArray(rawgData.results)) {
+              const rawgResults = rawgData.results.slice(0, 5).map(item => ({
+                name: item.name,
+                domain: 'RAWG Game',
+                icon: item.background_image || '',
+                type: 'Game'
+              }));
+              const uniqueRawgResults = rawgResults.filter(rr => !results.some(r => r.name.toLowerCase() === rr.name.toLowerCase()));
+              results = [...results, ...uniqueRawgResults];
+            }
+          }
+        }
+      } catch (err) {
+        console.log('RAWG search error:', err.message);
+      }
+
+      // 1.2. Fetch IGDB Games (if Twitch credentials are present)
+      try {
+        const token = await getTwitchToken();
+        const clientId = process.env.TWITCH_CLIENT_ID;
+        if (token && clientId) {
+          const igdbRes = await fetchWithTimeout('https://api.igdb.com/v4/games', {
+            method: 'POST',
+            headers: {
+              'Client-ID': clientId,
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'text/plain'
+            },
+            body: `search "${q.replace(/"/g, '\\"')}"; fields name, cover.url, cover.image_id; limit 5;`
+          }, 3000);
+          
+          if (igdbRes.ok) {
+            const igdbData = await igdbRes.json();
+            if (Array.isArray(igdbData)) {
+              const igdbResults = igdbData.map(item => {
+                let iconUrl = '';
+                if (item.cover && item.cover.image_id) {
+                  iconUrl = `https://images.igdb.com/igdb/image/upload/t_cover_big/${item.cover.image_id}.jpg`;
+                } else if (item.cover && item.cover.url) {
+                  iconUrl = item.cover.url.startsWith('//') ? 'https:' + item.cover.url : item.cover.url;
+                }
+                return {
+                  name: item.name,
+                  domain: 'IGDB Game',
+                  icon: iconUrl,
+                  type: 'Game'
+                };
+              });
+              const uniqueIgdbResults = igdbResults.filter(ir => !results.some(r => r.name.toLowerCase() === ir.name.toLowerCase()));
+              results = [...results, ...uniqueIgdbResults];
+            }
+          }
+        }
+      } catch (err) {
+        console.log('IGDB search error:', err.message);
       }
 
       // 1.5. Fetch Epic Games (Lutris/IGDB)
@@ -257,7 +356,7 @@ const POPULAR_EGS_GAMES = [
             }
             return {
               name: item.name,
-              domain: 'Epic Games',
+              domain: 'IGDB Game',
               icon: iconUrl,
               type: 'Game'
             };

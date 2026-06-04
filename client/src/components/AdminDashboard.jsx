@@ -1405,7 +1405,18 @@ export default function AdminDashboard() {
                               ) : (
                                 <div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: `${s.color}22`, border: `1px solid ${s.color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                    <div style={{ 
+                                      width: s.category === 'Gaming' ? '48px' : '48px', 
+                                      height: s.category === 'Gaming' ? '64px' : '48px', 
+                                      borderRadius: s.category === 'Gaming' ? '8px' : '12px', 
+                                      background: `${s.color}22`, 
+                                      border: `1px solid ${s.color}33`, 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      justifyContent: 'center', 
+                                      overflow: 'hidden',
+                                      flexShrink: 0
+                                    }}>
                                       {s.category === 'Gaming' ? (
                                         <img src={getProxiedUrl(s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name))} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
                                       ) : (
