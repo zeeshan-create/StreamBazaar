@@ -150,7 +150,11 @@ const POPULAR_EGS_GAMES = [
 ];
 
   app.get('/api/search-games', async (req, res) => {
-    const q = req.query.q;
+    let rawQ = req.query.q || '';
+    if (!rawQ) return res.json([]);
+    
+    // Clean up unicode symbols like ™, ®, © and trim whitespace for robust API query matching
+    const q = rawQ.replace(/[™®©]/g, '').replace(/\s+/g, ' ').trim();
     if (!q) return res.json([]);
     
     try {

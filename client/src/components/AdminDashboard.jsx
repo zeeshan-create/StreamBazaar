@@ -248,13 +248,26 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
 
     if (val.length > 2) {
       try {
-        const [brandRes, gameRes] = await Promise.all([
-          fetch(`https://api.brandfetch.io/v2/search/${val}`).catch(() => ({ json: () => [] })),
-          fetch(`${API_BASE}/search-games?q=${encodeURIComponent(val)}`).catch(() => ({ json: () => [] }))
-        ]);
-        
-        const brandData = await brandRes.json();
-        const gameData = await gameRes.json();
+        let brandData = [];
+        let gameData = [];
+
+        try {
+          const brandRes = await fetch(`https://api.brandfetch.io/v2/search/${encodeURIComponent(val)}`);
+          if (brandRes.ok) {
+            brandData = await brandRes.json().catch(() => []);
+          }
+        } catch (e) {
+          console.error("Brandfetch error:", e);
+        }
+
+        try {
+          const gameRes = await fetch(`${API_BASE}/search-games?q=${encodeURIComponent(val)}`);
+          if (gameRes.ok) {
+            gameData = await gameRes.json().catch(() => []);
+          }
+        } catch (e) {
+          console.error("Game search error:", e);
+        }
         
         let combined = [];
         if (Array.isArray(brandData)) {
@@ -275,7 +288,9 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         }
         
         setSuggestions(combined);
-      } catch (err) {}
+      } catch (err) {
+        console.error("Search suggestions combined error:", err);
+      }
     } else {
       setSuggestions([]);
     }
