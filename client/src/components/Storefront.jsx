@@ -297,6 +297,8 @@ export default function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const plansJsonRef = useRef('');
+
   const fetchPlans = useCallback(() => {
     const cacheBuster = Date.now();
     fetch(`${API_BASE}/api/plans?v=${cacheBuster}`, { cache: 'no-store' })
@@ -317,7 +319,13 @@ export default function App() {
           
           return p;
         });
-        setPlans(formatted); 
+        
+        // Deep serialization check to avoid redundant React renders and lag
+        const jsonStr = JSON.stringify(formatted);
+        if (jsonStr !== plansJsonRef.current) {
+          plansJsonRef.current = jsonStr;
+          setPlans(formatted);
+        }
         setLoading(false); 
       })
       .catch(() => setLoading(false));
@@ -330,12 +338,23 @@ export default function App() {
     // Initial fetch
     fetchPlans();
     
-    // Set up real-time live polling (every 3 seconds) for instant updates across all clients
+    // Low-latency live polling (1 second) for instant updates across all clients
     const interval = setInterval(() => {
       fetchPlans();
-    }, 3000);
+    }, 1000);
     
-    return () => clearInterval(interval);
+    // Sync instantly when user tabs back or page becomes visible
+    const handleSync = () => {
+      fetchPlans();
+    };
+    window.addEventListener('focus', handleSync);
+    document.addEventListener('visibilitychange', handleSync);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleSync);
+      document.removeEventListener('visibilitychange', handleSync);
+    };
   }, [fetchPlans]);
 
   const handleKey = useCallback((e) => { if (e.key === 'Escape') setPopup(null); }, []);
@@ -705,10 +724,8 @@ export default function App() {
                                   fontSize: '1.6rem', 
                                   fontWeight: 700, 
                                   letterSpacing: '-0.5px',
-                                  background: `linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(i + 2) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(i + 4) % VIBRANT_COLORS.length]})`,
-                                  WebkitBackgroundClip: 'text',
-                                  WebkitTextFillColor: 'transparent'
-                                }}>{plan.price}</div>
+                                  color: effectiveColor
+                                }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</div>
                                 <button style={{ padding: '0.6rem 1.25rem', borderRadius: '12px', background: '#2f3136', border: '1px solid #4a4d55', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
                                   Buy
                                 </button>
@@ -868,13 +885,11 @@ export default function App() {
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
                             <span className="plan-row-price" style={{ 
-                                background: `linear-gradient(135deg, ${effectiveColor}, ${VIBRANT_COLORS[(i + 1) % VIBRANT_COLORS.length]}, ${VIBRANT_COLORS[(i + 3) % VIBRANT_COLORS.length]})`,
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
+                                color: effectiveColor,
                                 fontWeight: '900', 
                                 fontSize: '1.15rem', 
                                 letterSpacing: '0.5px' 
-                              }}>{plan.price}</span>
+                              }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</span>
                             <motion.span
                               className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
                               style={{ border: `1px solid ${effectiveColor}50`, color: effectiveColor }}

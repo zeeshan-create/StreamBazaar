@@ -568,17 +568,30 @@ export default function AdminDashboard() {
 
   const handleSave = async (id) => {
     try {
+      const sanitizedPlans = (editForm.plans || []).map(p => {
+        let price = (p.price || '').trim();
+        if (price && !price.startsWith('₹')) {
+          price = '₹' + price;
+        }
+        return { ...p, price };
+      });
+      const payload = { ...editForm, plans: sanitizedPlans };
+
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         setEditingId(null);
         fetchServices();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to save: ${errData.error || res.statusText || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Save error:', err);
+      alert(`Save connection error: ${err.message}`);
     }
   };
 
@@ -594,17 +607,30 @@ export default function AdminDashboard() {
 
   const handleAdd = async () => {
     try {
+      const sanitizedPlans = (editForm.plans || []).map(p => {
+        let price = (p.price || '').trim();
+        if (price && !price.startsWith('₹')) {
+          price = '₹' + price;
+        }
+        return { ...p, price };
+      });
+      const payload = { ...editForm, plans: sanitizedPlans };
+
       const res = await fetch(`${API_BASE}/admin/plans`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         setShowAddForm(false);
         fetchServices();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to add service: ${errData.error || res.statusText || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Add error:', err);
+      alert(`Add connection error: ${err.message}`);
     }
   };
 

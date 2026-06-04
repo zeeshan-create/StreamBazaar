@@ -301,7 +301,10 @@ app.post('/api/admin/plans', async (req, res) => {
 
 app.put('/api/admin/plans/:id', async (req, res) => {
   try {
-    await Service.update({ _id: req.params.id }, { $set: req.body });
+    const updateData = { ...req.body };
+    delete updateData._id;
+    delete updateData.__v;
+    await Service.update({ _id: req.params.id }, { $set: updateData });
     const updated = await Service.findOne({ _id: req.params.id });
     res.json(updated);
   } catch (err) {
