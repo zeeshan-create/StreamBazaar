@@ -549,25 +549,40 @@ export default function App() {
               transition={{ duration: 0.2 }}
             >
               {filtered.length > 0 ? (
-                filtered.map(product => (
-                   <div key={product._id} className="search-result-item" onClick={() => {
-                      setSearchTerm('');
-                      setShowResults(false);
-                      setTimeout(() => {
-                         const el = document.getElementById(`card-${product._id}`);
-                         if (el) {
-                           const y = el.getBoundingClientRect().top + window.scrollY - 100;
-                           window.scrollTo({ top: y, behavior: 'smooth' });
-                         }
-                      }, 100);
-                   }}>
-                     <img src={product.customIcon || getFavicon(product.name)} className="search-result-logo" alt={product.name} />
-                     <div className="search-result-info">
-                       <div className="search-result-name">{product.name}</div>
-                       <div className="search-result-price">Starts at {product.plans[0].price}</div>
+                filtered.map(product => {
+                   const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
+                   const sanitizeColor = (c) => {
+                     if (!c) return null;
+                     c = c.trim();
+                     if (/^[0-9A-Fa-f]{3,6}$/.test(c)) return '#' + c;
+                     return c;
+                   };
+                   const rawColor = sanitizeColor(product.color);
+                   const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
+                   const effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[0] : rawColor;
+                   const displayPrice = product.plans?.[0]?.price || '';
+                   const formattedPrice = displayPrice.startsWith('₹') ? displayPrice : '₹' + displayPrice;
+
+                   return (
+                     <div key={product._id} className="search-result-item" onClick={() => {
+                        setSearchTerm('');
+                        setShowResults(false);
+                        setTimeout(() => {
+                           const el = document.getElementById(`card-${product._id}`);
+                           if (el) {
+                             const y = el.getBoundingClientRect().top + window.scrollY - 100;
+                             window.scrollTo({ top: y, behavior: 'smooth' });
+                           }
+                        }, 100);
+                     }}>
+                       <img src={product.customIcon || getFavicon(product.name)} className="search-result-logo" alt={product.name} />
+                       <div className="search-result-info">
+                         <div className="search-result-name">{product.name}</div>
+                         <div className="search-result-price" style={{ color: effectiveColor, fontWeight: '700' }}>Starts at {formattedPrice}</div>
+                       </div>
                      </div>
-                   </div>
-                ))
+                   );
+                })
               ) : (
                 <div className="search-no-results">No products found</div>
               )}
@@ -724,7 +739,8 @@ export default function App() {
                                   fontSize: '1.6rem', 
                                   fontWeight: 700, 
                                   letterSpacing: '-0.5px',
-                                  color: effectiveColor
+                                  color: effectiveColor,
+                                  textShadow: `0 2px 12px ${effectiveColor}30`
                                 }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</div>
                                 <button style={{ padding: '0.6rem 1.25rem', borderRadius: '12px', background: '#2f3136', border: '1px solid #4a4d55', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
                                   Buy
@@ -888,7 +904,8 @@ export default function App() {
                                 color: effectiveColor,
                                 fontWeight: '900', 
                                 fontSize: '1.15rem', 
-                                letterSpacing: '0.5px' 
+                                letterSpacing: '0.5px',
+                                textShadow: `0 2px 10px ${effectiveColor}30`
                               }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</span>
                             <motion.span
                               className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
