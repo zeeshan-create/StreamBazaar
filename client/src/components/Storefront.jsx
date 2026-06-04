@@ -25,6 +25,13 @@ const CustomIcons = {
 const TELEGRAM_LINK = 'https://t.me/owner_trusted_streams';
 const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
 
+const getProxiedUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  if (url.startsWith('/') || url.startsWith('http://localhost') || url.startsWith('https://streambazaar')) return url;
+  return `${API_BASE}/api/proxy-image?url=${encodeURIComponent(url)}`;
+};
+
 const DOMAINS = {
   'youtube premium': 'youtube.com',
   'youtube music': 'music.youtube.com',
@@ -235,31 +242,35 @@ const FEATURES = [
 
 const overlayVariants = {
   hidden:  { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.22 } },
-  exit:    { opacity: 0, transition: { duration: 0.18 } },
+  visible: { opacity: 1, transition: { duration: 0.12, ease: 'easeOut' } },
+  exit:    { opacity: 0, transition: { duration: 0.1, ease: 'easeIn' } },
 };
 const modalVariants = {
-  hidden:  { opacity: 0, scale: 0.75, y: 50, rotateX: -15, filter: 'blur(8px)' },
-  visible: { opacity: 1, scale: 1,    y: 0,  rotateX: 0, filter: 'blur(0px)', transition: { type: 'spring', stiffness: 450, damping: 28, mass: 0.6 } },
-  exit:    { opacity: 0, scale: 0.85, y: 30, filter: 'blur(4px)', transition: { duration: 0.15, ease: 'easeIn' } },
+  hidden:  { opacity: 0, scale: 0.96, y: 15 },
+  visible: { opacity: 1, scale: 1,    y: 0,  transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] } },
+  exit:    { opacity: 0, scale: 0.96, y: 10, transition: { duration: 0.1, ease: 'easeIn' } },
 };
 const deviceItemVariants = {
-  hidden:  { opacity: 0, y: 14, scale: 0.85 },
-  visible: (i) => ({ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 22, delay: i * 0.06 } }),
+  hidden:  { opacity: 0, y: 8 },
+  visible: (i) => ({ 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.12, ease: 'easeOut', delay: i * 0.02 } 
+  }),
 };
 const cardVariants = {
-  hidden:  { opacity: 0, y: 40, scale: 0.92, rotateX: 10 },
+  hidden:  { opacity: 0, y: 15, scale: 0.98 },
   visible: (i) => ({ 
-    opacity: 1, y: 0, scale: 1, rotateX: 0, 
-    transition: { type: 'spring', stiffness: 300, damping: 20, mass: 0.8, delay: i * 0.05 } 
+    opacity: 1, y: 0, scale: 1, 
+    transition: { duration: 0.2, ease: 'easeOut', delay: Math.min(i * 0.03, 0.24) } 
   }),
-  exit:    { opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2, ease: 'easeIn' } },
+  exit:    { opacity: 0, scale: 0.98, y: 10, transition: { duration: 0.15, ease: 'easeIn' } },
 };
 const planRowVariants = {
-  hidden:  { opacity: 0, x: -20, filter: 'blur(4px)' },
+  hidden:  { opacity: 0, x: -10 },
   visible: (i) => ({ 
-    opacity: 1, x: 0, filter: 'blur(0px)', 
-    transition: { type: 'spring', stiffness: 400, damping: 25, delay: i * 0.06 } 
+    opacity: 1, x: 0, 
+    transition: { duration: 0.15, ease: 'easeOut', delay: Math.min(i * 0.03, 0.18) } 
   }),
 };
 
@@ -303,14 +314,28 @@ export default function App() {
     const cacheBuster = Date.now();
     fetch(`${API_BASE}/api/plans?v=${cacheBuster}`, { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => { 
-        const formatted = d.map(p => {
+      .then(d => {
+        const formatted = d.map((p, idx) => {
           const lower = p.name.toLowerCase();
+          
+          const finalColor = p.primaryColor || p.color;
+          p.color = finalColor;
           
           if (!p.color || p.color === '#000000' || p.color === '#333' || p.color === '#333333' || p.color === '') {
              const matchedBrand = Object.keys(BRAND_COLORS).find(k => lower.includes(k));
              if (matchedBrand) p.color = BRAND_COLORS[matchedBrand];
           }
+
+          const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
+          const sanitizeColor = (c) => {
+            if (!c) return null;
+            c = c.trim();
+            if (/^[0-9A-Fa-f]{3,6}$/.test(c)) return '#' + c;
+            return c;
+          };
+          const rawColor = sanitizeColor(p.color);
+          const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
+          p.effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : rawColor;
 
           if (!p.category || p.category.trim() === '') {
              const matchedCat = Object.keys(BRAND_CATEGORIES).find(k => lower.includes(k));
@@ -426,6 +451,13 @@ export default function App() {
       // Smart domain fallback based on name
       domain = `${lowerName.replace(/[^a-z0-9]/g, '')}.com`;
     }
+    
+    // Use Logo.dev CDN if token is available
+    const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
+    if (token) {
+      return `https://img.logo.dev/${domain}?token=${token}`;
+    }
+    
     // Use high-quality Google Favicons API (sz=256 ensures high resolution)
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
   };
@@ -550,16 +582,7 @@ export default function App() {
             >
               {filtered.length > 0 ? (
                 filtered.map(product => {
-                   const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
-                   const sanitizeColor = (c) => {
-                     if (!c) return null;
-                     c = c.trim();
-                     if (/^[0-9A-Fa-f]{3,6}$/.test(c)) return '#' + c;
-                     return c;
-                   };
-                   const rawColor = sanitizeColor(product.color);
-                   const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
-                   const effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[0] : rawColor;
+                   const effectiveColor = product.effectiveColor || '#ff0055';
                    const displayPrice = product.plans?.[0]?.price || '';
                    const formattedPrice = displayPrice.startsWith('₹') ? displayPrice : '₹' + displayPrice;
 
@@ -626,16 +649,7 @@ export default function App() {
             <AnimatePresence mode="popLayout">
               {filtered.map((product, idx) => {
                 const isGaming = product.category && product.category.toLowerCase().includes('gam');
-                const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
-                const sanitizeColor = (c) => {
-                  if (!c) return null;
-                  c = c.trim();
-                  if (/^[0-9A-Fa-f]{3,6}$/.test(c)) return '#' + c;
-                  return c;
-                };
-                const rawColor = sanitizeColor(product.color);
-                const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
-                const effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : rawColor;
+                const effectiveColor = product.effectiveColor;
 
                 if (false && isGaming) {
                   return (
@@ -793,7 +807,7 @@ export default function App() {
                         const imgUrl = isGaming ? (product.customIcon || product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : (product.customIcon || getFavicon(product.name));
                         return (
                           <img
-                            src={imgUrl}
+                            src={getProxiedUrl(imgUrl)}
                             alt={product.name}
                             style={{ 
                               width: isGaming ? '65px' : '44px',
@@ -867,7 +881,7 @@ export default function App() {
                     animate="visible"
                   >
                     {product.plans.map((plan, i) => {
-                      const gameIcon = (product.category === 'Gaming' || plan.image) ? (plan.image || getGameIcon(plan.label)) : null;
+                      const gameIcon = (product.category === 'Gaming' || plan.image) ? (plan.image || getGameIcon(plan.label) || product.customIcon || getGameIcon(product.name) || getFavicon(product.name)) : null;
                       return (
                         <motion.div
                           key={i}
@@ -883,7 +897,7 @@ export default function App() {
                           }}
                         >
                           {gameIcon && (
-                            <img src={gameIcon} className="plan-game-icon" alt={plan.label} />
+                            <img src={getProxiedUrl(gameIcon)} className="plan-game-icon" alt={plan.label} />
                           )}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
                             <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>{plan.label}</span>
@@ -1166,7 +1180,7 @@ export default function App() {
               variants={modalVariants}
               initial="hidden" animate="visible" exit="exit"
               onClick={e => e.stopPropagation()}
-              style={{ '--popup-color': popup.product.color }}
+              style={{ '--popup-color': popup.product.effectiveColor }}
             >
               {/* Close */}
               <button className="popup-close" onClick={() => setPopup(null)}>
@@ -1176,7 +1190,7 @@ export default function App() {
               {/* Header */}
               <div className="popup-header">
                 <img
-                  src={popup.product.category === 'Gaming' || popup.plan.image ? (popup.plan.image || getGameIcon(popup.plan.label) || (popup.product.customIcon || getFavicon(popup.product.name))) : (popup.product.customIcon || getFavicon(popup.product.name))}
+                  src={popup.product.category === 'Gaming' || popup.plan.image ? (popup.plan.image || getGameIcon(popup.plan.label) || popup.product.customIcon || getGameIcon(popup.product.name) || getFavicon(popup.product.name)) : (popup.product.customIcon || getFavicon(popup.product.name))}
                   alt={popup.product.name}
                   className="popup-logo"
                   onError={e => { e.target.style.display = 'none'; }}
@@ -1191,7 +1205,7 @@ export default function App() {
               {/* Selected Plan */}
               <div className="popup-plan-chip">
                 <strong>{popup.plan.label}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
-                <strong style={{ color: popup.product.color }}>{popup.plan.price}</strong>
+                <strong style={{ color: popup.product.effectiveColor }}>{popup.plan.price}</strong>
               </div>
 
               {/* Device Selector */}
@@ -1270,7 +1284,7 @@ export default function App() {
                 </div>
                 <div className="summary-price" style={{ gridColumn: '1 / -1' }}>
                   <label>Total Price</label>
-                  <span style={{ color: popup.product.color }}>{popup.plan.price}</span>
+                  <span style={{ color: popup.product.effectiveColor }}>{popup.plan.price}</span>
                 </div>
               </div>
 

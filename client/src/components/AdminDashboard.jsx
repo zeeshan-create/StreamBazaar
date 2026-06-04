@@ -13,6 +13,14 @@ import '../App.css';
 
 const API_BASE = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
 
+const getProxiedUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  if (url.startsWith('/') || url.startsWith('http://localhost') || url.startsWith('https://streambazaar')) return url;
+  const rootBase = API_BASE.endsWith('/api') ? API_BASE.slice(0, -4) : API_BASE;
+  return `${rootBase}/api/proxy-image?url=${encodeURIComponent(url)}`;
+};
+
 // Analytical Mock Datasets for SVG Chart
 const CHART_DATA = {
   '7D': {
@@ -178,11 +186,20 @@ const getFavicon = (serviceName) => {
   if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
 
   const matchedKey = Object.keys(DOMAINS).find(key => lowerName.includes(key));
+  let domain;
   if (matchedKey) {
-    return `https://www.google.com/s2/favicons?domain=${DOMAINS[matchedKey]}&sz=256`;
+    domain = DOMAINS[matchedKey];
+  } else {
+    domain = `${lowerName.split(' ')[0].replace(/[^a-z0-9]/g, '')}.com`;
   }
-  const cleanName = lowerName.split(' ')[0].replace(/[^a-z0-9]/g, '');
-  return `https://www.google.com/s2/favicons?domain=${cleanName}.com&sz=256`;
+
+  // Use Logo.dev CDN if a token is configured
+  const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
+  if (token) {
+    return `https://img.logo.dev/${domain}?token=${token}`;
+  }
+
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
 };
 
 const getGameIcon = (gameName) => {
@@ -233,7 +250,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
       try {
         const [brandRes, gameRes] = await Promise.all([
           fetch(`https://api.brandfetch.io/v2/search/${val}`).catch(() => ({ json: () => [] })),
-          fetch(window.location.hostname === 'localhost' ? `http://localhost:5000/api/search-games?q=${val}` : `/api/search-games?q=${val}`).catch(() => ({ json: () => [] }))
+          fetch(`${API_BASE}/search-games?q=${encodeURIComponent(val)}`).catch(() => ({ json: () => [] }))
         ]);
         
         const brandData = await brandRes.json();
@@ -311,7 +328,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
       }));
     };
-    img.src = bestIcon;
+    img.src = getProxiedUrl(bestIcon);
     setSuggestions([]);
   };
 
@@ -362,22 +379,49 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
       <div className="admin-form-group">
         <label>Service/Game Title (Auto-Search)</label>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
-          {(editForm.customIcon || getFavicon(editForm.name)) && (() => {
-            const isGaming = editForm.category === 'Gaming';
-            return (
-              <img 
-                src={editForm.customIcon || getFavicon(editForm.name)} 
-                style={{ 
-                  width: isGaming ? '48px' : '32px', 
-                  height: isGaming ? '64px' : '32px', 
-                  borderRadius: isGaming ? '6px' : '4px', 
-                  objectFit: 'cover', 
-                  background: '#222',
-                  boxShadow: isGaming ? '0 2px 8px rgba(0,0,0,0.4)' : 'none'
-                }} 
-                alt="Preview" 
-              />
-            );
+          {(() => {
+             const isGaming = editForm.category === 'Gaming';
+             const iconSrc = editForm.customIcon || getFavicon(editForm.name);
+             if (!iconSrc && !editForm.name) return null;
+             return (
+               <div style={{ 
+                 width: isGaming ? '48px' : '32px', 
+                 height: isGaming ? '64px' : '32px', 
+                 borderRadius: isGaming ? '6px' : '4px', 
+                 overflow: 'hidden',
+                 background: '#222',
+                 boxShadow: isGaming ? '0 2px 8px rgba(0,0,0,0.4)' : 'none',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 flexShrink: 0
+               }}>
+                 {iconSrc ? (
+                   <>
+                     <img 
+                       src={getProxiedUrl(iconSrc)} 
+                       style={{ 
+                         width: '100%', 
+                         height: '100%', 
+                         objectFit: 'cover'
+                       }} 
+                       alt="Preview" 
+                       onError={e => {
+                         e.target.style.display = 'none';
+                         e.target.nextSibling.style.display = 'flex';
+                       }}
+                     />
+                     <div style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: isGaming ? '18px' : '14px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#333' }}>
+                       {editForm.name ? editForm.name.charAt(0).toUpperCase() : '?'}
+                     </div>
+                   </>
+                 ) : (
+                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: isGaming ? '18px' : '14px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#333' }}>
+                     {editForm.name ? editForm.name.charAt(0).toUpperCase() : '?'}
+                   </div>
+                 )}
+               </div>
+             );
           })()}
           <div style={{ flex: 1, position: 'relative' }}>
              <input className="admin-form-input" style={{ width: '100%' }} placeholder="Enter name to search brand (e.g. Netflix, Spotify)..." value={editForm.name || ''} onChange={e => handleSearch(e.target.value)} />
@@ -385,18 +429,34 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--color-surface)', border: '1px solid var(--color-border)', zIndex: 10, maxHeight: '200px', overflowY: 'auto', borderRadius: '8px', marginTop: '4px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
                  {suggestions.map((s, idx) => (
                     <div key={idx} onClick={() => handleSelect(s)} style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--color-background)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                       <img 
-                         src={s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`} 
-                         style={{ 
-                           width: s.type === 'Game' ? '32px' : '28px', 
-                           height: s.type === 'Game' ? '42px' : '28px', 
-                           borderRadius: '4px', 
-                           objectFit: 'cover', 
-                           background: '#111' 
-                         }} 
-                         alt={s.name} 
-                         onError={e => e.target.style.display='none'} 
-                       />
+                       <div style={{ 
+                         width: s.type === 'Game' ? '32px' : '28px', 
+                         height: s.type === 'Game' ? '42px' : '28px', 
+                         borderRadius: '4px', 
+                         overflow: 'hidden', 
+                         background: '#111', 
+                         display: 'flex', 
+                         alignItems: 'center', 
+                         justifyContent: 'center',
+                         flexShrink: 0
+                       }}>
+                         <img 
+                           src={getProxiedUrl(s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`)} 
+                           style={{ 
+                             width: '100%', 
+                             height: '100%', 
+                             objectFit: 'cover' 
+                           }} 
+                           alt={s.name} 
+                           onError={e => {
+                             e.target.style.display = 'none';
+                             e.target.nextSibling.style.display = 'flex';
+                           }} 
+                         />
+                         <div style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#222' }}>
+                           {s.name ? s.name.charAt(0).toUpperCase() : '?'}
+                         </div>
+                       </div>
                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                           <span style={{ fontWeight: '600' }}>{s.name}</span>
                           <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{s.domain}</span>
@@ -1268,7 +1328,7 @@ export default function AdminDashboard() {
                                           </div>
                                           <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                             <label style={{ fontSize: '0.85rem' }}>Price (₹)</label>
-                                            <input className="admin-form-input" placeholder="Price" value={plan.price} onChange={e => {
+                                            <input className="admin-form-input" placeholder="Price" value={plan.price || ''} onChange={e => {
                                               const newPlans = [...editForm.plans];
                                               newPlans[idx] = { ...newPlans[idx], price: e.target.value };
                                               setEditForm({...editForm, plans: newPlans});
@@ -1332,9 +1392,9 @@ export default function AdminDashboard() {
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                                     <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: `${s.color}22`, border: `1px solid ${s.color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                       {s.category === 'Gaming' ? (
-                                        <img src={s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                        <img src={getProxiedUrl(s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name))} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
                                       ) : (
-                                        <img src={s.customIcon || getFavicon(s.name)} style={{ width: '28px', height: '28px', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                        <img src={getProxiedUrl(s.customIcon || getFavicon(s.name))} style={{ width: '28px', height: '28px', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
                                       )}
                                       <Package size={22} style={{ color: s.color, display: 'none' }} />
                                     </div>
@@ -1624,7 +1684,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="admin-form-group" style={{ marginBottom: 0 }}>
                                       <label style={{ fontSize: '0.85rem' }}>Price (₹)</label>
-                                      <input className="admin-form-input" placeholder="Price" value={plan.price} onChange={e => {
+                                      <input className="admin-form-input" placeholder="Price" value={plan.price || ''} onChange={e => {
                                         const newPlans = [...editForm.plans];
                                         newPlans[idx] = { ...newPlans[idx], price: e.target.value };
                                         setEditForm({...editForm, plans: newPlans});

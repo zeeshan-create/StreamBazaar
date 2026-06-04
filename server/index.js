@@ -162,6 +162,63 @@ const POPULAR_EGS_GAMES = [
       if (localMatches.length > 0) {
         results = [...results, ...localMatches];
       }
+
+      // 0.5. Fetch directly from Epic Games Store GraphQL
+      try {
+        const egsQuery = `
+        query searchStoreQuery($keywords: String, $count: Int, $country: String!, $locale: String) {
+          Catalog {
+            searchStore(keywords: $keywords, count: $count, country: $country, locale: $locale) {
+              elements {
+                title
+                id
+                keyImages {
+                  type
+                  url
+                }
+              }
+            }
+          }
+        }
+        `;
+        const egsRes = await fetchWithTimeout('https://store.epicgames.com/graphql', {
+          method: 'POST',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            query: egsQuery,
+            variables: { keywords: q, count: 6, country: 'US', locale: 'en-US' }
+          })
+        }, 3000);
+        
+        const egsData = await egsRes.json();
+        const elements = egsData?.data?.Catalog?.searchStore?.elements;
+        if (elements && elements.length > 0) {
+          const egsSearchResults = elements.map(item => {
+            let bestImg = '';
+            if (item.keyImages && item.keyImages.length > 0) {
+              const wide = item.keyImages.find(img => img.type === 'OfferImageWide');
+              const tall = item.keyImages.find(img => img.type === 'OfferImageTall');
+              const thumb = item.keyImages.find(img => img.type === 'Thumbnail');
+              const logo = item.keyImages.find(img => img.type === 'ProductLogo');
+              bestImg = (wide?.url || tall?.url || thumb?.url || logo?.url || item.keyImages[0]?.url || '').trim();
+            }
+            return {
+              name: item.title,
+              domain: 'Epic Games',
+              icon: bestImg || 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/1200px-Epic_Games_logo.svg.png',
+              type: 'Game'
+            };
+          }).filter(g => g.name);
+
+          const uniqueEgsResults = egsSearchResults.filter(egr => !results.some(r => r.name.toLowerCase() === egr.name.toLowerCase()));
+          results = [...results, ...uniqueEgsResults];
+        }
+      } catch (err) {
+        console.log('EGS store GraphQL search error:', err.message);
+      }
       
       // 1. Fetch Steam Games (Using official storefront search for rate-limit resilience)
       try {
@@ -190,7 +247,7 @@ const POPULAR_EGS_GAMES = [
         const lutrisData = await lutrisRes.json();
         if (lutrisData && lutrisData.results && lutrisData.results.length > 0) {
           const epicResults = lutrisData.results.slice(0, 5).map(item => {
-            let iconUrl = item.coverart || item.banner_url || `https://www.google.com/s2/favicons?domain=epicgames.com&sz=256`;
+            let iconUrl = item.coverart || item.banner_url || `https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/1200px-Epic_Games_logo.svg.png`;
             if (iconUrl && iconUrl.startsWith('/')) {
               iconUrl = 'https://lutris.net' + iconUrl;
             }
@@ -208,6 +265,38 @@ const POPULAR_EGS_GAMES = [
         }
       } catch (err) {
         console.log('Lutris/Epic search error:', err.message);
+      }
+      
+      // 1.8. Fetch Logo.dev Search (If Secret Key is set)
+      if (process.env.LOGO_DEV_SECRET_KEY) {
+        try {
+          const logoDevRes = await fetchWithTimeout(`https://api.logo.dev/search?q=${encodeURIComponent(q)}`, {
+            headers: {
+              'Authorization': `Bearer ${process.env.LOGO_DEV_SECRET_KEY}`
+            }
+          }, 3000);
+          const logoDevData = await logoDevRes.json();
+          if (Array.isArray(logoDevData)) {
+            const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
+            const logoDevResults = logoDevData.slice(0, 5).map(item => {
+              let iconUrl = item.logo_url;
+              if (pubToken && iconUrl) {
+                iconUrl = iconUrl.replace('YOUR_PUBLISHABLE_KEY', pubToken);
+              }
+              return {
+                name: item.name,
+                domain: item.domain,
+                icon: iconUrl,
+                type: 'OTT/Brand'
+              };
+            });
+            // Deduplicate logo.dev search results based on domain name
+            const filteredLogoDevResults = logoDevResults.filter(ldr => !results.some(r => r.domain.toLowerCase() === ldr.domain.toLowerCase()));
+            results = [...filteredLogoDevResults, ...results];
+          }
+        } catch (err) {
+          console.log('Logo.dev search error:', err.message);
+        }
       }
       
       // 2. Fetch OTT Brands
@@ -469,7 +558,40 @@ ${productContext}
   }
 });
 
+// ── IMAGE PROXY ENDPOINT ──────────────────────────────────────────
+app.get('/api/proxy-image', async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    return res.status(400).send('Missing url parameter');
+  }
+
+  try {
+    const response = await fetchWithTimeout(targetUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    }, 5000);
+
+    if (!response.ok) {
+      console.error(`Proxy fetch failed for ${targetUrl}: Status ${response.status}`);
+      return res.status(response.status).send(`Failed to fetch image: ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get('content-type');
+    res.setHeader('Content-Type', contentType || 'image/jpeg');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=604800'); // Cache for 7 days
+
+    const buffer = await response.arrayBuffer();
+    res.send(Buffer.from(buffer));
+  } catch (err) {
+    console.error(`Proxy error for ${targetUrl}:`, err.message);
+    res.status(500).send(`Proxy server error: ${err.message}`);
+  }
+});
+
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 module.exports = app;
+
