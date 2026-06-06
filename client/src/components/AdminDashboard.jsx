@@ -316,59 +316,57 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
   };
 
   const handleSelect = (item) => {
+    const autoColor = '#6366f1';
+    const isGameType = isGamingCategory(item.type) || item.type === 'Game';
+
+    // Resolve the best persistent icon URL immediately
+    let bestIcon = item.icon || (item.domain && !item.domain.includes(' ')
+      ? `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`
+      : null);
+    if (bestIcon && bestIcon.includes('brandfetch.io') && item.domain) {
+      const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
+      bestIcon = token
+        ? `https://img.logo.dev/${item.domain}?token=${token}`
+        : `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
+    }
+
+    // ─── 1. Set name + icon + category IMMEDIATELY ─────────────────────────
+    //   This makes the preview show the logo right away, without waiting for
+    //   the async image-load / color-extraction step below.
+    setEditForm(prev => ({
+      ...prev,
+      name: item.name,
+      ...(bestIcon ? { customIcon: bestIcon } : {}),
+      ...(isGameType && (!prev.category || prev.category === 'Streaming')
+        ? { category: 'Gaming' }
+        : {}),
+    }));
+
+    // Also propagate name change to parent for brand-category detection
     if (onNameChange) {
       onNameChange(item.name);
-    } else {
-      setEditForm(prev => ({ ...prev, name: item.name }));
     }
 
-    const autoColor = '#6366f1'; // Default fallback
+    setSuggestions([]);
 
-    let bestIcon = item.icon || `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
-    if (bestIcon.includes('brandfetch.io') && item.domain) {
-      const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-      bestIcon = token ? `https://img.logo.dev/${item.domain}?token=${token}` : `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
-    }
-
+    // ─── 2. Async: extract brand colors from the icon ────────────────────────
+    //   Only updates primaryColor / secondaryColor; does NOT touch customIcon.
+    if (!bestIcon) return;
     const img = new Image();
-    img.crossOrigin = "Anonymous";
+    img.crossOrigin = 'Anonymous';
     img.onload = async () => {
       try {
         const palette = await Vibrant.from(img).getPalette();
-        const primary = palette.Vibrant ? palette.Vibrant.hex : autoColor;
-        const secondary = palette.DarkVibrant ? palette.DarkVibrant.hex : (palette.Muted ? palette.Muted.hex : autoColor);
-        
-        setEditForm(prev => ({ 
-          ...prev, 
-          name: item.name, 
-          customIcon: bestIcon,
-          primaryColor: primary,
-          secondaryColor: secondary,
-          ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
-        }));
-      } catch(e) {
-        setEditForm(prev => ({ 
-          ...prev, 
-          name: item.name, 
-          customIcon: bestIcon,
-          primaryColor: autoColor,
-          secondaryColor: autoColor,
-          ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
-        }));
+        const primary   = palette.Vibrant     ? palette.Vibrant.hex     : autoColor;
+        const secondary = palette.DarkVibrant ? palette.DarkVibrant.hex
+                        : palette.Muted       ? palette.Muted.hex       : autoColor;
+        setEditForm(prev => ({ ...prev, primaryColor: primary, secondaryColor: secondary }));
+      } catch (_) {
+        // Color extraction failed – keep defaults, logo already showing
       }
     };
-    img.onerror = () => {
-      setEditForm(prev => ({ 
-        ...prev, 
-        name: item.name, 
-        customIcon: bestIcon,
-        primaryColor: autoColor,
-        secondaryColor: autoColor,
-        ...(item.type === 'Game' && (!prev.category || prev.category === 'Streaming') ? { category: 'Gaming' } : {})
-      }));
-    };
+    // onerror: colors already defaulted above, logo already set — nothing to do
     img.src = getProxiedUrl(bestIcon);
-    setSuggestions([]);
   };
 
   const handleDrop = (e) => {
@@ -1370,17 +1368,19 @@ export default function AdminDashboard() {
     onNameChange={(e_val) => {
                                         const val = e_val;
                                         const lowerVal = val.toLowerCase();
-                                        let newCategory = editForm.category;
-                                        let newPrimary = editForm.primaryColor; let newSecondary = editForm.secondaryColor;
-                                        
-                                        const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
-                                        if (matchedBrand) {
-                                          const catIsDefault = !editForm.category || editForm.category === 'Streaming';
-                                          const colorIsDefault = !editForm.primaryColor || editForm.primaryColor === '#6366f1' || editForm.primaryColor === '#000000';
-                                          if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
-                                          if (colorIsDefault && BRAND_COLORS[matchedBrand]) { newPrimary = BRAND_COLORS[matchedBrand]; newSecondary = BRAND_COLORS[matchedBrand]; }
-                                        }
-                                        setEditForm({...editForm, name: val, category: newCategory, primaryColor: newPrimary, secondaryColor: newSecondary});
+                                        setEditForm(prev => {
+                                          let newCategory = prev.category;
+                                          let newPrimary = prev.primaryColor;
+                                          let newSecondary = prev.secondaryColor;
+                                          const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
+                                          if (matchedBrand) {
+                                            const catIsDefault = !prev.category || prev.category === 'Streaming';
+                                            const colorIsDefault = !prev.primaryColor || prev.primaryColor === '#6366f1' || prev.primaryColor === '#000000';
+                                            if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
+                                            if (colorIsDefault && BRAND_COLORS[matchedBrand]) { newPrimary = BRAND_COLORS[matchedBrand]; newSecondary = BRAND_COLORS[matchedBrand]; }
+                                          }
+                                          return { ...prev, name: val, category: newCategory, primaryColor: newPrimary, secondaryColor: newSecondary };
+                                        });
                                       }} 
   />
                                   <div className="admin-form-group">
@@ -1743,19 +1743,19 @@ export default function AdminDashboard() {
     onNameChange={(e_val) => {
                                   const val = e_val;
                                   const lowerVal = val.toLowerCase();
-                                  
-                                  let newCategory = editForm.category;
-                                  let newPrimary = editForm.primaryColor; let newSecondary = editForm.secondaryColor;
-                                  
-                                  const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
-                                  if (matchedBrand) {
-                                    const catIsDefault = !editForm.category || editForm.category === 'Streaming';
-                                    const colorIsDefault = !editForm.primaryColor || editForm.primaryColor === '#6366f1' || editForm.primaryColor === '#000000';
-                                    if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
-                                    if (colorIsDefault && BRAND_COLORS[matchedBrand]) { newPrimary = BRAND_COLORS[matchedBrand]; newSecondary = BRAND_COLORS[matchedBrand]; }
-                                  }
-                                  
-                                  setEditForm({...editForm, name: val, category: newCategory, primaryColor: newPrimary, secondaryColor: newSecondary});
+                                  setEditForm(prev => {
+                                    let newCategory = prev.category;
+                                    let newPrimary = prev.primaryColor;
+                                    let newSecondary = prev.secondaryColor;
+                                    const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
+                                    if (matchedBrand) {
+                                      const catIsDefault = !prev.category || prev.category === 'Streaming';
+                                      const colorIsDefault = !prev.primaryColor || prev.primaryColor === '#6366f1' || prev.primaryColor === '#000000';
+                                      if (catIsDefault && BRAND_CATEGORIES[matchedBrand]) newCategory = BRAND_CATEGORIES[matchedBrand];
+                                      if (colorIsDefault && BRAND_COLORS[matchedBrand]) { newPrimary = BRAND_COLORS[matchedBrand]; newSecondary = BRAND_COLORS[matchedBrand]; }
+                                    }
+                                    return { ...prev, name: val, category: newCategory, primaryColor: newPrimary, secondaryColor: newSecondary };
+                                  });
                                 }} 
   />
                             <div className="admin-form-group">
