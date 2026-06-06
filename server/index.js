@@ -495,11 +495,16 @@ app.post('/api/admin/forgot-password', async (req, res) => {
     await Admin.update({ _id: admin._id }, { otp, otpExpires });
 
     if (!process.env.SMTP_PASS) {
-      console.log(`\n🔑 [MOCK EMAIL] OTP for admin password reset: ${otp} (Email: ${email})\n`);
-      return res.json({ 
-        success: true, 
-        message: 'Verification code generated! (Running in mock mode: please configure SMTP_PASS in .env to receive emails. The code has been printed to the server console log for security.)',
-        mock: true
+      if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+        console.log(`\n🔑 [MOCK EMAIL] OTP for admin password reset: ${otp} (Email: ${email})\n`);
+        return res.json({ 
+          success: true, 
+          message: 'Verification code generated! (Running in mock mode: please configure SMTP_PASS in .env to receive emails. The code has been printed to the server console log for security.)',
+          mock: true
+        });
+      }
+      return res.status(500).json({ 
+        error: 'SMTP_PASS environment variable is not configured on the live server. Please add SMTP_PASS to your Vercel Project settings.' 
       });
     }
 
