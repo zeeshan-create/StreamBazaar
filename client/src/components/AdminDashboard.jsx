@@ -55,7 +55,7 @@ const MOCK_NOTIFICATIONS = [
 const MOCK_USERS = [
   { id: 1, name: "Rahul Sharma", email: "rahul@streambazaar.in", role: "Viewer", status: "Active" },
   { id: 2, name: "Anjali Gupta", email: "anjali@streambazaar.in", role: "Editor", status: "Active" },
-  { id: 3, name: "Zeeshan Hussain", email: "zeeshanshussain0999@gmail.com", role: "Admin", status: "Active" },
+  { id: 3, name: "Zeeshan Hussain", email: "zk45681@gmail.com", role: "Admin", status: "Active" },
   { id: 4, name: "Aman Verma", email: "aman@streambazaar.in", role: "Viewer", status: "Inactive" },
   { id: 5, name: "Sneha Patel", email: "sneha@streambazaar.in", role: "Viewer", status: "Active" }
 ];
@@ -510,7 +510,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState('');
   
   // Forgot Password / OTP states
-  const [forgotEmail, setForgotEmail] = useState('zeeshanshussain0999@gmail.com');
+  const [forgotEmail, setForgotEmail] = useState('zk45681@gmail.com');
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [forgotStep, setForgotStep] = useState(1);
