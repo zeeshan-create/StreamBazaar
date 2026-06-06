@@ -55,7 +55,7 @@ const MOCK_NOTIFICATIONS = [
 const MOCK_USERS = [
   { id: 1, name: "Rahul Sharma", email: "rahul@streambazaar.in", role: "Viewer", status: "Active" },
   { id: 2, name: "Anjali Gupta", email: "anjali@streambazaar.in", role: "Editor", status: "Active" },
-  { id: 3, name: "Vikram Singh", email: "vikram@streambazaar.in", role: "Admin", status: "Active" },
+  { id: 3, name: "Zeeshan Hussain", email: "zeeshanshussain0999@gmail.com", role: "Admin", status: "Active" },
   { id: 4, name: "Aman Verma", email: "aman@streambazaar.in", role: "Viewer", status: "Inactive" },
   { id: 5, name: "Sneha Patel", email: "sneha@streambazaar.in", role: "Viewer", status: "Active" }
 ];
@@ -1248,7 +1248,7 @@ export default function AdminDashboard() {
                     aria-label="Toggle profile user actions"
                   >
                     <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', color: 'white' }}>
-                      VS
+                      ZH
                     </div>
                   </button>
 
@@ -1256,7 +1256,7 @@ export default function AdminDashboard() {
                     {showProfileMenu && (
                       <div className="header-dropdown">
                         <div className="dropdown-header-title" style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span>Vikram Singh</span>
+                          <span>Zeeshan Hussain</span>
                           <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>Platform Administrator</span>
                         </div>
                         <div className="dropdown-item-row" onClick={() => { setActiveTab('settings'); setShowProfileMenu(false); }}><Settings size={15} /> Settings</div>
