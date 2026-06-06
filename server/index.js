@@ -514,13 +514,13 @@ app.post('/api/admin/forgot-password', async (req, res) => {
       port: parseInt(process.env.SMTP_PORT || '465'),
       secure: process.env.SMTP_SECURE !== 'false',
       auth: {
-        user: process.env.SMTP_USER || 'zeeshanshussain0999@gmail.com',
+        user: process.env.SMTP_USER || 'zeeshanhussain0999@gmail.com',
         pass: process.env.SMTP_PASS
       }
     });
 
     const mailOptions = {
-      from: `"StreamBazaar Security" <${process.env.SMTP_USER || 'zeeshanshussain0999@gmail.com'}>`,
+      from: `"StreamBazaar Security" <${process.env.SMTP_USER || 'zeeshanhussain0999@gmail.com'}>`,
       to: admin.email,
       subject: 'StreamBazaar Admin Access Verification Code',
       html: `
