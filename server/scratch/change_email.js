@@ -25,11 +25,11 @@ async function run() {
       { _id: admin._id },
       { 
         $set: {
-          email: 'zk45681@gmail.com'
+          email: 'zeeshanshussain0999@gmail.com'
         }
       }
     );
-    console.log("Admin email updated successfully to zk45681@gmail.com!");
+    console.log("Admin email updated successfully to zeeshanshussain0999@gmail.com!");
   } else {
     // If not found by username, look for any admin or create a new one
     const anyAdmin = await Admin.findOne({});
@@ -39,20 +39,20 @@ async function run() {
         { 
           $set: {
             username: 'Ai+rizwan#1974000hussain!#/',
-            email: 'zk45681@gmail.com'
+            email: 'zeeshanshussain0999@gmail.com'
           }
         }
       );
-      console.log("Updated existing admin document to use zk45681@gmail.com!");
+      console.log("Updated existing admin document to use zeeshanshussain0999@gmail.com!");
     } else {
       await Admin.create({
         username: 'Ai+rizwan#1974000hussain!#/',
         password: '@#12Rizwan55Hussain/!#7861974000!12',
-        email: 'zk45681@gmail.com',
+        email: 'zeeshanshussain0999@gmail.com',
         otp: null,
         otpExpires: null
       });
-      console.log("Created brand new admin document with zk45681@gmail.com!");
+      console.log("Created brand new admin document with zeeshanshussain0999@gmail.com!");
     }
   }
   
