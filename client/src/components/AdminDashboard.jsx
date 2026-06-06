@@ -502,7 +502,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('adminAuthenticated') === 'true';
+    return sessionStorage.getItem('adminAuthenticated') === 'true';
   });
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -587,7 +587,7 @@ export default function AdminDashboard() {
   }, [isAuthenticated]);
 
   const handleLogout = () => {
-    localStorage.removeItem('adminAuthenticated');
+    sessionStorage.removeItem('adminAuthenticated');
     setIsAuthenticated(false);
   };
 
@@ -602,7 +602,7 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        localStorage.setItem('adminAuthenticated', 'true');
+        sessionStorage.setItem('adminAuthenticated', 'true');
         setIsAuthenticated(true);
       } else {
         setError(data.error || 'Invalid username or password. Please try again!');
