@@ -32,6 +32,40 @@ const getProxiedUrl = (url) => {
   return `${API_BASE}/api/proxy-image?url=${encodeURIComponent(url)}`;
 };
 
+const isGamingCategory = (cat) => {
+  if (!cat) return false;
+  const c = cat.toLowerCase().trim();
+  return c === 'gaming' || c === 'steam' || c === 'playstation' || c === 'xbox' || c === 'epic' || c === 'steam gaming' || c === 'games' || c === 'game' || c.includes('gaming') || c.includes('game');
+};
+
+const renderPlaceholder = (name, isGaming, color) => {
+  const firstLetter = name ? name.trim().charAt(0).toUpperCase() : '?';
+  const accentColor = color || '#6366f1';
+  return (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: `linear-gradient(135deg, ${accentColor}33, ${accentColor}11)`,
+      border: `1px dashed ${accentColor}55`,
+      borderRadius: isGaming ? '10px' : '12px',
+      color: accentColor,
+      fontWeight: 'bold',
+      fontSize: isGaming ? '1.5rem' : '1.25rem',
+      textShadow: `0 0 10px ${accentColor}40`,
+      position: 'relative'
+    }}>
+      <span>{firstLetter}</span>
+      <span style={{ fontSize: '0.65rem', opacity: 0.6, position: 'absolute', bottom: isGaming ? '8px' : '4px' }}>
+        {isGaming ? '🎮' : '📺'}
+      </span>
+    </div>
+  );
+};
+
 const DOMAINS = {
   'youtube premium': 'youtube.com',
   'youtube music': 'music.youtube.com',
@@ -394,14 +428,14 @@ export default function App() {
     const aCat = activeCategory.trim().toLowerCase();
     
     const matchSearch = p.name.toLowerCase().includes(q) || pCat.includes(q);
-    const matchCat    = aCat === 'all' || pCat === aCat || (aCat === 'gaming' && (pCat === 'steam' || pCat === 'playstation' || pCat === 'steam gaming' || pCat === 'game' || pCat === 'games'));
+    const matchCat    = aCat === 'all' || pCat === aCat || (aCat === 'gaming' && isGamingCategory(pCat));
     return matchSearch && matchCat;
   }).sort((a, b) => {
     // Gaming cards always appear last
-    const aCat = a.category ? a.category.trim().toLowerCase() : '';
-    const bCat = b.category ? b.category.trim().toLowerCase() : '';
-    if (aCat === 'gaming' && bCat !== 'gaming') return 1;
-    if (aCat !== 'gaming' && bCat === 'gaming') return -1;
+    const aIsGaming = isGamingCategory(a.category);
+    const bIsGaming = isGamingCategory(b.category);
+    if (aIsGaming && !bIsGaming) return 1;
+    if (!aIsGaming && bIsGaming) return -1;
     return 0;
   });
 
@@ -789,22 +823,24 @@ export default function App() {
                   whileTap={{ scale: 0.97, y: 0 }}
                 >
                   {/* Card Header */}
-                  <div className="card-header" style={{ alignItems: product.category === 'Gaming' ? 'flex-start' : 'center', gap: '0.85rem' }}>
+                  <div className="card-header" style={{ alignItems: isGamingCategory(product.category) ? 'flex-start' : 'center', gap: '0.85rem' }}>
                     <div
                       className="card-logo-wrap"
                       style={{ 
                         background: `${effectiveColor}18`, 
                         border: `1px solid ${effectiveColor}30`,
-                        width: product.category === 'Gaming' ? '65px' : '52px',
-                        height: product.category === 'Gaming' ? '86px' : '52px',
-                        borderRadius: product.category === 'Gaming' ? '10px' : '14px',
-                        boxShadow: product.category === 'Gaming' ? '0 4px 12px rgba(0,0,0,0.3)' : 'none'
+                        width: isGamingCategory(product.category) ? '65px' : '52px',
+                        height: isGamingCategory(product.category) ? '86px' : '52px',
+                        borderRadius: isGamingCategory(product.category) ? '10px' : '14px',
+                        boxShadow: isGamingCategory(product.category) ? '0 4px 12px rgba(0,0,0,0.3)' : 'none'
                       }}
                     >
                       {(() => {
-                        if (imgErr[product.name]) return <div style={{ fontSize: '1.5rem' }}>🎬</div>;
-                        const isGaming = product.category === 'Gaming';
+                        const isGaming = isGamingCategory(product.category);
                         const imgUrl = isGaming ? (product.customIcon || product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : (product.customIcon || getFavicon(product.name));
+                        if (imgErr[product.name] || !imgUrl) {
+                          return renderPlaceholder(product.name, isGaming, effectiveColor);
+                        }
                         return (
                           <img
                             src={getProxiedUrl(imgUrl)}
@@ -824,9 +860,9 @@ export default function App() {
                       <div 
                         className="card-name"
                         style={{
-                          whiteSpace: product.category === 'Gaming' ? 'normal' : 'nowrap',
-                          lineHeight: product.category === 'Gaming' ? '1.2' : 'inherit',
-                          fontSize: product.category === 'Gaming' ? '1.02rem' : '1.1rem'
+                          whiteSpace: isGamingCategory(product.category) ? 'normal' : 'nowrap',
+                          lineHeight: isGamingCategory(product.category) ? '1.2' : 'inherit',
+                          fontSize: isGamingCategory(product.category) ? '1.02rem' : '1.1rem'
                         }}
                       >
                         {product.name}
@@ -840,13 +876,13 @@ export default function App() {
                           </span>
                         )}
                       </div>
-                      <div className="card-desc" style={{ marginTop: product.category === 'Gaming' ? '0.2rem' : '0' }}>
-                        {product.description || (product.category === 'Gaming' ? 'Offline PC Access.' : '')}
+                      <div className="card-desc" style={{ marginTop: isGamingCategory(product.category) ? '0.2rem' : '0' }}>
+                        {product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : '')}
                       </div>
                     </div>
                     {(() => {
                       const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames') || product.customIcon.includes('epic'))) || (product.name && product.name.toLowerCase().includes('epic'));
-                      if (product.category === 'Gaming') {
+                      if (isGamingCategory(product.category)) {
                          return (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '0.2rem 0.5rem', borderRadius: '50px', border: `1px solid ${effectiveColor}40`, background: `${effectiveColor}15`, fontSize: '0.65rem', fontWeight: 700, color: effectiveColor, whiteSpace: 'nowrap', letterSpacing: '0.5px', alignSelf: 'flex-start', marginTop: '2px' }}>
                               {isEpicGame ? (
@@ -881,7 +917,7 @@ export default function App() {
                     animate="visible"
                   >
                     {product.plans.map((plan, i) => {
-                      const gameIcon = (product.category === 'Gaming' || plan.image) ? (plan.image || getGameIcon(plan.label) || product.customIcon || getGameIcon(product.name) || getFavicon(product.name)) : null;
+                      const gameIcon = (isGamingCategory(product.category) || plan.image) ? (plan.image || getGameIcon(plan.label) || product.customIcon || getGameIcon(product.name) || getFavicon(product.name)) : null;
                       return (
                         <motion.div
                           key={i}
@@ -1189,13 +1225,26 @@ export default function App() {
 
               {/* Header */}
               <div className="popup-header">
-                <img
-                  src={popup.product.category === 'Gaming' || popup.plan.image ? (popup.plan.image || getGameIcon(popup.plan.label) || popup.product.customIcon || getGameIcon(popup.product.name) || getFavicon(popup.product.name)) : (popup.product.customIcon || getFavicon(popup.product.name))}
-                  alt={popup.product.name}
-                  className="popup-logo"
-                  onError={e => { e.target.style.display = 'none'; }}
-                  style={popup.product.category === 'Gaming' ? { width: '80px', height: '36px', objectFit: 'cover', borderRadius: '6px' } : {}}
-                />
+                {(() => {
+                  const isGaming = isGamingCategory(popup.product.category);
+                  const imgUrl = (isGaming || popup.plan.image) ? (popup.plan.image || getGameIcon(popup.plan.label) || popup.product.customIcon || getGameIcon(popup.product.name) || getFavicon(popup.product.name)) : (popup.product.customIcon || getFavicon(popup.product.name));
+                  if (imgErr[`popup-${popup.product.name}`] || !imgUrl) {
+                    return (
+                      <div style={{ width: '48px', height: '48px', flexShrink: 0 }}>
+                        {renderPlaceholder(popup.product.name, isGaming, popup.product.effectiveColor)}
+                      </div>
+                    );
+                  }
+                  return (
+                    <img
+                      src={getProxiedUrl(imgUrl)}
+                      alt={popup.product.name}
+                      className="popup-logo"
+                      onError={() => setImgErr(p => ({ ...p, [`popup-${popup.product.name}`]: true }))}
+                      style={isGaming ? { width: '80px', height: '36px', objectFit: 'cover', borderRadius: '6px' } : {}}
+                    />
+                  );
+                })()}
                 <div>
                   <div className="popup-title">{popup.product.name}</div>
                   <div className="popup-subtitle">1 Device Seat Access</div>

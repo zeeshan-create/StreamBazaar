@@ -429,12 +429,18 @@ const POPULAR_EGS_GAMES = [
         const brandData = await brandRes.json();
         
         if (brandData && brandData.length > 0) {
-          const brandResults = brandData.slice(0, 3).map(brand => ({
-            name: brand.name,
-            domain: brand.domain,
-            icon: brand.icon || `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`,
-            type: 'OTT/Brand'
-          }));
+          const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
+          const brandResults = brandData.slice(0, 3).map(brand => {
+            const persistentIcon = brand.domain 
+              ? (pubToken ? `https://img.logo.dev/${brand.domain}?token=${pubToken}` : `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`) 
+              : (brand.icon || `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`);
+            return {
+              name: brand.name,
+              domain: brand.domain,
+              icon: persistentIcon,
+              type: 'OTT/Brand'
+            };
+          });
           results = [...results, ...brandResults];
         }
       } catch (err) {
