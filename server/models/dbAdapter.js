@@ -24,8 +24,17 @@ async function connectToDatabase() {
 // ── SCHEMAS & MODELS ──────────────────────────────────────────────
 const serviceSchema = new mongoose.Schema({}, { strict: false });
 const orderSchema = new mongoose.Schema({}, { strict: false });
+const adminSchema = new mongoose.Schema({
+  username: { type: String, default: 'Ai+rizwan#1974000hussain!#/' },
+  password: { type: String, default: '@#12Rizwan55Hussain/!#7861974000!12' },
+  email: { type: String, default: 'zeeshanshussain0999@gmail.com' },
+  otp: { type: String, default: null },
+  otpExpires: { type: Date, default: null }
+}, { strict: false });
+
 const MongoService = mongoose.models.Service || mongoose.model('Service', serviceSchema);
 const MongoOrder = mongoose.models.Order || mongoose.model('Order', orderSchema);
+const MongoAdmin = mongoose.models.Admin || mongoose.model('Admin', adminSchema);
 
 // ── SERVERLESS MONGO ADAPTER ──────────────────────────────────────
 function createAdapter(mongoModel) {
@@ -68,5 +77,6 @@ function createAdapter(mongoModel) {
 
 module.exports = {
   Service: createAdapter(MongoService),
-  Order: createAdapter(MongoOrder)
+  Order: createAdapter(MongoOrder),
+  Admin: createAdapter(MongoAdmin)
 };

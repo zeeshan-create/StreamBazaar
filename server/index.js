@@ -4,6 +4,27 @@ require('dotenv').config();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Service = require('./models/Service');
 const Order = require('./models/Order');
+const Admin = require('./models/Admin');
+
+// Seed default admin credentials in database if not present
+async function seedAdminUser() {
+  try {
+    const existing = await Admin.findOne({ email: 'zeeshanshussain0999@gmail.com' });
+    if (!existing) {
+      await Admin.insert({
+        username: 'Ai+rizwan#1974000hussain!#/',
+        password: '@#12Rizwan55Hussain/!#7861974000!12',
+        email: 'zeeshanshussain0999@gmail.com',
+        otp: null,
+        otpExpires: null
+      });
+      console.log('🌱 Default Admin user seeded successfully.');
+    }
+  } catch (err) {
+    console.error('❌ Failed to seed admin user:', err.message);
+  }
+}
+seedAdminUser();
 
 const app = express();
 app.use(cors());
@@ -436,6 +457,160 @@ app.get('/api/plans', async (req, res) => {
     res.json(allServices);
   } catch (err) {
     res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// ── ADMIN AUTHENTICATION ROUTES ──────────────────────────────────
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+    const admin = await Admin.findOne({ username, password });
+    if (admin) {
+      res.json({ success: true, user: { username: admin.username, email: admin.email } });
+    } else {
+      res.status(401).json({ error: 'Invalid username or password' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+    const admin = await Admin.findOne({ email: email.trim() });
+    if (!admin) {
+      return res.status(404).json({ error: 'Admin email not found' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins expiry
+
+    await Admin.update({ _id: admin._id }, { otp, otpExpires });
+
+    if (!process.env.SMTP_PASS) {
+      console.log(`\n🔑 [MOCK EMAIL] OTP for admin password reset: ${otp} (Email: ${email})\n`);
+      return res.json({ 
+        success: true, 
+        message: 'Verification code generated! (Running in mock mode: please configure SMTP_PASS in .env to receive emails. The code has been printed to the server console log for security.)',
+        mock: true
+      });
+    }
+
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: process.env.SMTP_SECURE !== 'false',
+      auth: {
+        user: process.env.SMTP_USER || 'zeeshanshussain0999@gmail.com',
+        pass: process.env.SMTP_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: `"StreamBazaar Security" <${process.env.SMTP_USER || 'zeeshanshussain0999@gmail.com'}>`,
+      to: admin.email,
+      subject: 'StreamBazaar Admin Access Verification Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 12px; background-color: #0f111a; color: #ffffff;">
+          <h2 style="color: #a855f7; text-align: center;">Admin Password Recovery</h2>
+          <p>Hello Admin,</p>
+          <p>A request was made to reset your admin panel credentials. Use the verification code below to authorize the password reset:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #a855f7; border: 2px dashed #a855f7; padding: 10px 20px; border-radius: 8px; display: inline-block;">${otp}</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 14px;">This code is valid for 10 minutes. If you did not request this, please secure your system immediately.</p>
+          <hr style="border: none; border-top: 1px solid #334155; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #64748b; text-align: center;">StreamBazaar Premium Store Automation System</p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: 'Verification code sent to your email.' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ error: 'Email and OTP are required' });
+    }
+    const admin = await Admin.findOne({ email: email.trim(), otp });
+    if (!admin) {
+      return res.status(400).json({ error: 'Invalid verification code' });
+    }
+    
+    if (new Date() > new Date(admin.otpExpires)) {
+      return res.status(400).json({ error: 'Verification code has expired' });
+    }
+    
+    res.json({ success: true, message: 'OTP verified successfully.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/reset-password', async (req, res) => {
+  try {
+    const { email, otp, newUsername, newPassword } = req.body;
+    if (!email || !otp || !newUsername || !newPassword) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+    
+    const admin = await Admin.findOne({ email: email.trim(), otp });
+    if (!admin) {
+      return res.status(400).json({ error: 'Invalid verification code' });
+    }
+    
+    if (new Date() > new Date(admin.otpExpires)) {
+      return res.status(400).json({ error: 'Verification code has expired' });
+    }
+
+    await Admin.update({ _id: admin._id }, { 
+      username: newUsername, 
+      password: newPassword,
+      otp: null,
+      otpExpires: null
+    });
+    
+    res.json({ success: true, message: 'Admin credentials updated successfully.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/update-credentials', async (req, res) => {
+  try {
+    const { currentUsername, currentPassword, newUsername, newPassword } = req.body;
+    if (!currentUsername || !currentPassword || !newUsername || !newPassword) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+    
+    const admin = await Admin.findOne({ username: currentUsername, password: currentPassword });
+    if (!admin) {
+      return res.status(401).json({ error: 'Invalid current credentials' });
+    }
+    
+    await Admin.update({ _id: admin._id }, { 
+      username: newUsername, 
+      password: newPassword 
+    });
+    
+    res.json({ success: true, message: 'Admin credentials updated successfully.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

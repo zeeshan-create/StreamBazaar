@@ -501,14 +501,32 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
 };
 
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('adminAuthenticated') === 'true';
+  });
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [forgotEmail, setForgotEmail] = useState('');
+  
+  // Forgot Password / OTP states
+  const [forgotEmail, setForgotEmail] = useState('zeeshanshussain0999@gmail.com');
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1);
+  const [otp, setOtp] = useState('');
+  const [resetUsername, setResetUsername] = useState('');
+  const [resetPassword, setResetPassword] = useState('');
+  const [forgotError, setForgotError] = useState('');
+
+  // Change credentials states
+  const [currentUsername, setCurrentUsername] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [updateCredError, setUpdateCredError] = useState('');
+  const [updateCredSuccess, setUpdateCredSuccess] = useState('');
+
 
   // Layout Tab control
   const [activeTab, setActiveTab] = useState('products'); // products, media, settings
@@ -551,8 +569,7 @@ export default function AdminDashboard() {
   const [apiKey, setApiKey] = useState('sb_live_a8f92bd8c9d04402a83e0c03636f');
   const [apiKeyCopied, setApiKeyCopied] = useState(false);
 
-  const ADMIN_USERNAME = 'Ai+rizwan#1974000hussain!#/';
-  const ADMIN_PASSWORD = '@#12Rizwan55Hussain/!#7861974000!12';
+
 
   // Debouncing search inputs (300ms)
   useEffect(() => {
@@ -562,25 +579,125 @@ export default function AdminDashboard() {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
+  // Load services automatically on authentication status check
+  useEffect(() => {
+    if (isAuthenticated) {
       fetchServices();
-    } else {
-      setError('Invalid username or password. Please try again!');
+    }
+  }, [isAuthenticated]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuthenticated');
+    setIsAuthenticated(false);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      const res = await fetch(`${API_BASE}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        localStorage.setItem('adminAuthenticated', 'true');
+        setIsAuthenticated(true);
+      } else {
+        setError(data.error || 'Invalid username or password. Please try again!');
+      }
+    } catch (err) {
+      setError('Server connection error. Please try again later.');
     }
   };
 
-  const handleForgotSubmit = (e) => {
+  const handleForgotSubmit = async (e) => {
     e.preventDefault();
-    if (forgotEmail) {
-      setForgotSent(true);
-      setTimeout(() => {
-        setShowForgotModal(false);
-        setForgotSent(false);
-        setForgotEmail('');
-      }, 2000);
+    setForgotError('');
+    
+    if (forgotStep === 1) {
+      if (!forgotEmail) {
+        setForgotError('Email is required');
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/admin/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotEmail })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setForgotStep(2);
+          setForgotSent(true);
+        } else {
+          setForgotError(data.error || 'Failed to send verification code. Check your email address.');
+        }
+      } catch (err) {
+        setForgotError('Connection error. Please try again.');
+      }
+    } else {
+      if (!otp || !resetUsername || !resetPassword) {
+        setForgotError('All fields are required');
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/admin/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: forgotEmail,
+            otp: otp.trim(),
+            newUsername: resetUsername,
+            newPassword: resetPassword
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert('Admin credentials reset successfully! You can now log in.');
+          setUsername(resetUsername);
+          setPassword(resetPassword);
+          setShowForgotModal(false);
+          setForgotStep(1);
+          setForgotSent(false);
+          setOtp('');
+          setResetUsername('');
+          setResetPassword('');
+        } else {
+          setForgotError(data.error || 'Verification code failed or expired.');
+        }
+      } catch (err) {
+        setForgotError('Connection error. Please try again.');
+      }
+    }
+  };
+
+  const handleUpdateCredentials = async () => {
+    setUpdateCredError('');
+    setUpdateCredSuccess('');
+    if (!currentUsername || !currentPassword || !newUsername || !newPassword) {
+      setUpdateCredError('All fields are required');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/admin/update-credentials`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentUsername, currentPassword, newUsername, newPassword })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setUpdateCredSuccess('Admin credentials updated successfully!');
+        setCurrentUsername('');
+        setCurrentPassword('');
+        setNewUsername('');
+        setNewPassword('');
+      } else {
+        setUpdateCredError(data.error || 'Failed to update credentials');
+      }
+    } catch (err) {
+      setUpdateCredError('Connection error. Please try again.');
     }
   };
 
@@ -910,32 +1027,88 @@ export default function AdminDashboard() {
                   className="popup-modal"
                   style={{ width: '92%', maxWidth: '400px', padding: '2rem' }}
                 >
-                  <button className="popup-close" onClick={() => setShowForgotModal(false)} aria-label="Close modal">
+                  <button type="button" className="popup-close" onClick={() => { setShowForgotModal(false); setForgotStep(1); setForgotSent(false); setForgotError(''); }} aria-label="Close modal">
                     <X size={16} />
                   </button>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>Reset Password</h3>
-                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>We'll send a password recovery magic link to your registered administrator email.</p>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>
+                    {forgotStep === 1 ? 'Reset Password' : 'Verify & Reset'}
+                  </h3>
+                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+                    {forgotStep === 1 
+                      ? 'We will send a 6-digit secure access verification code to your registered admin email.' 
+                      : 'Enter the 6-digit code sent to your email and your new login credentials.'}
+                  </p>
                   
                   <form onSubmit={handleForgotSubmit}>
-                    <div className="admin-form-group">
-                      <label htmlFor="forgot_email">Email address</label>
-                      <input 
-                        id="forgot_email"
-                        type="email" 
-                        className="admin-form-input" 
-                        placeholder="admin@streambazaar.in"
-                        value={forgotEmail}
-                        onChange={e => setForgotEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    {forgotSent && (
-                      <div style={{ color: 'var(--color-success)', fontSize: '0.85rem', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Check size={16} /> Magic recovery link sent to your inbox!
+                    {forgotStep === 1 ? (
+                      <div className="admin-form-group">
+                        <label htmlFor="forgot_email">Registered Email address</label>
+                        <input 
+                          id="forgot_email"
+                          type="email" 
+                          className="admin-form-input" 
+                          placeholder="zeeshanshussain0999@gmail.com"
+                          value={forgotEmail}
+                          onChange={e => setForgotEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="admin-form-group">
+                          <label htmlFor="otp_code">6-Digit Verification Code</label>
+                          <input 
+                            id="otp_code"
+                            type="text" 
+                            maxLength="6"
+                            className="admin-form-input" 
+                            placeholder="Enter 6-digit code"
+                            value={otp}
+                            onChange={e => setOtp(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="admin-form-group">
+                          <label htmlFor="reset_username">New Username</label>
+                          <input 
+                            id="reset_username"
+                            type="text" 
+                            className="admin-form-input" 
+                            placeholder="Enter new username"
+                            value={resetUsername}
+                            onChange={e => setResetUsername(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="admin-form-group">
+                          <label htmlFor="reset_pass">New Password</label>
+                          <input 
+                            id="reset_pass"
+                            type="password" 
+                            className="admin-form-input" 
+                            placeholder="Enter new password"
+                            value={resetPassword}
+                            onChange={e => setResetPassword(e.target.value)}
+                            required
+                          />
+                        </div>
                       </div>
                     )}
+
+                    {forgotError && (
+                      <div style={{ color: 'var(--color-danger)', fontSize: '0.82rem', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <ShieldAlert size={14} /> {forgotError}
+                      </div>
+                    )}
+                    
+                    {forgotSent && forgotStep === 2 && (
+                      <div style={{ color: 'var(--color-success)', fontSize: '0.85rem', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Check size={16} /> Code sent! Please check your inbox.
+                      </div>
+                    )}
+
                     <button className="btn-primary" style={{ width: '100%', marginTop: '1.5rem', padding: '0.85rem', borderRadius: '10px', justifyContent: 'center' }}>
-                      Send recovery link
+                      {forgotStep === 1 ? 'Send verification code' : 'Update Credentials'}
                     </button>
                   </form>
                 </motion.div>
@@ -984,7 +1157,7 @@ export default function AdminDashboard() {
 
             <div style={{ padding: '1.25rem', borderTop: '1px solid var(--color-border)' }}>
               <button 
-                onClick={() => setIsAuthenticated(false)}
+                onClick={handleLogout}
                 className="sidebar-btn" 
                 style={{ color: 'var(--color-danger)' }}
               >
@@ -1087,7 +1260,7 @@ export default function AdminDashboard() {
                           <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>Platform Administrator</span>
                         </div>
                         <div className="dropdown-item-row" onClick={() => { setActiveTab('settings'); setShowProfileMenu(false); }}><Settings size={15} /> Settings</div>
-                        <div className="dropdown-item-row" style={{ color: 'var(--color-danger)' }} onClick={() => setIsAuthenticated(false)}><LogOut size={15} /> Logout</div>
+                        <div className="dropdown-item-row" style={{ color: 'var(--color-danger)' }} onClick={handleLogout}><LogOut size={15} /> Logout</div>
                       </div>
                     )}
                   </AnimatePresence>
@@ -1930,6 +2103,77 @@ export default function AdminDashboard() {
                             <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>Require OTP key upon admin login.</div>
                           </div>
                           <input type="checkbox" style={{ cursor: 'pointer' }} />
+                        </div>
+
+                        {/* Change Admin Credentials */}
+                        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1.5rem', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)' }}>Change Admin Credentials</h4>
+                          {updateCredError && (
+                            <div style={{ color: 'var(--color-danger)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                              <ShieldAlert size={14} /> {updateCredError}
+                            </div>
+                          )}
+                          {updateCredSuccess && (
+                            <div style={{ color: 'var(--color-success)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                              <Check size={14} /> {updateCredSuccess}
+                            </div>
+                          )}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                            <div className="admin-form-group">
+                              <label htmlFor="curr_username">Current Username</label>
+                              <input 
+                                id="curr_username"
+                                type="text" 
+                                className="admin-form-input" 
+                                placeholder="Enter current username"
+                                value={currentUsername}
+                                onChange={e => setCurrentUsername(e.target.value)}
+                              />
+                            </div>
+                            <div className="admin-form-group">
+                              <label htmlFor="curr_pass">Current Password</label>
+                              <input 
+                                id="curr_pass"
+                                type="password" 
+                                className="admin-form-input" 
+                                placeholder="Enter current password"
+                                value={currentPassword}
+                                onChange={e => setCurrentPassword(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                            <div className="admin-form-group">
+                              <label htmlFor="new_username">New Username</label>
+                              <input 
+                                id="new_username"
+                                type="text" 
+                                className="admin-form-input" 
+                                placeholder="Enter new username"
+                                value={newUsername}
+                                onChange={e => setNewUsername(e.target.value)}
+                              />
+                            </div>
+                            <div className="admin-form-group">
+                              <label htmlFor="new_pass">New Password</label>
+                              <input 
+                                id="new_pass"
+                                type="password" 
+                                className="admin-form-input" 
+                                placeholder="Enter new password"
+                                value={newPassword}
+                                onChange={e => setNewPassword(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            type="button" 
+                            className="btn-primary" 
+                            style={{ width: 'fit-content', padding: '0.6rem 1.25rem', borderRadius: '8px', fontSize: '0.85rem', alignSelf: 'flex-start' }}
+                            onClick={handleUpdateCredentials}
+                          >
+                            Update Credentials
+                          </button>
                         </div>
                       </div>
                     )}
