@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Service = require('./models/Service');
 const Order = require('./models/Order');
@@ -205,6 +208,9 @@ const POPULAR_EGS_GAMES = [
   }
 ];
 
+const searchCache = new Map();
+const CACHE_TTL = 300000; // 5 minutes cache
+
   app.get('/api/search-games', async (req, res) => {
     let rawQ = req.query.q || '';
     if (!rawQ) return res.json([]);
@@ -212,6 +218,17 @@ const POPULAR_EGS_GAMES = [
     // Clean up unicode symbols like ™, ®, © and trim whitespace for robust API query matching
     const q = rawQ.replace(/[™®©]/g, '').replace(/\s+/g, ' ').trim();
     if (!q) return res.json([]);
+    
+    const cacheKey = q.toLowerCase();
+    if (searchCache.has(cacheKey)) {
+      const cached = searchCache.get(cacheKey);
+      if (Date.now() - cached.timestamp < CACHE_TTL) {
+        console.log(`[Cache Hit] Returning cached results for query: "${cacheKey}"`);
+        return res.json(cached.data);
+      } else {
+        searchCache.delete(cacheKey);
+      }
+    }
     
     try {
       let results = [];
@@ -253,7 +270,10 @@ const POPULAR_EGS_GAMES = [
           })
         }, 3000);
         
-        const egsData = await egsRes.json();
+        let egsData = null;
+        if (egsRes.ok && egsRes.headers.get('content-type')?.includes('application/json')) {
+          egsData = await egsRes.json();
+        }
         const elements = egsData?.data?.Catalog?.searchStore?.elements;
         if (elements && elements.length > 0) {
           const egsSearchResults = elements.map(item => {
@@ -286,12 +306,18 @@ const POPULAR_EGS_GAMES = [
         const steamData = await steamRes.json();
         
         if (steamData && steamData.items && steamData.items.length > 0) {
-          const gameResults = steamData.items.slice(0, 5).map(item => ({
-            name: item.name,
-            domain: 'Steam Game',
-            icon: `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg`,
-            type: 'Game'
-          }));
+          const gameResults = steamData.items.slice(0, 5).map(item => {
+            let iconUrl = item.tiny_image || `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg`;
+            if (iconUrl.includes('?')) {
+              iconUrl = iconUrl.split('?')[0];
+            }
+            return {
+              name: item.name,
+              domain: 'Steam Game',
+              icon: iconUrl,
+              type: 'Game'
+            };
+          });
           
           // Deduplicate based on name
           const uniqueSteamResults = gameResults.filter(gr => !results.some(r => r.name.toLowerCase() === gr.name.toLowerCase()));
@@ -399,8 +425,11 @@ const POPULAR_EGS_GAMES = [
               'Authorization': `Bearer ${process.env.LOGO_DEV_SECRET_KEY}`
             }
           }, 3000);
-          const logoDevData = await logoDevRes.json();
-          if (Array.isArray(logoDevData)) {
+          let logoDevData = null;
+          if (logoDevRes.ok && logoDevRes.headers.get('content-type')?.includes('application/json')) {
+            logoDevData = await logoDevRes.json();
+          }
+          if (logoDevData && Array.isArray(logoDevData)) {
             const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
             const logoDevResults = logoDevData.slice(0, 5).map(item => {
               let iconUrl = item.logo_url;
@@ -426,7 +455,10 @@ const POPULAR_EGS_GAMES = [
       // 2. Fetch OTT Brands
       try {
         const brandRes = await fetchWithTimeout(`https://api.brandfetch.io/v2/search/${encodeURIComponent(q)}`, {}, 3000);
-        const brandData = await brandRes.json();
+        let brandData = null;
+        if (brandRes.ok && brandRes.headers.get('content-type')?.includes('application/json')) {
+          brandData = await brandRes.json();
+        }
         
         if (brandData && brandData.length > 0) {
           const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
@@ -446,7 +478,10 @@ const POPULAR_EGS_GAMES = [
       } catch (err) {
         console.log('Brandfetch error:', err.message);
       }
-      
+      searchCache.set(cacheKey, {
+        timestamp: Date.now(),
+        data: results
+      });
       res.json(results);
     } catch (err) {
       console.error('Unified Search error:', err.message);

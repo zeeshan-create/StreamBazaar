@@ -350,14 +350,19 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
     }
 
     // Single atomic state update to prevent race conditions
-    setEditForm(prev => ({
-      ...prev,
-      name: item.name,
-      customIcon: bestIcon,
-      category: resolvedCategory,
-      primaryColor: resolvedPrimary,
-      secondaryColor: resolvedSecondary
-    }));
+    setEditForm(prev => {
+      const categoryIsDefaultOrUnchanged = !prev.category || prev.category === 'Streaming' || prev.category === 'Gaming' || prev.category === prev.originalCategory;
+      const colorsAreDefaultOrUnchanged = !prev.primaryColor || prev.primaryColor === '#6366f1' || prev.primaryColor === '#000000' || prev.primaryColor === prev.originalPrimaryColor;
+      
+      return {
+        ...prev,
+        name: item.name,
+        customIcon: bestIcon,
+        category: categoryIsDefaultOrUnchanged ? resolvedCategory : prev.category,
+        primaryColor: colorsAreDefaultOrUnchanged ? resolvedPrimary : prev.primaryColor,
+        secondaryColor: colorsAreDefaultOrUnchanged ? resolvedSecondary : prev.secondaryColor
+      };
+    });
 
     setSuggestions([]);
 
@@ -370,7 +375,11 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         const primary   = palette.Vibrant     ? palette.Vibrant.hex     : resolvedPrimary;
         const secondary = palette.DarkVibrant ? palette.DarkVibrant.hex
                         : palette.Muted       ? palette.Muted.hex       : resolvedSecondary;
-        setEditForm(prev => ({ ...prev, primaryColor: primary, secondaryColor: secondary }));
+        setEditForm(prev => {
+          const colorsAreDefaultOrUnchanged = !prev.primaryColor || prev.primaryColor === '#6366f1' || prev.primaryColor === '#000000' || prev.primaryColor === prev.originalPrimaryColor || prev.primaryColor === resolvedPrimary;
+          if (!colorsAreDefaultOrUnchanged) return prev;
+          return { ...prev, primaryColor: primary, secondaryColor: secondary };
+        });
       } catch (_) {
         // Keeping defaults if vibrant fails
       }
@@ -431,9 +440,9 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
              if (!iconSrc && !editForm.name) return null;
              return (
                <div style={{ 
-                 width: isGaming ? '48px' : '32px', 
-                 height: isGaming ? '64px' : '32px', 
-                 borderRadius: isGaming ? '6px' : '4px', 
+                 width: isGaming ? '48px' : '48px', 
+                 height: isGaming ? '64px' : '48px', 
+                 borderRadius: isGaming ? '6px' : '8px', 
                  overflow: 'hidden',
                  background: '#222',
                  boxShadow: isGaming ? '0 2px 8px rgba(0,0,0,0.4)' : 'none',
@@ -444,14 +453,24 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                }}>
                  {iconSrc && !imgError ? (
                    <img 
-                     src={getProxiedUrl(iconSrc)} 
-                     style={{ 
-                       width: '100%', 
-                       height: '100%', 
-                       objectFit: 'cover'
-                     }} 
+                     src={iconSrc} style={{ width: '100%', height: '100%', objectFit: isGaming ? 'cover' : 'contain', padding: isGaming ? '0' : '4px' }} 
                      alt="Preview" 
-                     onError={() => setImgError(true)}
+                     onError={(e) => {
+                       if (!e.target.dataset.triedProxy) {
+                         e.target.dataset.triedProxy = 'true';
+                         e.target.src = getProxiedUrl(iconSrc);
+                         return;
+                       }
+                       if (iconSrc === editForm.customIcon) {
+                         const fallback = isGaming ? (getGameIcon(editForm.name) || getFavicon(editForm.name)) : getFavicon(editForm.name);
+                         if (fallback && fallback !== editForm.customIcon) {
+                           e.target.src = fallback;
+                           e.target.dataset.triedProxy = '';
+                           return;
+                         }
+                       }
+                       setImgError(true);
+                     }}
                    />
                  ) : (
                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: isGaming ? '18px' : '14px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#333' }}>
@@ -468,8 +487,8 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                  {suggestions.map((s, idx) => (
                     <div key={idx} onClick={() => handleSelect(s)} style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--color-background)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                        <div style={{ 
-                         width: s.type === 'Game' ? '32px' : '28px', 
-                         height: s.type === 'Game' ? '42px' : '28px', 
+                         width: s.type === 'Game' ? '36px' : '36px', 
+                         height: s.type === 'Game' ? '48px' : '36px', 
                          borderRadius: '4px', 
                          overflow: 'hidden', 
                          background: '#111', 
@@ -478,19 +497,32 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                          justifyContent: 'center',
                          flexShrink: 0
                        }}>
-                         <img 
-                           src={getProxiedUrl(s.icon || `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`)} 
-                           style={{ 
-                             width: '100%', 
-                             height: '100%', 
-                             objectFit: 'cover' 
-                           }} 
-                           alt={s.name} 
-                           onError={e => {
-                             e.target.style.display = 'none';
-                             e.target.nextSibling.style.display = 'flex';
-                           }} 
-                         />
+                          {(() => {
+                            const directUrl = s.icon || (s.type === 'Game' ? (getGameIcon(s.name) || '') : `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`);
+                            return (
+                              <img 
+                                src={directUrl} style={{ width: '100%', height: '100%', objectFit: s.type === 'Game' ? 'cover' : 'contain', padding: s.type === 'Game' ? '0' : '2px' }} 
+                                alt={s.name} 
+                                onError={e => {
+                                  if (!e.target.dataset.triedProxy) {
+                                    e.target.dataset.triedProxy = 'true';
+                                    e.target.src = getProxiedUrl(directUrl);
+                                    return;
+                                  }
+                                  if (!e.target.dataset.triedFallback) {
+                                    e.target.dataset.triedFallback = 'true';
+                                    const fallbackImg = getGameIcon(s.name);
+                                    if (fallbackImg && fallbackImg !== directUrl) {
+                                      e.target.src = getProxiedUrl(fallbackImg);
+                                      return;
+                                    }
+                                  }
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }} 
+                              />
+                            );
+                          })()}
                          <div style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#222' }}>
                            {s.name ? s.name.charAt(0).toUpperCase() : '?'}
                          </div>
@@ -778,7 +810,12 @@ export default function AdminDashboard() {
 
   const handleEditStart = (service) => {
     setEditingId(service._id);
-    setEditForm({ ...service });
+    setEditForm({ 
+      ...service,
+      originalCategory: service.category,
+      originalPrimaryColor: service.primaryColor,
+      originalSecondaryColor: service.secondaryColor
+    });
   };
 
   const handleSave = async (id) => {
@@ -1359,7 +1396,7 @@ export default function AdminDashboard() {
                       {productView === 'grid' ? (
                         <div className="admin-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
                           {filteredServices.map(s => (
-                            <div key={s._id} className="admin-card" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '18px', padding: '1.5rem' }}>
+                            <div key={s._id} className="admin-card" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '18px', padding: '1.5rem', position: 'relative', zIndex: editingId === s._id ? 100 : 1 }}>
                               {editingId === s._id ? (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                   <LogoUploader 
@@ -1616,9 +1653,51 @@ export default function AdminDashboard() {
                                       flexShrink: 0
                                     }}>
                                       {isGamingCategory(s.category) ? (
-                                        <img src={getProxiedUrl(s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name))} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                        <img 
+                                          src={s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name)} 
+                                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                          onError={(e) => {
+                                            const direct = s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name);
+                                            if (!e.target.dataset.triedProxy) {
+                                              e.target.dataset.triedProxy = 'true';
+                                              e.target.src = getProxiedUrl(direct);
+                                              return;
+                                            }
+                                            if (s.customIcon) {
+                                              const fallback = s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name);
+                                              if (fallback && fallback !== s.customIcon) {
+                                                e.target.src = fallback;
+                                                e.target.dataset.triedProxy = '';
+                                                return;
+                                              }
+                                            }
+                                            e.target.style.display = 'none'; 
+                                            e.target.nextSibling.style.display = 'block'; 
+                                          }} 
+                                        />
                                       ) : (
-                                        <img src={getProxiedUrl(s.customIcon || getFavicon(s.name))} style={{ width: '28px', height: '28px', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                        <img 
+                                          src={s.customIcon || getFavicon(s.name)} 
+                                          style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} 
+                                          onError={(e) => {
+                                            const direct = s.customIcon || getFavicon(s.name);
+                                            if (!e.target.dataset.triedProxy) {
+                                              e.target.dataset.triedProxy = 'true';
+                                              e.target.src = getProxiedUrl(direct);
+                                              return;
+                                            }
+                                            if (s.customIcon) {
+                                              const fallback = getFavicon(s.name);
+                                              if (fallback && fallback !== s.customIcon) {
+                                                e.target.src = fallback;
+                                                e.target.dataset.triedProxy = '';
+                                                return;
+                                              }
+                                            }
+                                            e.target.style.display = 'none'; 
+                                            e.target.nextSibling.style.display = 'block'; 
+                                          }} 
+                                        />
                                       )}
                                       <Package size={22} style={{ color: s.color, display: 'none' }} />
                                     </div>

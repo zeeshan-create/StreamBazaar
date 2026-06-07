@@ -869,15 +869,34 @@ export default function App() {
                         }
                         return (
                           <img
-                            src={getProxiedUrl(imgUrl)}
+                            src={imgUrl}
                             alt={product.name}
                             style={{ 
-                              width: isGaming ? '65px' : '44px',
-                              height: isGaming ? '86px' : '44px',
+                              width: '100%',
+                              height: '100%',
                               objectFit: isGaming ? 'cover' : 'contain',
+                              padding: isGaming ? '0' : '4px',
                               borderRadius: isGaming ? '10px' : '8px'
                             }}
-                            onError={() => setImgErr(p => ({ ...p, [product.name]: true }))}
+                             onError={(e) => {
+                               if (!e.target.dataset.triedProxy) {
+                                 e.target.dataset.triedProxy = 'true';
+                                 e.target.src = getProxiedUrl(imgUrl);
+                                 return;
+                               }
+                               if (imgUrl === product.customIcon) {
+                                 const fallback = isGaming ? (product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : getFavicon(product.name);
+                                 if (fallback && fallback !== product.customIcon) {
+                                   if (!e.target.dataset.triedFallback) {
+                                     e.target.dataset.triedFallback = 'true';
+                                     e.target.src = fallback;
+                                     e.target.dataset.triedProxy = ''; // Reset proxy flag for fallback
+                                     return;
+                                   }
+                                 }
+                               }
+                               setImgErr(p => ({ ...p, [product.name]: true }));
+                             }}
                           />
                         );
                       })()}
