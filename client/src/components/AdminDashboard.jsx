@@ -244,79 +244,65 @@ const isGamingCategory = (cat) => {
 const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
   const [dragActive, setDragActive] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState([]);
-  
-  const handleSearch = async (val) => {
+  const searchTimeoutRef = React.useRef(null);
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
+    setImgError(false);
+  }, [editForm.customIcon, editForm.name]);
+
+  const handleSearch = (val) => {
     if (onNameChange) {
       onNameChange(val);
     } else {
       setEditForm(prev => ({ ...prev, name: val }));
     }
 
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
     if (val.length > 2) {
-      try {
-        let brandData = [];
-        let gameData = [];
-
-        try {
-          const brandRes = await fetch(`https://api.brandfetch.io/v2/search/${encodeURIComponent(val)}`);
-          if (brandRes.ok) {
-            brandData = await brandRes.json().catch(() => []);
-          }
-        } catch (e) {
-          console.error("Brandfetch error:", e);
-        }
-
+      searchTimeoutRef.current = setTimeout(async () => {
         try {
           const gameRes = await fetch(`${API_BASE}/search-games?q=${encodeURIComponent(val)}`);
           if (gameRes.ok) {
-            gameData = await gameRes.json().catch(() => []);
+            const gameData = await gameRes.json().catch(() => []);
+            if (Array.isArray(gameData)) {
+              const mapped = gameData.map(g => {
+                let persistentIcon = g.icon || g.logo;
+                if (g.type === 'OTT/Brand' && g.domain) {
+                  const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
+                  persistentIcon = token ? `https://img.logo.dev/${g.domain}?token=${token}` : `https://www.google.com/s2/favicons?domain=${g.domain}&sz=256`;
+                }
+                return {
+                  name: g.name,
+                  domain: g.domain || 'Steam Game',
+                  icon: persistentIcon,
+                  type: g.type || 'Game'
+                };
+              });
+              setSuggestions(mapped);
+            }
           }
         } catch (e) {
           console.error("Game search error:", e);
         }
-        
-        let combined = [];
-        if (Array.isArray(brandData)) {
-          combined = [...combined, ...brandData.map(b => {
-            const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-            const persistentIcon = b.domain 
-              ? (token ? `https://img.logo.dev/${b.domain}?token=${token}` : `https://www.google.com/s2/favicons?domain=${b.domain}&sz=256`) 
-              : b.icon;
-            return {
-              name: b.name,
-              domain: b.domain,
-              icon: persistentIcon,
-              type: 'OTT/Brand'
-            };
-          })];
-        }
-        if (Array.isArray(gameData)) {
-          combined = [...combined, ...gameData.map(g => {
-            let persistentIcon = g.icon || g.logo;
-            if (g.type === 'OTT/Brand' && g.domain) {
-              const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-              persistentIcon = token ? `https://img.logo.dev/${g.domain}?token=${token}` : `https://www.google.com/s2/favicons?domain=${g.domain}&sz=256`;
-            }
-            return {
-              name: g.name,
-              domain: g.domain || 'Steam Game',
-              icon: persistentIcon,
-              type: g.type || 'Game'
-            };
-          })];
-        }
-        
-        setSuggestions(combined);
-      } catch (err) {
-        console.error("Search suggestions combined error:", err);
-      }
+      }, 300);
     } else {
       setSuggestions([]);
     }
   };
 
   const handleSelect = (item) => {
-    const autoColor = '#6366f1';
     const isGameType = isGamingCategory(item.type) || item.type === 'Game';
 
     // Resolve the best persistent icon URL immediately
@@ -330,42 +316,47 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         : `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
     }
 
-    // ─── 1. Set name + icon + category IMMEDIATELY ─────────────────────────
-    //   This makes the preview show the logo right away, without waiting for
-    //   the async image-load / color-extraction step below.
+    // Determine category and default colors
+    let resolvedCategory = isGameType ? 'Gaming' : 'Streaming';
+    let resolvedPrimary = '#6366f1';
+    let resolvedSecondary = '#4f46e5';
+
+    const lowerVal = item.name.toLowerCase();
+    const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
+    if (matchedBrand) {
+      if (BRAND_CATEGORIES[matchedBrand]) resolvedCategory = BRAND_CATEGORIES[matchedBrand];
+      if (BRAND_COLORS[matchedBrand]) {
+        resolvedPrimary = BRAND_COLORS[matchedBrand];
+        resolvedSecondary = BRAND_COLORS[matchedBrand];
+      }
+    }
+
+    // Single atomic state update to prevent race conditions
     setEditForm(prev => ({
       ...prev,
       name: item.name,
-      ...(bestIcon ? { customIcon: bestIcon } : {}),
-      ...(isGameType && (!prev.category || prev.category === 'Streaming')
-        ? { category: 'Gaming' }
-        : {}),
+      customIcon: bestIcon,
+      category: resolvedCategory,
+      primaryColor: resolvedPrimary,
+      secondaryColor: resolvedSecondary
     }));
-
-    // Also propagate name change to parent for brand-category detection
-    if (onNameChange) {
-      onNameChange(item.name);
-    }
 
     setSuggestions([]);
 
-    // ─── 2. Async: extract brand colors from the icon ────────────────────────
-    //   Only updates primaryColor / secondaryColor; does NOT touch customIcon.
     if (!bestIcon) return;
     const img = new Image();
     img.crossOrigin = 'Anonymous';
     img.onload = async () => {
       try {
         const palette = await Vibrant.from(img).getPalette();
-        const primary   = palette.Vibrant     ? palette.Vibrant.hex     : autoColor;
+        const primary   = palette.Vibrant     ? palette.Vibrant.hex     : resolvedPrimary;
         const secondary = palette.DarkVibrant ? palette.DarkVibrant.hex
-                        : palette.Muted       ? palette.Muted.hex       : autoColor;
+                        : palette.Muted       ? palette.Muted.hex       : resolvedSecondary;
         setEditForm(prev => ({ ...prev, primaryColor: primary, secondaryColor: secondary }));
       } catch (_) {
-        // Color extraction failed – keep defaults, logo already showing
+        // Keeping defaults if vibrant fails
       }
     };
-    // onerror: colors already defaulted above, logo already set — nothing to do
     img.src = getProxiedUrl(bestIcon);
   };
 
@@ -418,7 +409,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
           {(() => {
              const isGaming = isGamingCategory(editForm.category);
-             const iconSrc = editForm.customIcon || getFavicon(editForm.name);
+             const iconSrc = editForm.customIcon || (isGaming ? (getGameIcon(editForm.name) || getFavicon(editForm.name)) : getFavicon(editForm.name));
              if (!iconSrc && !editForm.name) return null;
              return (
                <div style={{ 
@@ -433,25 +424,17 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                  justifyContent: 'center',
                  flexShrink: 0
                }}>
-                 {iconSrc ? (
-                   <>
-                     <img 
-                       src={getProxiedUrl(iconSrc)} 
-                       style={{ 
-                         width: '100%', 
-                         height: '100%', 
-                         objectFit: 'cover'
-                       }} 
-                       alt="Preview" 
-                       onError={e => {
-                         e.target.style.display = 'none';
-                         e.target.nextSibling.style.display = 'flex';
-                       }}
-                     />
-                     <div style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: isGaming ? '18px' : '14px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#333' }}>
-                       {editForm.name ? editForm.name.charAt(0).toUpperCase() : '?'}
-                     </div>
-                   </>
+                 {iconSrc && !imgError ? (
+                   <img 
+                     src={getProxiedUrl(iconSrc)} 
+                     style={{ 
+                       width: '100%', 
+                       height: '100%', 
+                       objectFit: 'cover'
+                     }} 
+                     alt="Preview" 
+                     onError={() => setImgError(true)}
+                   />
                  ) : (
                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: isGaming ? '18px' : '14px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#333' }}>
                      {editForm.name ? editForm.name.charAt(0).toUpperCase() : '?'}

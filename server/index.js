@@ -861,12 +861,14 @@ app.get('/api/proxy-image', async (req, res) => {
       }
     }, 5000);
 
-    if (!response.ok) {
+    const contentType = response.headers.get('content-type') || '';
+    const isImage = contentType.startsWith('image/');
+
+    if (!response.ok && !isImage) {
       console.error(`Proxy fetch failed for ${targetUrl}: Status ${response.status}`);
       return res.status(response.status).send(`Failed to fetch image: ${response.statusText}`);
     }
 
-    const contentType = response.headers.get('content-type');
     res.setHeader('Content-Type', contentType || 'image/jpeg');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'public, max-age=604800'); // Cache for 7 days
