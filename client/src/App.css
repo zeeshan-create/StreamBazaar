@@ -408,9 +408,12 @@ nav {
   padding: 1.15rem 1.25rem;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  transition: var(--transition);
   position: relative;
   overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+              box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+              border-color 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, box-shadow;
 }
 .ott-card::before {
   content: '';
@@ -420,9 +423,15 @@ nav {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
 }
 .ott-card:hover {
-  border-color: var(--border-hover);
-  background: var(--card-hover);
-  transform: translateY(-4px);
+  border-color: var(--card-accent) !important;
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.4), 
+              0 8px 24px -8px var(--card-accent), 
+              inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+.ott-card:active {
+  transform: translateY(-2px) scale(0.985);
+  transition: transform 0.1s ease;
 }
 
 /* ── SKELETON LOADER ─────────────────────────────────────────────── */
@@ -498,10 +507,13 @@ nav {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   cursor: pointer;
-  transition: var(--transition);
   gap: 0.5rem;
   position: relative;
   overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
+              background-color 0.2s ease, 
+              border-color 0.2s ease;
+  will-change: transform;
 }
 .plan-row::after {
   content: '';
@@ -517,9 +529,13 @@ nav {
   animation: shimmer 0.7s ease forwards;
 }
 .plan-row:hover {
-  border-color: rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.07);
-  transform: translateX(3px);
+  border-color: rgba(255,255,255,0.22) !important;
+  background: rgba(255,255,255,0.08) !important;
+  transform: translateX(4px);
+}
+.plan-row:active {
+  transform: translateX(2px) scale(0.985);
+  transition: transform 0.08s ease;
 }
 .plan-row-label { font-size: 0.82rem; color: var(--text-mid); flex: 1; min-width: 0; }
 .plan-game-icon {

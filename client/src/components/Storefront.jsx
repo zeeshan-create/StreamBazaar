@@ -834,7 +834,6 @@ export default function App() {
                 return (
                 <motion.div
                   key={product._id || product.id}
-                  layout
                   id={`card-${product._id || product.id}`}
                   className="ott-card"
                   custom={idx}
@@ -848,8 +847,6 @@ export default function App() {
                     background: 'var(--card)',
                     boxShadow: `0 0 15px ${effectiveColor}15, inset 0 0 15px ${effectiveColor}10`
                   }}
-                  whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px ${effectiveColor}88, 0 28px 60px -12px ${effectiveColor}44`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
-                  whileTap={{ scale: 0.97, y: 0 }}
                 >
                   {/* Card Header */}
                   <div className="card-header" style={{ alignItems: isGamingCategory(product.category) ? 'flex-start' : 'center', gap: '0.85rem' }}>
@@ -946,7 +943,6 @@ export default function App() {
                     animate="visible"
                   >
                     {product.plans.map((plan, i) => {
-                      const gameIcon = (isGamingCategory(product.category) || plan.image) ? (plan.image || getGameIcon(plan.label) || product.customIcon || getGameIcon(product.name) || getFavicon(product.name)) : null;
                       return (
                         <motion.div
                           key={i}
@@ -954,28 +950,18 @@ export default function App() {
                           variants={planRowVariants}
                           className="plan-row"
                           style={{ background: `linear-gradient(90deg, ${effectiveColor}15 0%, transparent 100%)`, borderLeft: `3px solid ${effectiveColor}` }}
-                          whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.2)', transition: { duration: 0.15 } }}
-                          whileTap={{ scale: 0.97 }}
                           onClick={() => {
                             if (product.status && product.status !== 'Available') return;
                             openPopup(product, plan);
                           }}
                         >
-                          {gameIcon && (
-                            <img 
-                              src={getProxiedUrl(gameIcon)} 
-                              className={`plan-game-icon ${isGamingCategory(product.category) ? 'gaming' : 'ott'}`} 
-                              alt={plan.label} 
-                              onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                          )}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
                             <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>{plan.label}</span>
                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                               <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: `${effectiveColor}20`, color: effectiveColor, border: `1px solid ${effectiveColor}40`, whiteSpace: 'nowrap' }}>
                                 {plan.duration}
                               </span>
-                              {(!gameIcon && plan.quality && plan.quality.toLowerCase() !== plan.label.toLowerCase()) && (
+                              {(plan.quality && plan.quality.toLowerCase() !== plan.label.toLowerCase()) && (
                                 <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', border: '1px solid rgba(255,255,255,0.1)', whiteSpace: 'nowrap' }}>
                                   {plan.quality}
                                 </span>
