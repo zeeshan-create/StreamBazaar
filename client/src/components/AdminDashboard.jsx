@@ -116,22 +116,40 @@ const DOMAINS = {
 };
 
 const GAME_IMGS = {
-  'gta 5': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_231x87.jpg',
-  'gta v': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_231x87.jpg',
-  'rdr 2': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_231x87.jpg',
-  'red dead': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_231x87.jpg',
-  'cyberpunk': 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_231x87.jpg',
-  'wwe': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_231x87.jpg',
-  'forza': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_231x87.jpg',
-  'fifa': 'https://cdn.akamai.steamstatic.com/steam/apps/2195250/capsule_231x87.jpg',
-  'fc 24': 'https://cdn.akamai.steamstatic.com/steam/apps/2195250/capsule_231x87.jpg',
-  'spider-man': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_231x87.jpg',
-  'spiderman': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_231x87.jpg',
-  'god of war': 'https://cdn.akamai.steamstatic.com/steam/apps/1593500/capsule_231x87.jpg',
-  'hogwarts': 'https://cdn.akamai.steamstatic.com/steam/apps/990080/capsule_231x87.jpg',
-  'resident evil': 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/capsule_231x87.jpg',
-  'elden ring': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_231x87.jpg',
-  'call of duty': 'https://cdn.akamai.steamstatic.com/steam/apps/1938090/capsule_231x87.jpg'
+  'wwe 2k25': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
+  'wwe bundles': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
+  'forza horizon 5': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_184x69.jpg',
+  'gta v': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_184x69.jpg',
+  'gta trilogy': 'https://cdn.akamai.steamstatic.com/steam/apps/1546930/capsule_184x69.jpg',
+  'spider-man 2': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
+  'spider-man series': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
+  'uncharted': 'https://cdn.akamai.steamstatic.com/steam/apps/1659420/capsule_184x69.jpg',
+  'crimson desert': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=120&auto=format&fit=crop&q=60',
+  'the last of us': 'https://cdn.akamai.steamstatic.com/steam/apps/1888930/capsule_184x69.jpg',
+  'black myth wukong': 'https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_184x69.jpg',
+  'ghost of tsushima': 'https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_184x69.jpg',
+  'elden ring': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg',
+  'resident evil': 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/capsule_184x69.jpg',
+  'hogwarts legacy': 'https://cdn.akamai.steamstatic.com/steam/apps/990080/capsule_184x69.jpg',
+  'god of war': 'https://cdn.akamai.steamstatic.com/steam/apps/1593500/capsule_184x69.jpg',
+  'cyberpunk 2077': 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_184x69.jpg',
+  'pragmata': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg',
+  'assassin\'s creed': 'https://cdn.akamai.steamstatic.com/steam/apps/2208920/capsule_184x69.jpg',
+  'khazan': 'https://cdn.akamai.steamstatic.com/steam/apps/2801450/capsule_184x69.jpg', // Placeholder
+  'f1 24': 'https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_184x69.jpg',
+  'f1 25': 'https://cdn.akamai.steamstatic.com/steam/apps/3059520/capsule_184x69.jpg',
+  'stellar blade': 'https://cdn.akamai.steamstatic.com/steam/apps/3489700/capsule_184x69.jpg',
+  'mafia': 'https://cdn.akamai.steamstatic.com/steam/apps/1030840/capsule_184x69.jpg',
+  'tekken 7': 'https://cdn.akamai.steamstatic.com/steam/apps/389730/capsule_184x69.jpg',
+  'tekken 8': 'https://cdn.akamai.steamstatic.com/steam/apps/1778820/capsule_184x69.jpg',
+  'expedition 33': 'https://cdn.akamai.steamstatic.com/steam/apps/2690040/capsule_184x69.jpg',
+  'red dead redemption': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
+  'hitman': 'https://cdn.akamai.steamstatic.com/steam/apps/1659040/capsule_184x69.jpg',
+  'rockstar pack': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
+  'far cry': 'https://cdn.akamai.steamstatic.com/steam/apps/2369390/capsule_184x69.jpg',
+  'poppy playtime': 'https://cdn.akamai.steamstatic.com/steam/apps/1721470/capsule_184x69.jpg',
+  'minecraft': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg', // placeholder
+  'special steam accounts': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg', // placeholder
 };
 
 const BRAND_COLORS = {

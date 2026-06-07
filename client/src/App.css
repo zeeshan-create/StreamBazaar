@@ -523,14 +523,24 @@ nav {
 }
 .plan-row-label { font-size: 0.82rem; color: var(--text-mid); flex: 1; min-width: 0; }
 .plan-game-icon {
-  width: 54px;
-  height: 25px;
-  object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  margin-right: 4px;
+  margin-right: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: all 0.2s ease;
+}
+.plan-game-icon.gaming {
+  width: 34px;
+  height: 45px;
+  object-fit: cover;
+}
+.plan-game-icon.ott {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 2px;
 }
 .plan-row-price { font-size: 0.95rem; font-weight: 700; flex-shrink: 0; }
 .plan-row-buy {

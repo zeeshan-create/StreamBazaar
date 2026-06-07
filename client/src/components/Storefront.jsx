@@ -240,8 +240,9 @@ const GAME_IMGS = {
   'pragmata': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg',
   'assassin\'s creed': 'https://cdn.akamai.steamstatic.com/steam/apps/2208920/capsule_184x69.jpg',
   'khazan': 'https://cdn.akamai.steamstatic.com/steam/apps/2801450/capsule_184x69.jpg', // Placeholder
-  'f1 25': 'https://cdn.akamai.steamstatic.com/steam/apps/2465800/capsule_184x69.jpg',
-  'stellar blade': 'https://cdn.akamai.steamstatic.com/steam/apps/2522250/capsule_184x69.jpg', // Placeholder
+  'f1 24': 'https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_184x69.jpg',
+  'f1 25': 'https://cdn.akamai.steamstatic.com/steam/apps/3059520/capsule_184x69.jpg',
+  'stellar blade': 'https://cdn.akamai.steamstatic.com/steam/apps/3489700/capsule_184x69.jpg',
   'mafia': 'https://cdn.akamai.steamstatic.com/steam/apps/1030840/capsule_184x69.jpg',
   'tekken 7': 'https://cdn.akamai.steamstatic.com/steam/apps/389730/capsule_184x69.jpg',
   'tekken 8': 'https://cdn.akamai.steamstatic.com/steam/apps/1778820/capsule_184x69.jpg',
@@ -961,7 +962,12 @@ export default function App() {
                           }}
                         >
                           {gameIcon && (
-                            <img src={getProxiedUrl(gameIcon)} className="plan-game-icon" alt={plan.label} />
+                            <img 
+                              src={getProxiedUrl(gameIcon)} 
+                              className={`plan-game-icon ${isGamingCategory(product.category) ? 'gaming' : 'ott'}`} 
+                              alt={plan.label} 
+                              onError={(e) => { e.target.style.display = 'none'; }}
+                            />
                           )}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
                             <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>{plan.label}</span>
@@ -1269,7 +1275,7 @@ export default function App() {
                       alt={popup.product.name}
                       className="popup-logo"
                       onError={() => setImgErr(p => ({ ...p, [`popup-${popup.product.name}`]: true }))}
-                      style={isGaming ? { width: '80px', height: '36px', objectFit: 'cover', borderRadius: '6px' } : {}}
+                      style={isGaming ? { width: '48px', height: '64px', objectFit: 'cover', borderRadius: '8px' } : { width: '48px', height: '48px', objectFit: 'contain' }}
                     />
                   );
                 })()}
