@@ -232,7 +232,7 @@ const DURATION_OPTIONS = [
   '6 Months',
   '12 Months'
 ];
-const PLATFORMS = ['TV', 'PC', 'iOS', 'Android', 'Laptop', 'PS4', 'PS5', 'Xbox'];
+const PLATFORMS = ['TV', 'PC', 'iOS', 'Android', 'Laptop', 'PS2', 'PS3', 'PS4', 'PS5', 'Xbox', 'Xbox S', 'Xbox X'];
 
 
 const isGamingCategory = (cat) => {

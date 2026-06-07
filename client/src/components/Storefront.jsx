@@ -13,13 +13,41 @@ import FomoToast from './FomoToast';
 
 
 const CustomIcons = {
-  Apple: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>,
-  Android: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20.24 12.24a9 9 0 1 0-16.48 0"/><path d="M17 19H7"/><path d="M4.26 15.26 2 13"/><path d="M19.74 15.26 22 13"/><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M21 16v2a2 2 0 0 1-2 2h-1"/><path d="M3 16v2a2 2 0 0 0 2 2h1"/></svg>,
-  TV: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>,
-  PC: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>,
-  Laptop: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg>,
-  PlayStation: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="7" cy="12" r="2"/><circle cx="17" cy="12" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/><path d="M17 12h2a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><path d="M7 12H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2"/></svg>,
-  Xbox: () => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M6.5 6.5l11 11"/><path d="M17.5 6.5l-11 11"/></svg>,
+  Apple: () => (
+    <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
+      <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282"/>
+    </svg>
+  ),
+  Android: () => (
+    <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
+      <path d="M2.76 3.061a.5.5 0 0 1 .679.2l1.283 2.352A8.9 8.9 0 0 1 8 5a8.9 8.9 0 0 1 3.278.613l1.283-2.352a.5.5 0 1 1 .878.478l-1.252 2.295C14.475 7.266 16 9.477 16 12H0c0-2.523 1.525-4.734 3.813-5.966L2.56 3.74a.5.5 0 0 1 .2-.678ZM5 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2m6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+    </svg>
+  ),
+  TV: () => (
+    <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
+      <path d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5M13.991 3l.024.001a1.5 1.5 0 0 1 .538.143.76.76 0 0 1 .302.254c.067.1.145.277.145.602v5.991l-.001.024a1.5 1.5 0 0 1-.143.538.76.76 0 0 1-.254.302c-.1.067-.277.145-.602.145H2.009l-.024-.001a1.5 1.5 0 0 1-.538-.143.76.76 0 0 1-.302-.254C1.078 10.502 1 10.325 1 10V4.009l.001-.024a1.5 1.5 0 0 1 .143-.538.76.76 0 0 1 .254-.302C1.498 3.078 1.675 3 2 3zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2"/>
+    </svg>
+  ),
+  PC: () => (
+    <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
+      <path d="M0 4s0-2 2-2h12s2 0 2 2v6s0 2-2 2h-4q0 1 .25 1.5H11a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1h.75Q6 13 6 12H2s-2 0-2-2zm1.398-.855a.76.76 0 0 0-.254.302A1.5 1.5 0 0 0 1 4.01V10c0 .325.078.502.145.602q.105.156.302.254a1.5 1.5 0 0 0 .538.143L2.01 11H14c.325 0 .502-.078.602-.145a.76.76 0 0 0 .254-.302 1.5 1.5 0 0 0 .143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.76.76 0 0 0-.302-.254A1.5 1.5 0 0 0 13.99 3H2c-.325 0-.502.078-.602.145"/>
+    </svg>
+  ),
+  Laptop: () => (
+    <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
+      <path d="M13.5 3a.5.5 0 0 1 .5.5V11H2V3.5a.5.5 0 0 1 .5-.5zm-11-1A1.5 1.5 0 0 0 1 3.5V12h14V3.5A1.5 1.5 0 0 0 13.5 2zM0 12.5h16a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5"/>
+    </svg>
+  ),
+  PlayStation: () => (
+    <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
+      <path d="M15.858 11.451c-.313.395-1.079.676-1.079.676l-5.696 2.046v-1.509l4.192-1.493c.476-.17.549-.412.162-.538-.386-.127-1.085-.09-1.56.08l-2.794.984v-1.566l.161-.054s.807-.286 1.942-.412c1.135-.125 2.525.017 3.616.43 1.23.39 1.368.962 1.056 1.356M9.625 8.883v-3.86c0-.453-.083-.87-.508-.988-.326-.105-.528.198-.528.65v9.664l-2.606-.827V2c1.108.206 2.722.692 3.59.985 2.207.757 2.955 1.7 2.955 3.825 0 2.071-1.278 2.856-2.903 2.072Zm-8.424 3.625C-.061 12.15-.271 11.41.304 10.984c.532-.394 1.436-.69 1.436-.69l3.737-1.33v1.515l-2.69.963c-.474.17-.547.411-.161.538.386.126 1.085.09 1.56-.08l1.29-.469v1.356l-.257.043a8.45 8.45 0 0 1-4.018-.323Z"/>
+    </svg>
+  ),
+  Xbox: () => (
+    <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
+      <path d="M7.202 15.967a8 8 0 0 1-3.552-1.26c-.898-.585-1.101-.826-1.101-1.306 0-.965 1.062-2.656 2.879-4.583C6.459 7.723 7.897 6.44 8.052 6.475c.302.068 2.718 2.423 3.622 3.531 1.43 1.753 2.088 3.189 1.754 3.829-.254.486-1.83 1.437-2.987 1.802-.954.301-2.207.429-3.239.33m-5.866-3.57C.589 11.253.212 10.127.03 8.497c-.06-.539-.038-.846.137-1.95.218-1.377 1.002-2.97 1.945-3.95.401-.417.437-.427.926-.263.595.2 1.23.638 2.213 1.528l.574.519-.313.385C4.056 6.553 2.52 9.086 1.94 10.653c-.315.852-.442 1.707-.306 2.063.091.24.007.15-.3-.319Zm13.101.195c.074-.36-.019-1.02-.238-1.687-.473-1.443-2.055-4.128-3.508-5.953l-.457-.575.494-.454c.646-.593 1.095-.948 1.58-1.25.381-.237.927-.448 1.161-.448.145 0 .654.528 1.065 1.104a8.4 8.4 0 0 1 1.343 3.102c.153.728.166 2.286.024 3.012a9.5 9.5 0 0 1-.6 1.893c-.179.393-.624 1.156-.82 1.404-.1.128-.1.127-.043-.148ZM7.335 1.952c-.67-.34-1.704-.705-2.276-.803a4 4 0 0 0-.759-.043c-.471.024-.45 0 .306-.358A7.8 7.8 0 0 1 6.47.128c.8-.169 2.306-.17 3.094-.005.85.18 1.853.552 2.418.9l.168.103-.385-.02c-.766-.038-1.88.27-3.078.853-.361.176-.676.316-.699.312a12 12 0 0 1-.654-.319Z"/>
+    </svg>
+  ),
 };
 
 const TELEGRAM_LINK = 'https://t.me/owner_trusted_streams';
@@ -1261,26 +1289,29 @@ export default function App() {
               <div className="popup-device-label">Select Your Device</div>
               <motion.div
                 className="device-grid"
-                style={{ gridTemplateColumns: popup.product.category === 'Gaming' ? 'repeat(5,1fr)' : 'repeat(4,1fr)' }}
+                style={{ gridTemplateColumns: isGamingCategory(popup.product.category) ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)' }}
                 initial="hidden"
                 animate="visible"
               >
-                
-                
-                {(popup.product.category === 'Gaming' ? [
+                {(isGamingCategory(popup.product.category) ? [
                   { id: 'PC', label: 'PC', icon: CustomIcons.PC },
                   { id: 'Laptop', label: 'Laptop', icon: CustomIcons.Laptop },
+                  { id: 'PS2', label: 'PS2', icon: CustomIcons.PlayStation },
+                  { id: 'PS3', label: 'PS3', icon: CustomIcons.PlayStation },
                   { id: 'PS4', label: 'PS4', icon: CustomIcons.PlayStation },
                   { id: 'PS5', label: 'PS5', icon: CustomIcons.PlayStation },
-                  { id: 'Xbox', label: 'Xbox', icon: CustomIcons.Xbox }
+                  { id: 'Xbox', label: 'Xbox', icon: CustomIcons.Xbox },
+                  { id: 'Xbox S', label: 'Xbox S', icon: CustomIcons.Xbox },
+                  { id: 'Xbox X', label: 'Xbox X', icon: CustomIcons.Xbox }
                 ] : [
                   { id: 'TV', label: 'TV', icon: CustomIcons.TV },
                   { id: 'PC', label: 'PC', icon: CustomIcons.PC },
                   { id: 'iOS', label: 'iOS', icon: CustomIcons.Apple },
                   { id: 'Android', label: 'Android', icon: CustomIcons.Android }
                 ]).map((d, i) => {
-                  const supported = popup.plan.supportedDevices || (popup.plan.device ? [popup.plan.device] : ['TV', 'PC', 'iOS', 'Android']);
-                  const available = supported.includes(d.id);
+                  const supportedRaw = popup.plan.supportedDevices || (popup.plan.device ? [popup.plan.device] : (isGamingCategory(popup.product.category) ? ['PC', 'Laptop', 'PS2', 'PS3', 'PS4', 'PS5', 'Xbox', 'Xbox S', 'Xbox X'] : ['TV', 'PC', 'iOS', 'Android']));
+                  const supported = supportedRaw.map(x => x ? x.toLowerCase() : '');
+                  const available = supported.includes(d.id.toLowerCase());
                   return (
 
                   <motion.button
