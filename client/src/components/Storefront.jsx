@@ -551,57 +551,57 @@ export default function App() {
     if (lower.includes('offline')) {
       config = {
         label: 'Offline Activation',
-        color: '#f59e0b', // amber
-        bg: 'rgba(245, 158, 11, 0.08)',
-        border: 'rgba(245, 158, 11, 0.22)',
+        color: '#fbbf24', // bright amber
+        bg: 'rgba(251, 191, 36, 0.12)',
+        border: 'rgba(251, 191, 36, 0.3)',
         icon: <Laptop2 size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
     } else if (lower.includes('private')) {
       config = {
         label: 'Private Account',
-        color: '#10b981', // emerald
-        bg: 'rgba(16, 185, 129, 0.08)',
-        border: 'rgba(16, 185, 129, 0.22)',
+        color: '#34d399', // bright emerald
+        bg: 'rgba(52, 211, 153, 0.12)',
+        border: 'rgba(52, 211, 153, 0.3)',
         icon: <ShieldCheck size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
     } else if (lower.includes('personal') || lower.includes('upgrade')) {
       config = {
         label: 'Personal Upgrade',
-        color: '#ec4899', // pink
-        bg: 'rgba(236, 72, 153, 0.08)',
-        border: 'rgba(236, 72, 153, 0.22)',
+        color: '#f472b6', // bright pink
+        bg: 'rgba(244, 114, 182, 0.12)',
+        border: 'rgba(244, 114, 182, 0.3)',
         icon: <Zap size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
     } else if (lower.includes('shared') || lower.includes('sharing')) {
       config = {
         label: 'Shared Profile',
-        color: '#3b82f6', // blue
-        bg: 'rgba(59, 130, 246, 0.08)',
-        border: 'rgba(59, 130, 246, 0.22)',
+        color: '#60a5fa', // bright blue
+        bg: 'rgba(96, 165, 250, 0.12)',
+        border: 'rgba(96, 165, 250, 0.3)',
         icon: <Zap size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
     } else if (lower.includes('4k') || lower.includes('ultra hd') || lower.includes('uhd')) {
       config = {
         label: '4K Ultra HD',
-        color: '#a855f7', // purple
-        bg: 'rgba(168, 85, 247, 0.08)',
-        border: 'rgba(168, 85, 247, 0.22)',
+        color: '#c084fc', // bright purple
+        bg: 'rgba(192, 132, 252, 0.12)',
+        border: 'rgba(192, 132, 252, 0.3)',
         icon: <Tv2 size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
     } else if (lower.includes('seat')) {
       config = {
         label: 'Seat Access',
-        color: '#3b82f6',
-        bg: 'rgba(59, 130, 246, 0.08)',
-        border: 'rgba(59, 130, 246, 0.22)',
+        color: '#60a5fa', // bright blue
+        bg: 'rgba(96, 165, 250, 0.12)',
+        border: 'rgba(96, 165, 250, 0.3)',
         icon: <Zap size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
     } else if (lower.includes('legal') || lower.includes('verified')) {
       config = {
         label: 'Verified Safe',
-        color: '#10b981',
-        bg: 'rgba(16, 185, 129, 0.08)',
-        border: 'rgba(16, 185, 129, 0.22)',
+        color: '#34d399', // bright emerald
+        bg: 'rgba(52, 211, 153, 0.12)',
+        border: 'rgba(52, 211, 153, 0.3)',
         icon: <ShieldCheck size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
     }
@@ -635,30 +635,56 @@ export default function App() {
     const lower = label.toLowerCase();
     
     let icon = null;
-    let color = 'var(--text)';
+    let color = '#ffffff';
+    let bg = 'rgba(255, 255, 255, 0.05)';
+    let border = 'rgba(255, 255, 255, 0.1)';
     
     if (lower.includes('4k') || lower.includes('ultra hd') || lower.includes('uhd')) {
-      icon = <Tv2 size={12} style={{ color: '#a855f7', marginRight: '5px', flexShrink: 0 }} />;
-      color = '#e9d5ff'; // light purple
+      icon = <Tv2 size={11} style={{ color: '#c084fc', marginRight: '4px', flexShrink: 0 }} />;
+      color = '#c084fc'; // bright purple
+      bg = 'rgba(192, 132, 252, 0.12)';
+      border = 'rgba(192, 132, 252, 0.3)';
     } else if (lower.includes('1080p') || lower.includes('full hd') || lower.includes('720p') || lower.includes('hd')) {
-      icon = <Tv2 size={12} style={{ color: '#3b82f6', marginRight: '5px', flexShrink: 0 }} />;
-      color = '#dbeafe'; // light blue
+      icon = <Tv2 size={11} style={{ color: '#60a5fa', marginRight: '4px', flexShrink: 0 }} />;
+      color = '#60a5fa'; // bright blue
+      bg = 'rgba(96, 165, 250, 0.12)';
+      border = 'rgba(96, 165, 250, 0.3)';
     } else if (lower.includes('shared')) {
-      icon = <Zap size={12} style={{ color: '#3b82f6', marginRight: '5px', flexShrink: 0 }} />;
-      color = '#e0f2fe'; // light sky blue
+      icon = <Zap size={11} style={{ color: '#60a5fa', marginRight: '4px', flexShrink: 0 }} />;
+      color = '#60a5fa'; // bright blue
+      bg = 'rgba(96, 165, 250, 0.12)';
+      border = 'rgba(96, 165, 250, 0.3)';
     } else if (lower.includes('private') || lower.includes('individual')) {
-      icon = <ShieldCheck size={12} style={{ color: '#10b981', marginRight: '5px', flexShrink: 0 }} />;
-      color = '#d1fae5'; // light emerald
+      icon = <ShieldCheck size={11} style={{ color: '#34d399', marginRight: '4px', flexShrink: 0 }} />;
+      color = '#34d399'; // bright emerald
+      bg = 'rgba(52, 211, 153, 0.12)';
+      border = 'rgba(52, 211, 153, 0.3)';
     } else if (lower.includes('game') || lower.includes('pc') || lower.includes('playstation') || lower.includes('xbox') || lower.includes('ps5') || lower.includes('ps4') || lower.includes('ps3') || lower.includes('ps2') || lower.includes('seat')) {
-      icon = <Gamepad2 size={12} style={{ color: '#f59e0b', marginRight: '5px', flexShrink: 0 }} />;
-      color = '#fef3c7'; // light amber
+      icon = <Gamepad2 size={11} style={{ color: '#fbbf24', marginRight: '4px', flexShrink: 0 }} />;
+      color = '#fbbf24'; // bright amber
+      bg = 'rgba(251, 191, 36, 0.12)';
+      border = 'rgba(251, 191, 36, 0.3)';
     } else if (lower.includes('premium')) {
-      icon = <Award size={12} style={{ color: '#fbbf24', marginRight: '5px', flexShrink: 0 }} />;
-      color = '#fffbeb'; // light gold
+      icon = <Award size={11} style={{ color: '#fbbf24', marginRight: '4px', flexShrink: 0 }} />;
+      color = '#fbbf24'; // bright gold
+      bg = 'rgba(251, 191, 36, 0.12)';
+      border = 'rgba(251, 191, 36, 0.3)';
     }
     
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', color, gap: '1px' }}>
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        color,
+        background: bg,
+        border: `1px solid ${border}`,
+        padding: '2px 8px',
+        borderRadius: '6px',
+        fontSize: '0.74rem',
+        fontWeight: '700',
+        lineHeight: 1.2,
+        alignSelf: 'flex-start'
+      }}>
         {icon}
         {label}
       </span>
