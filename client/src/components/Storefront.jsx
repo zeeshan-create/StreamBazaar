@@ -691,6 +691,27 @@ export default function App() {
     );
   };
 
+  const getPlanTheme = (label, defaultColor) => {
+    if (!label) return { color: defaultColor, bg: `${defaultColor}15` };
+    const lower = label.toLowerCase();
+    
+    if (lower.includes('4k') || lower.includes('ultra hd') || lower.includes('uhd')) {
+      return { color: '#c084fc', bg: 'rgba(192, 132, 252, 0.06)' };
+    } else if (lower.includes('1080p') || lower.includes('full hd') || lower.includes('720p') || lower.includes('hd')) {
+      return { color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.06)' };
+    } else if (lower.includes('shared')) {
+      return { color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.06)' };
+    } else if (lower.includes('private') || lower.includes('individual')) {
+      return { color: '#34d399', bg: 'rgba(52, 211, 153, 0.06)' };
+    } else if (lower.includes('game') || lower.includes('pc') || lower.includes('playstation') || lower.includes('xbox') || lower.includes('ps5') || lower.includes('ps4') || lower.includes('ps3') || lower.includes('ps2') || lower.includes('seat')) {
+      return { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.06)' };
+    } else if (lower.includes('premium')) {
+      return { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.06)' };
+    }
+    
+    return { color: defaultColor, bg: `${defaultColor}15` };
+  };
+
   return (
     <div className="app-container">
       {/* ── NAVBAR ─────────────────────────────────────────────── */}
@@ -1158,6 +1179,7 @@ export default function App() {
                     animate="visible"
                   >
                     {product.plans.map((plan, i) => {
+                      const planTheme = getPlanTheme(plan.label, tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor));
                       return (
                         <motion.div
                           key={i}
@@ -1165,62 +1187,56 @@ export default function App() {
                           variants={planRowVariants}
                           className="plan-row"
                           style={{ 
-                            background: `linear-gradient(90deg, ${tooDark ? 'rgba(255, 107, 0, 0.06)' : `${effectiveColor}15`} 0%, transparent 100%)`, 
-                            borderLeft: `3px solid ${tooDark ? '#ff6b00' : effectiveColor}` 
+                            background: `linear-gradient(90deg, ${planTheme.bg} 0%, transparent 100%)`, 
+                            borderLeft: `3px solid ${planTheme.color}` 
                           }}
                           onClick={() => {
                             if (product.status && product.status !== 'Available') return;
                             openPopup(product, plan);
                           }}
                         >
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
-                            <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: 1, minWidth: 0, paddingRight: '10px' }}>
+                            <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2', display: 'inline-flex' }}>
                               {renderPlanLabel(plan.label)}
                             </span>
-                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                              <span style={{ 
-                                fontSize: '0.65rem', 
-                                fontWeight: 'bold', 
-                                padding: '2px 6px', 
-                                borderRadius: '4px', 
-                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}20`), 
-                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
-                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.25)' : `${effectiveColor}40`)}`, 
-                                whiteSpace: 'nowrap' 
-                              }}>
-                                {plan.duration}
+                            <span style={{ 
+                              fontSize: '0.65rem', 
+                              fontWeight: 'bold', 
+                              padding: '2px 6px', 
+                              borderRadius: '4px', 
+                              backgroundColor: `${planTheme.color}15`, 
+                              color: planTheme.color, 
+                              border: `1px solid ${planTheme.color}35`, 
+                              whiteSpace: 'nowrap' 
+                            }}>
+                              {plan.duration}
+                            </span>
+                            {(plan.quality && plan.quality.toLowerCase() !== plan.label.toLowerCase()) && (
+                              <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', border: '1px solid rgba(255,255,255,0.1)', whiteSpace: 'nowrap' }}>
+                                {plan.quality}
                               </span>
-                              {(plan.quality && plan.quality.toLowerCase() !== plan.label.toLowerCase()) && (
-                                <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', border: '1px solid rgba(255,255,255,0.1)', whiteSpace: 'nowrap' }}>
-                                  {plan.quality}
-                                </span>
-                              )}
-                            </div>
+                            )}
                           </div>
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
                             <span className="plan-row-price" style={{ 
-                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor),
+                                color: planTheme.color,
                                 fontWeight: '900', 
                                 fontSize: '1.15rem', 
                                 letterSpacing: '0.5px',
-                                textShadow: tooDark 
-                                  ? '0 0 10px rgba(255, 107, 0, 0.5), 0 0 20px rgba(255, 107, 0, 0.25)' 
-                                  : ((product.name && product.name.toLowerCase().includes('jiohotstar')) 
-                                      ? '0 0 10px rgba(255, 42, 127, 0.4), 0 0 20px rgba(255, 42, 127, 0.2)' 
-                                      : `0 2px 10px ${effectiveColor}30`)
+                                textShadow: `0 2px 10px ${planTheme.color}30`
                               }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</span>
                             <motion.span
                               className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
                               style={{ 
-                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.45)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.45)' : `${effectiveColor}50`)}`, 
-                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor) 
+                                border: `1px solid ${planTheme.color}50`, 
+                                color: planTheme.color 
                               }}
                               whileHover={product.status === 'Available' ? { 
                                 scale: 1.05, 
-                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.15)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.15)' : `${effectiveColor}30`), 
-                                borderColor: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
-                                boxShadow: tooDark ? '0 0 10px rgba(255, 107, 0, 0.4)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '0 0 10px rgba(255, 42, 127, 0.4)' : `0 0 10px ${effectiveColor}40`) 
+                                backgroundColor: `${planTheme.color}20`, 
+                                borderColor: planTheme.color, 
+                                boxShadow: `0 0 10px ${planTheme.color}40` 
                               } : {}}
                             >
                               {product.status && product.status !== 'Available' ? product.status : 'Buy'}
@@ -1519,9 +1535,38 @@ export default function App() {
               </div>
 
               {/* Selected Plan */}
-              <div className="popup-plan-chip">
-                <strong>{renderPlanLabel(popup.plan.label)}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
-                <strong style={{ color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</strong>
+              <div className="popup-plan-chip" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '12px', padding: '0.65rem 1rem', marginBottom: '1.5rem' }}>
+                {renderPlanLabel(popup.plan.label)}
+                {popup.plan.quality && (
+                  <span style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    color: 'var(--text-mid)',
+                    fontWeight: '600'
+                  }}>{popup.plan.quality}</span>
+                )}
+                <span style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  fontSize: '0.74rem',
+                  color: 'var(--text-mid)',
+                  fontWeight: '600'
+                }}>{popup.plan.duration}</span>
+                <span style={{
+                  background: popup.product.name.toLowerCase().includes('jiohotstar') ? 'rgba(255, 42, 127, 0.12)' : (isColorTooDark(popup.product.effectiveColor) ? 'rgba(255, 107, 0, 0.12)' : `${popup.product.effectiveColor}20`),
+                  border: `1px solid ${popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor)}`,
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  fontSize: '0.74rem',
+                  color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor),
+                  fontWeight: '700',
+                  marginLeft: 'auto'
+                }}>{popup.plan.price}</span>
               </div>
 
               {/* Device Selector */}
@@ -1558,23 +1603,21 @@ export default function App() {
                     custom={i}
                     variants={deviceItemVariants}
                     className={`device-btn ${popup.device === d.id ? 'selected' : ''} ${available ? 'available' : 'out-of-stock'}`}
-                    whileHover={available ? { scale: 1.08, y: -3, boxShadow: `0 8px 24px rgba(0,0,0,0.3)` } : {}}
-                    whileTap={available ? { scale: 0.92 } : {}}
+                    whileHover={available ? { scale: 1.05, y: -2 } : {}}
+                    whileTap={available ? { scale: 0.95 } : {}}
                     onClick={() => { if(available) setPopup(prev => ({ ...prev, device: d.id })) }}
                   >
                     <motion.span
                       className="device-icon"
-                      animate={popup.device === d.id ? { rotate: [0, -8, 8, 0], scale: [1, 1.25, 1] } : {}}
+                      animate={popup.device === d.id ? { rotate: [0, -8, 8, 0], scale: [1, 1.15, 1] } : {}}
                       transition={{ duration: 0.35 }}
-                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.4rem' }}
+                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.3rem' }}
                     >
                       {d.icon()}
                     </motion.span>
-                    {d.label}
-                    {available ? (
-                      <span className="device-status-badge available">Available</span>
-                    ) : (
-                      <span className="device-status-badge oos">Out of Stock</span>
+                    <span className="device-label">{d.label}</span>
+                    {!available && (
+                      <span className="device-oos-label">Out of Stock</span>
                     )}
                   </motion.button>
                 );
@@ -1599,7 +1642,7 @@ export default function App() {
                 </div>
                 <div className="summary-item">
                   <label>Plan Type</label>
-                  <span>{popup.plan.type}</span>
+                  <span style={{ display: 'inline-flex' }}>{renderPlanLabel(popup.plan.label)}</span>
                 </div>
                 <div className="summary-price" style={{ gridColumn: '1 / -1' }}>
                   <label>Total Price</label>
