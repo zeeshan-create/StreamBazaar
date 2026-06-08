@@ -566,7 +566,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState('');
   
   // Forgot Password / OTP states
-  const [forgotEmail, setForgotEmail] = useState('zeeshanhussain0999@gmail.com');
+  const [forgotEmail, setForgotEmail] = useState('');
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [forgotStep, setForgotStep] = useState(1);
@@ -641,6 +641,13 @@ export default function AdminDashboard() {
       fetchServices();
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    return () => {
+      // Automatic logout when user navigates away from the Admin component
+      sessionStorage.removeItem('adminAuthenticated');
+    };
+  }, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem('adminAuthenticated');
@@ -1094,7 +1101,7 @@ export default function AdminDashboard() {
               Forgot password?
             </button>
 
-            <Link to="/" style={{ display: 'block', marginTop: '1rem', color: 'var(--color-text-muted)', fontSize: '0.82rem', textDecoration: 'none' }}>
+            <Link to="/" onClick={handleLogout} style={{ display: 'block', marginTop: '1rem', color: 'var(--color-text-muted)', fontSize: '0.82rem', textDecoration: 'none' }}>
               ← Return to public website
             </Link>
           </motion.form>
@@ -1130,7 +1137,7 @@ export default function AdminDashboard() {
                           id="forgot_email"
                           type="email" 
                           className="admin-form-input" 
-                          placeholder="zeeshanshussain0999@gmail.com"
+                          placeholder="Enter registered email"
                           value={forgotEmail}
                           onChange={e => setForgotEmail(e.target.value)}
                           required
@@ -1205,7 +1212,7 @@ export default function AdminDashboard() {
           {/* ── COLLAPSIBLE SIDEBAR DRAWER ────────────────────────── */}
           <nav className={`admin-sidebar-nav ${sidebarExpanded ? 'expanded' : ''}`} aria-label="Sidebar Navigation">
             <div className="sidebar-header">
-              <Link to="/">
+              <Link to="/" onClick={handleLogout}>
                 <img src="/logo.png" alt="StreamBazaar Logo" className="sidebar-logo" />
               </Link>
               <button 
