@@ -580,7 +580,7 @@ export default function App() {
         border: 'rgba(59, 130, 246, 0.22)',
         icon: <Zap size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
       };
-    } else if (lower.includes('4k') || lower.includes('ultra hd')) {
+    } else if (lower.includes('4k') || lower.includes('ultra hd') || lower.includes('uhd')) {
       config = {
         label: '4K Ultra HD',
         color: '#a855f7', // purple
@@ -626,6 +626,41 @@ export default function App() {
       }}>
         {config.icon}
         {config.label}
+      </span>
+    );
+  };
+
+  const renderPlanLabel = (label) => {
+    if (!label) return null;
+    const lower = label.toLowerCase();
+    
+    let icon = null;
+    let color = 'var(--text)';
+    
+    if (lower.includes('4k') || lower.includes('ultra hd') || lower.includes('uhd')) {
+      icon = <Tv2 size={12} style={{ color: '#a855f7', marginRight: '5px', flexShrink: 0 }} />;
+      color = '#e9d5ff'; // light purple
+    } else if (lower.includes('1080p') || lower.includes('full hd') || lower.includes('720p') || lower.includes('hd')) {
+      icon = <Tv2 size={12} style={{ color: '#3b82f6', marginRight: '5px', flexShrink: 0 }} />;
+      color = '#dbeafe'; // light blue
+    } else if (lower.includes('shared')) {
+      icon = <Zap size={12} style={{ color: '#3b82f6', marginRight: '5px', flexShrink: 0 }} />;
+      color = '#e0f2fe'; // light sky blue
+    } else if (lower.includes('private') || lower.includes('individual')) {
+      icon = <ShieldCheck size={12} style={{ color: '#10b981', marginRight: '5px', flexShrink: 0 }} />;
+      color = '#d1fae5'; // light emerald
+    } else if (lower.includes('game') || lower.includes('pc') || lower.includes('playstation') || lower.includes('xbox') || lower.includes('ps5') || lower.includes('ps4') || lower.includes('ps3') || lower.includes('ps2') || lower.includes('seat')) {
+      icon = <Gamepad2 size={12} style={{ color: '#f59e0b', marginRight: '5px', flexShrink: 0 }} />;
+      color = '#fef3c7'; // light amber
+    } else if (lower.includes('premium')) {
+      icon = <Award size={12} style={{ color: '#fbbf24', marginRight: '5px', flexShrink: 0 }} />;
+      color = '#fffbeb'; // light gold
+    }
+    
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', color, gap: '1px' }}>
+        {icon}
+        {label}
       </span>
     );
   };
@@ -1113,7 +1148,9 @@ export default function App() {
                           }}
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
-                            <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>{plan.label}</span>
+                            <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>
+                              {renderPlanLabel(plan.label)}
+                            </span>
                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                               <span style={{ 
                                 fontSize: '0.65rem', 
@@ -1457,7 +1494,7 @@ export default function App() {
 
               {/* Selected Plan */}
               <div className="popup-plan-chip">
-                <strong>{popup.plan.label}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
+                <strong>{renderPlanLabel(popup.plan.label)}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
                 <strong style={{ color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</strong>
               </div>
 
