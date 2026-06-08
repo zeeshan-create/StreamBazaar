@@ -745,13 +745,13 @@ export default function App() {
                       exit="exit"
                       style={{ 
                         borderRadius: '24px', 
-                        border: `1px solid ${tooDarkGame ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}80`}`, 
+                        border: `1px solid ${tooDarkGame ? 'rgba(255, 107, 0, 0.35)' : `${effectiveColor}80`}`, 
                         background: '#0d0f17',
                         boxShadow: tooDarkGame
-                          ? `0 0 20px rgba(255, 255, 255, 0.05), inset 0 0 20px rgba(255, 255, 255, 0.03)`
+                          ? `0 0 20px rgba(255, 107, 0, 0.05), inset 0 0 20px rgba(255, 107, 0, 0.03)`
                           : `0 0 20px ${effectiveColor}20, inset 0 0 20px ${effectiveColor}10`,
                         padding: '1.25rem',
-                        '--card-accent': tooDarkGame ? '#ffffff' : effectiveColor,
+                        '--card-accent': tooDarkGame ? '#ff6b00' : effectiveColor,
                         display: 'flex', flexDirection: 'column', gap: '1.25rem'
                       }}
                       whileHover={{ y: -8, scale: 1.015, boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 20px 40px rgba(0,0,0,0.35)`, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
@@ -788,7 +788,7 @@ export default function App() {
                         {(() => {
                           const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames'))) || (product.name && product.name.toLowerCase().includes('epic'));
                           return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '0.25rem 0.75rem', borderRadius: '999px', border: `1px solid ${tooDarkGame ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}40`}`, background: tooDarkGame ? 'rgba(255, 255, 255, 0.08)' : `${effectiveColor}15`, fontSize: '0.75rem', fontWeight: 700, color: tooDarkGame ? '#ffffff' : effectiveColor, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '0.25rem 0.75rem', borderRadius: '999px', border: `1px solid ${tooDarkGame ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, background: tooDarkGame ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, fontSize: '0.75rem', fontWeight: 700, color: tooDarkGame ? '#ff6b00' : effectiveColor, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
                               {isEpicGame ? (
                                 <>
                                   <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 0L1.75 3v13.5L12 24l10.25-7.5V3L12 0zm7.25 15.5l-7.25 5.3-7.25-5.3V5.5l7.25-2.1 7.25 2.1v10z"/></svg>
@@ -822,13 +822,13 @@ export default function App() {
                               openPopup(product, plan);
                             }}
                           >
-                            <div style={{ width: '4px', background: tooDarkGame ? '#ffffff' : effectiveColor }} />
+                            <div style={{ width: '4px', background: tooDarkGame ? '#ff6b00' : effectiveColor }} />
                             <div style={{ flex: 1, padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                               <div>
                                 <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: 'var(--text)' }}>{plan.label}</h4>
                                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                  <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '6px', background: tooDarkGame ? 'rgba(255, 255, 255, 0.08)' : `${effectiveColor}15`, color: tooDarkGame ? '#ffffff' : effectiveColor, border: `1px solid ${tooDarkGame ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}60`}`, whiteSpace: 'nowrap', fontWeight: 'bold' }}>{plan.duration}</span>
-                                  <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '6px', background: tooDarkGame ? 'rgba(255, 255, 255, 0.08)' : `${effectiveColor}15`, color: tooDarkGame ? '#ffffff' : effectiveColor, border: `1px solid ${tooDarkGame ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}60`}`, whiteSpace: 'nowrap', fontWeight: 'bold' }}>PC Game Seat Access</span>
+                                  <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '6px', background: tooDarkGame ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, color: tooDarkGame ? '#ff6b00' : effectiveColor, border: `1px solid ${tooDarkGame ? 'rgba(255, 107, 0, 0.25)' : `${effectiveColor}60`}`, whiteSpace: 'nowrap', fontWeight: 'bold' }}>{plan.duration}</span>
+                                  <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '6px', background: tooDarkGame ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, color: tooDarkGame ? '#ff6b00' : effectiveColor, border: `1px solid ${tooDarkGame ? 'rgba(255, 107, 0, 0.25)' : `${effectiveColor}60`}`, whiteSpace: 'nowrap', fontWeight: 'bold' }}>PC Game Seat Access</span>
                                 </div>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -865,11 +865,11 @@ export default function App() {
                   animate="visible"
                   exit="exit"
                   style={{ 
-                    '--card-accent': tooDark ? '#ffffff' : effectiveColor,
-                    border: `1px solid ${tooDark ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}60`}`,
+                    '--card-accent': tooDark ? '#ff6b00' : effectiveColor,
+                    border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.35)' : `${effectiveColor}60`}`,
                     background: 'var(--card)',
                     boxShadow: tooDark 
-                      ? `0 0 15px rgba(255, 255, 255, 0.05), inset 0 0 15px rgba(255, 255, 255, 0.03)`
+                      ? `0 0 15px rgba(255, 107, 0, 0.05), inset 0 0 15px rgba(255, 107, 0, 0.03)`
                       : `0 0 15px ${effectiveColor}15, inset 0 0 15px ${effectiveColor}10`
                   }}
                 >
@@ -878,8 +878,8 @@ export default function App() {
                     <div
                       className="card-logo-wrap"
                       style={{ 
-                        background: tooDark ? 'rgba(255, 255, 255, 0.05)' : `${effectiveColor}18`, 
-                        border: `1px solid ${tooDark ? 'rgba(255, 255, 255, 0.1)' : `${effectiveColor}30`}`,
+                        background: tooDark ? 'rgba(255, 107, 0, 0.05)' : `${effectiveColor}18`, 
+                        border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.2)' : `${effectiveColor}30`}`,
                         width: isGamingCategory(product.category) ? '65px' : '52px',
                         height: isGamingCategory(product.category) ? '86px' : '52px',
                         borderRadius: isGamingCategory(product.category) ? '10px' : '14px',
@@ -960,11 +960,11 @@ export default function App() {
                               gap: '3px', 
                               padding: '0.2rem 0.5rem', 
                               borderRadius: '50px', 
-                              border: `1px solid ${tooDark ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}40`}`, 
-                              background: tooDark ? 'rgba(255, 255, 255, 0.08)' : `${effectiveColor}15`, 
+                              border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, 
+                              background: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, 
                               fontSize: '0.65rem', 
                               fontWeight: 700, 
-                              color: tooDark ? '#ffffff' : effectiveColor, 
+                              color: tooDark ? '#ff6b00' : effectiveColor, 
                               whiteSpace: 'nowrap', 
                               letterSpacing: '0.5px', 
                               alignSelf: 'flex-start', 
@@ -988,9 +988,9 @@ export default function App() {
                         <span
                           className="card-badge"
                           style={{ 
-                            background: tooDark ? 'rgba(255, 255, 255, 0.08)' : `${effectiveColor}18`, 
-                            color: tooDark ? '#ffffff' : effectiveColor, 
-                            border: `1px solid ${tooDark ? 'rgba(255, 255, 255, 0.15)' : `${effectiveColor}30`}` 
+                            background: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}18`, 
+                            color: tooDark ? '#ff6b00' : effectiveColor, 
+                            border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : `${effectiveColor}30`}` 
                           }}
                         >
                           {product.category ? product.category.toUpperCase() : 'STREAMING'}
@@ -1013,8 +1013,8 @@ export default function App() {
                           variants={planRowVariants}
                           className="plan-row"
                           style={{ 
-                            background: `linear-gradient(90deg, ${tooDark ? 'rgba(255, 255, 255, 0.06)' : `${effectiveColor}15`} 0%, transparent 100%)`, 
-                            borderLeft: `3px solid ${tooDark ? '#ffffff' : effectiveColor}` 
+                            background: `linear-gradient(90deg, ${tooDark ? 'rgba(255, 107, 0, 0.06)' : `${effectiveColor}15`} 0%, transparent 100%)`, 
+                            borderLeft: `3px solid ${tooDark ? '#ff6b00' : effectiveColor}` 
                           }}
                           onClick={() => {
                             if (product.status && product.status !== 'Available') return;
@@ -1029,9 +1029,9 @@ export default function App() {
                                 fontWeight: 'bold', 
                                 padding: '2px 6px', 
                                 borderRadius: '4px', 
-                                backgroundColor: tooDark ? 'rgba(255, 255, 255, 0.1)' : `${effectiveColor}20`, 
-                                color: tooDark ? '#ffffff' : effectiveColor, 
-                                border: `1px solid ${tooDark ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}40`}`, 
+                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}20`, 
+                                color: tooDark ? '#ff6b00' : effectiveColor, 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : `${effectiveColor}40`}`, 
                                 whiteSpace: 'nowrap' 
                               }}>
                                 {plan.duration}
@@ -1057,14 +1057,14 @@ export default function App() {
                             <motion.span
                               className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
                               style={{ 
-                                border: `1px solid ${tooDark ? 'rgba(255, 255, 255, 0.4)' : `${effectiveColor}50`}`, 
-                                color: tooDark ? '#ffffff' : effectiveColor 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.45)' : `${effectiveColor}50`}`, 
+                                color: tooDark ? '#ff6b00' : effectiveColor 
                               }}
                               whileHover={product.status === 'Available' ? { 
                                 scale: 1.05, 
-                                backgroundColor: tooDark ? 'rgba(255, 255, 255, 0.2)' : `${effectiveColor}30`, 
-                                borderColor: tooDark ? '#ffffff' : effectiveColor, 
-                                boxShadow: tooDark ? '0 0 10px rgba(255, 255, 255, 0.4)' : `0 0 10px ${effectiveColor}40` 
+                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.15)' : `${effectiveColor}30`, 
+                                borderColor: tooDark ? '#ff6b00' : effectiveColor, 
+                                boxShadow: tooDark ? '0 0 10px rgba(255, 107, 0, 0.4)' : `0 0 10px ${effectiveColor}40` 
                               } : {}}
                             >
                               {product.status && product.status !== 'Available' ? product.status : 'Buy'}
@@ -1321,7 +1321,7 @@ export default function App() {
               variants={modalVariants}
               initial="hidden" animate="visible" exit="exit"
               onClick={e => e.stopPropagation()}
-              style={{ '--popup-color': isColorTooDark(popup.product.effectiveColor) ? '#ffffff' : popup.product.effectiveColor }}
+              style={{ '--popup-color': isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor }}
             >
               {/* Close */}
               <button className="popup-close" onClick={() => setPopup(null)}>
