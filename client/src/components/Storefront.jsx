@@ -542,46 +542,92 @@ export default function App() {
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
   };
 
-  const renderDescription = (desc) => {
+  const renderProductTypeBadge = (desc, category) => {
     if (!desc) return null;
-    const highlights = [
-      { word: 'offline', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.12)', border: 'rgba(251, 191, 36, 0.25)' },
-      { word: 'shared', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)', border: 'rgba(96, 165, 250, 0.25)' },
-      { word: 'sharing', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)', border: 'rgba(96, 165, 250, 0.25)' },
-      { word: 'private', color: '#34d399', bg: 'rgba(52, 211, 153, 0.12)', border: 'rgba(52, 211, 153, 0.25)' },
-      { word: 'purchase', color: '#c084fc', bg: 'rgba(192, 132, 252, 0.12)', border: 'rgba(192, 132, 252, 0.25)' },
-      { word: 'personal', color: '#f472b6', bg: 'rgba(244, 114, 182, 0.12)', border: 'rgba(244, 114, 182, 0.25)' }
-    ];
-
-    const words = highlights.map(h => h.word);
-    const regex = new RegExp(`\\b(${words.join('|')})\\b`, 'gi');
-    const parts = desc.split(regex);
-
-    return parts.map((part, index) => {
-      const match = highlights.find(h => h.word === part.toLowerCase());
-      if (match) {
-        return (
-          <span 
-            key={index} 
-            style={{ 
-              color: match.color, 
-              background: match.bg, 
-              border: `1px solid ${match.border}`,
-              padding: '1px 6px',
-              borderRadius: '4px',
-              fontWeight: '700',
-              fontSize: '0.72rem',
-              margin: '0 2px',
-              display: 'inline-block',
-              verticalAlign: 'middle'
-            }}
-          >
-            {part}
-          </span>
-        );
-      }
-      return <span key={index}>{part}</span>;
-    });
+    const lower = desc.toLowerCase();
+    
+    let config = null;
+    
+    if (lower.includes('offline')) {
+      config = {
+        label: 'Offline Activation',
+        color: '#f59e0b', // amber
+        bg: 'rgba(245, 158, 11, 0.08)',
+        border: 'rgba(245, 158, 11, 0.22)',
+        icon: <Laptop2 size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
+      };
+    } else if (lower.includes('private')) {
+      config = {
+        label: 'Private Account',
+        color: '#10b981', // emerald
+        bg: 'rgba(16, 185, 129, 0.08)',
+        border: 'rgba(16, 185, 129, 0.22)',
+        icon: <ShieldCheck size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
+      };
+    } else if (lower.includes('personal') || lower.includes('upgrade')) {
+      config = {
+        label: 'Personal Upgrade',
+        color: '#ec4899', // pink
+        bg: 'rgba(236, 72, 153, 0.08)',
+        border: 'rgba(236, 72, 153, 0.22)',
+        icon: <Zap size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
+      };
+    } else if (lower.includes('shared') || lower.includes('sharing')) {
+      config = {
+        label: 'Shared Profile',
+        color: '#3b82f6', // blue
+        bg: 'rgba(59, 130, 246, 0.08)',
+        border: 'rgba(59, 130, 246, 0.22)',
+        icon: <Zap size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
+      };
+    } else if (lower.includes('4k') || lower.includes('ultra hd')) {
+      config = {
+        label: '4K Ultra HD',
+        color: '#a855f7', // purple
+        bg: 'rgba(168, 85, 247, 0.08)',
+        border: 'rgba(168, 85, 247, 0.22)',
+        icon: <Tv2 size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
+      };
+    } else if (lower.includes('seat')) {
+      config = {
+        label: 'Seat Access',
+        color: '#3b82f6',
+        bg: 'rgba(59, 130, 246, 0.08)',
+        border: 'rgba(59, 130, 246, 0.22)',
+        icon: <Zap size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
+      };
+    } else if (lower.includes('legal') || lower.includes('verified')) {
+      config = {
+        label: 'Verified Safe',
+        color: '#10b981',
+        bg: 'rgba(16, 185, 129, 0.08)',
+        border: 'rgba(16, 185, 129, 0.22)',
+        icon: <ShieldCheck size={11} style={{ marginRight: '4px', flexShrink: 0 }} />
+      };
+    }
+    
+    if (!config) return null;
+    
+    return (
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        color: config.color,
+        background: config.bg,
+        border: `1px solid ${config.border}`,
+        padding: '2px 8px',
+        borderRadius: '6px',
+        fontSize: '0.65rem',
+        fontWeight: '800',
+        textTransform: 'uppercase',
+        letterSpacing: '0.04em',
+        alignSelf: 'flex-start',
+        lineHeight: 1
+      }}>
+        {config.icon}
+        {config.label}
+      </span>
+    );
   };
 
   return (
@@ -820,12 +866,12 @@ export default function App() {
                               />
                             );
                           })()}
-                          <div>
-                            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: 'var(--text)' }}>{product.name}</h3>
-                            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', marginTop: '0.25rem', lineHeight: 1.4, maxWidth: '200px' }}>
-                              {renderDescription(product.description || "Offline game activation for PC. Full updates supported.")}
-                            </p>
-                          </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '0.25rem' }}>
+                              {renderProductTypeBadge(product.description || "Offline game activation for PC. Full updates supported.", product.category)}
+                              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', margin: 0, lineHeight: 1.4, maxWidth: '200px' }}>
+                                {product.description || "Offline game activation for PC. Full updates supported."}
+                              </p>
+                            </div>
                         </div>
                         {(() => {
                           const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames'))) || (product.name && product.name.toLowerCase().includes('epic'));
@@ -988,8 +1034,11 @@ export default function App() {
                           </span>
                         )}
                       </div>
-                      <div className="card-desc" style={{ marginTop: isGamingCategory(product.category) ? '0.2rem' : '0' }}>
-                        {renderDescription(product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : ''))}
+                      <div className="card-desc" style={{ marginTop: isGamingCategory(product.category) ? '0.2rem' : '0.1rem', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                        {renderProductTypeBadge(product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : ''), product.category)}
+                        <span style={{ color: 'var(--text-mid)', fontSize: '0.78rem', lineHeight: '1.4' }}>
+                          {product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : '')}
+                        </span>
                       </div>
                     </div>
                     {(() => {
@@ -1396,9 +1445,10 @@ export default function App() {
                 })()}
                 <div>
                   <div className="popup-title">{popup.product.name}</div>
-                  <div className="popup-subtitle" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-mid)', fontWeight: 'normal' }}>
-                      {renderDescription(popup.product.description || (isGamingCategory(popup.product.category) ? 'Offline PC Access.' : ''))}
+                  <div className="popup-subtitle" style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '6px' }}>
+                    {renderProductTypeBadge(popup.product.description || (isGamingCategory(popup.product.category) ? 'Offline PC Access.' : ''), popup.product.category)}
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-mid)', fontWeight: 'normal', lineHeight: 1.3 }}>
+                      {popup.product.description || (isGamingCategory(popup.product.category) ? 'Offline PC Access.' : '')}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', opacity: 0.8, fontWeight: 'normal' }}>1 Device Seat Access</span>
                   </div>
