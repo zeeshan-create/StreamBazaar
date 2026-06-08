@@ -436,8 +436,9 @@ const CACHE_TTL = 300000; // 5 minutes cache
               if (pubToken && iconUrl) {
                 iconUrl = iconUrl.replace('YOUR_PUBLISHABLE_KEY', pubToken);
               }
+              const displayName = item.name || (item.domain ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : 'Brand');
               return {
-                name: item.name,
+                name: displayName,
                 domain: item.domain,
                 icon: iconUrl,
                 type: 'OTT/Brand'
@@ -466,8 +467,9 @@ const CACHE_TTL = 300000; // 5 minutes cache
             const persistentIcon = brand.domain 
               ? (pubToken ? `https://img.logo.dev/${brand.domain}?token=${pubToken}` : `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`) 
               : (brand.icon || `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`);
+            const displayName = brand.name || (brand.domain ? brand.domain.split('.')[0].charAt(0).toUpperCase() + brand.domain.split('.')[0].slice(1) : 'Brand');
             return {
-              name: brand.name,
+              name: displayName,
               domain: brand.domain,
               icon: persistentIcon,
               type: 'OTT/Brand'
@@ -729,6 +731,15 @@ app.delete('/api/admin/plans/:id', async (req, res) => {
   try {
     await Service.remove({ _id: req.params.id });
     res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/admin/plans-all', async (req, res) => {
+  try {
+    await Service.remove({}, { multi: true });
+    res.json({ success: true, message: 'All products deleted successfully.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

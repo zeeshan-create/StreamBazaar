@@ -301,8 +301,9 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                   const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
                   persistentIcon = token ? `https://img.logo.dev/${g.domain}?token=${token}` : `https://www.google.com/s2/favicons?domain=${g.domain}&sz=256`;
                 }
+                const displayName = g.name || (g.domain && g.domain !== 'Steam Game' ? g.domain.split('.')[0].charAt(0).toUpperCase() + g.domain.split('.')[0].slice(1) : '') || 'Brand';
                 return {
-                  name: g.name,
+                  name: displayName,
                   domain: g.domain || 'Steam Game',
                   icon: persistentIcon,
                   type: g.type || 'Game'
@@ -339,7 +340,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
     let resolvedPrimary = '#6366f1';
     let resolvedSecondary = '#4f46e5';
 
-    const lowerVal = item.name.toLowerCase();
+    const lowerVal = (item.name || '').toLowerCase();
     const matchedBrand = Object.keys(BRAND_CATEGORIES).find(k => lowerVal.includes(k));
     if (matchedBrand) {
       if (BRAND_CATEGORIES[matchedBrand]) resolvedCategory = BRAND_CATEGORIES[matchedBrand];
@@ -356,7 +357,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
       
       return {
         ...prev,
-        name: item.name,
+        name: item.name || (item.domain && item.domain !== 'Steam Game' ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : '') || 'Brand',
         customIcon: bestIcon,
         category: categoryIsDefaultOrUnchanged ? resolvedCategory : prev.category,
         primaryColor: colorsAreDefaultOrUnchanged ? resolvedPrimary : prev.primaryColor,
@@ -854,6 +855,28 @@ export default function AdminDashboard() {
       if (res.ok) fetchServices();
     } catch (err) {
       console.error('Delete error:', err);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!window.confirm('⚠️ WARNING: Are you absolutely sure you want to delete ALL products? This action cannot be undone.')) return;
+    const doubleCheck = window.prompt('Type "DELETE ALL" to confirm deletion of all products:');
+    if (doubleCheck !== 'DELETE ALL') {
+      alert('Confirmation code mismatch. Deletion cancelled.');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/admin/plans-all`, { method: 'DELETE' });
+      if (res.ok) {
+        alert('All products have been deleted successfully.');
+        fetchServices();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to delete: ${errData.error || res.statusText || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('Delete all error:', err);
+      alert(`Connection error: ${err.message}`);
     }
   };
 
@@ -1377,16 +1400,45 @@ export default function AdminDashboard() {
                     </div>
 
 
-                    <button 
-                      className="btn-primary"
-                      onClick={() => {
-                        setEditForm({ name: '', category: 'Streaming', primaryColor: '#6366f1', secondaryColor: '#4f46e5', description: 'default', status: 'Available', plans: [{ label: 'default', quality: '', duration: 'default', price: '₹', type: '', supportedDevices: ['TV', 'PC', 'iOS', 'Android'], image: '' }] });
-                        setShowAddForm(true);
-                      }}
-                      style={{ padding: '0.6rem 1.25rem', borderRadius: '10px' }}
-                    >
-                      <Plus size={16} /> Add New Service
-                    </button>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button 
+                        className="btn-primary"
+                        onClick={() => {
+                          setEditForm({ name: '', category: 'Streaming', primaryColor: '#6366f1', secondaryColor: '#4f46e5', description: 'default', status: 'Available', plans: [{ label: 'default', quality: '', duration: 'default', price: '₹', type: '', supportedDevices: ['TV', 'PC', 'iOS', 'Android'], image: '' }] });
+                          setShowAddForm(true);
+                        }}
+                        style={{ padding: '0.6rem 1.25rem', borderRadius: '10px' }}
+                      >
+                        <Plus size={16} /> Add New Service
+                      </button>
+                      <button 
+                        className="admin-action-btn delete"
+                        onClick={handleDeleteAll}
+                        style={{ 
+                          padding: '0.6rem 1.25rem', 
+                          borderRadius: '10px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '0.5rem',
+                          background: 'rgba(239, 68, 68, 0.15)',
+                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                          color: '#ef4444',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = '#ef4444';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+                          e.currentTarget.style.color = '#ef4444';
+                        }}
+                      >
+                        <Trash2 size={16} /> Delete All
+                      </button>
+                    </div>
                   </div>
 
                   {loading ? (
