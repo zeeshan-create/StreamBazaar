@@ -443,10 +443,12 @@ export default function App() {
     // Initial fetch
     fetchPlans();
     
-    // Low-latency live polling (1 second) for instant updates across all clients
+    // Live polling (15 seconds) for updates when the tab is active in the foreground
     const interval = setInterval(() => {
-      fetchPlans();
-    }, 1000);
+      if (!document.hidden) {
+        fetchPlans();
+      }
+    }, 15000);
     
     // Sync instantly when user tabs back or page becomes visible
     const handleSync = () => {
