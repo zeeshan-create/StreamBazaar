@@ -865,7 +865,7 @@ export default function App() {
                   animate="visible"
                   exit="exit"
                   style={{ 
-                    '--card-accent': tooDark ? '#ff6b00' : effectiveColor,
+                    '--card-accent': (product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : (tooDark ? '#ff6b00' : effectiveColor),
                     border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.35)' : `${effectiveColor}60`}`,
                     background: 'var(--card)',
                     boxShadow: tooDark 
@@ -988,9 +988,9 @@ export default function App() {
                         <span
                           className="card-badge"
                           style={{ 
-                            background: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}18`, 
-                            color: tooDark ? '#ff6b00' : effectiveColor, 
-                            border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : `${effectiveColor}30`}` 
+                            background: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}18`), 
+                            color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
+                            border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.3)' : `${effectiveColor}30`)}` 
                           }}
                         >
                           {product.category ? product.category.toUpperCase() : 'STREAMING'}
@@ -1029,9 +1029,9 @@ export default function App() {
                                 fontWeight: 'bold', 
                                 padding: '2px 6px', 
                                 borderRadius: '4px', 
-                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}20`, 
-                                color: tooDark ? '#ff6b00' : effectiveColor, 
-                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : `${effectiveColor}40`}`, 
+                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}20`), 
+                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.25)' : `${effectiveColor}40`)}`, 
                                 whiteSpace: 'nowrap' 
                               }}>
                                 {plan.duration}
@@ -1046,25 +1046,27 @@ export default function App() {
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
                             <span className="plan-row-price" style={{ 
-                                color: tooDark ? '#ff6b00' : effectiveColor,
+                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor),
                                 fontWeight: '900', 
                                 fontSize: '1.15rem', 
                                 letterSpacing: '0.5px',
                                 textShadow: tooDark 
                                   ? '0 0 10px rgba(255, 107, 0, 0.5), 0 0 20px rgba(255, 107, 0, 0.25)' 
-                                  : `0 2px 10px ${effectiveColor}30`
+                                  : ((product.name && product.name.toLowerCase().includes('jiohotstar')) 
+                                      ? '0 0 10px rgba(255, 42, 127, 0.4), 0 0 20px rgba(255, 42, 127, 0.2)' 
+                                      : `0 2px 10px ${effectiveColor}30`)
                               }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</span>
                             <motion.span
                               className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
                               style={{ 
-                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.45)' : `${effectiveColor}50`}`, 
-                                color: tooDark ? '#ff6b00' : effectiveColor 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.45)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.45)' : `${effectiveColor}50`)}`, 
+                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor) 
                               }}
                               whileHover={product.status === 'Available' ? { 
                                 scale: 1.05, 
-                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.15)' : `${effectiveColor}30`, 
-                                borderColor: tooDark ? '#ff6b00' : effectiveColor, 
-                                boxShadow: tooDark ? '0 0 10px rgba(255, 107, 0, 0.4)' : `0 0 10px ${effectiveColor}40` 
+                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.15)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.15)' : `${effectiveColor}30`), 
+                                borderColor: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
+                                boxShadow: tooDark ? '0 0 10px rgba(255, 107, 0, 0.4)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '0 0 10px rgba(255, 42, 127, 0.4)' : `0 0 10px ${effectiveColor}40`) 
                               } : {}}
                             >
                               {product.status && product.status !== 'Available' ? product.status : 'Buy'}
@@ -1321,7 +1323,7 @@ export default function App() {
               variants={modalVariants}
               initial="hidden" animate="visible" exit="exit"
               onClick={e => e.stopPropagation()}
-              style={{ '--popup-color': isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor }}
+              style={{ '--popup-color': popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}
             >
               {/* Close */}
               <button className="popup-close" onClick={() => setPopup(null)}>
@@ -1359,7 +1361,7 @@ export default function App() {
               {/* Selected Plan */}
               <div className="popup-plan-chip">
                 <strong>{popup.plan.label}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
-                <strong style={{ color: isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor }}>{popup.plan.price}</strong>
+                <strong style={{ color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</strong>
               </div>
 
               {/* Device Selector */}
@@ -1441,7 +1443,7 @@ export default function App() {
                 </div>
                 <div className="summary-price" style={{ gridColumn: '1 / -1' }}>
                   <label>Total Price</label>
-                  <span style={{ color: isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor }}>{popup.plan.price}</span>
+                  <span style={{ color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</span>
                 </div>
               </div>
 
