@@ -836,9 +836,9 @@ export default function App() {
                                   fontSize: '1.6rem', 
                                   fontWeight: 700, 
                                   letterSpacing: '-0.5px',
-                                  color: tooDarkGame ? '#ffffff' : effectiveColor,
+                                  color: tooDarkGame ? '#ff6b00' : effectiveColor,
                                   textShadow: tooDarkGame
-                                    ? '0 0 10px rgba(255, 255, 255, 0.65), 0 0 20px rgba(255, 255, 255, 0.35)'
+                                    ? '0 0 10px rgba(255, 107, 0, 0.5), 0 0 20px rgba(255, 107, 0, 0.25)'
                                     : `0 2px 12px ${effectiveColor}30`
                                 }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</div>
                                 <button style={{ padding: '0.6rem 1.25rem', borderRadius: '12px', background: '#2f3136', border: '1px solid #4a4d55', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
@@ -1046,12 +1046,12 @@ export default function App() {
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
                             <span className="plan-row-price" style={{ 
-                                color: tooDark ? '#ffffff' : effectiveColor,
+                                color: tooDark ? '#ff6b00' : effectiveColor,
                                 fontWeight: '900', 
                                 fontSize: '1.15rem', 
                                 letterSpacing: '0.5px',
                                 textShadow: tooDark 
-                                  ? '0 0 10px rgba(255, 255, 255, 0.65), 0 0 20px rgba(255, 255, 255, 0.35)' 
+                                  ? '0 0 10px rgba(255, 107, 0, 0.5), 0 0 20px rgba(255, 107, 0, 0.25)' 
                                   : `0 2px 10px ${effectiveColor}30`
                               }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</span>
                             <motion.span
@@ -1359,7 +1359,7 @@ export default function App() {
               {/* Selected Plan */}
               <div className="popup-plan-chip">
                 <strong>{popup.plan.label}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
-                <strong style={{ color: isColorTooDark(popup.product.effectiveColor) ? '#ffffff' : popup.product.effectiveColor }}>{popup.plan.price}</strong>
+                <strong style={{ color: isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor }}>{popup.plan.price}</strong>
               </div>
 
               {/* Device Selector */}
@@ -1441,7 +1441,7 @@ export default function App() {
                 </div>
                 <div className="summary-price" style={{ gridColumn: '1 / -1' }}>
                   <label>Total Price</label>
-                  <span style={{ color: isColorTooDark(popup.product.effectiveColor) ? '#ffffff' : popup.product.effectiveColor }}>{popup.plan.price}</span>
+                  <span style={{ color: isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor }}>{popup.plan.price}</span>
                 </div>
               </div>
 
