@@ -630,45 +630,57 @@ export default function App() {
     );
   };
 
-  const renderPlanLabel = (label) => {
+  const renderPlanLabel = (label, customColor) => {
     if (!label) return null;
     const lower = label.toLowerCase();
     
     let icon = null;
-    let color = '#ffffff';
-    let bg = 'rgba(255, 255, 255, 0.05)';
-    let border = 'rgba(255, 255, 255, 0.1)';
+    let color = customColor || '#ffffff';
+    let bg = customColor ? `${customColor}12` : 'rgba(255, 255, 255, 0.05)';
+    let border = customColor ? `${customColor}30` : 'rgba(255, 255, 255, 0.1)';
     
     if (lower.includes('4k') || lower.includes('ultra hd') || lower.includes('uhd')) {
-      icon = <Tv2 size={11} style={{ color: '#c084fc', marginRight: '4px', flexShrink: 0 }} />;
-      color = '#c084fc'; // bright purple
-      bg = 'rgba(192, 132, 252, 0.12)';
-      border = 'rgba(192, 132, 252, 0.3)';
+      icon = <Tv2 size={11} style={{ color: color, marginRight: '4px', flexShrink: 0 }} />;
+      if (!customColor) {
+        color = '#c084fc'; // bright purple
+        bg = 'rgba(192, 132, 252, 0.12)';
+        border = 'rgba(192, 132, 252, 0.3)';
+      }
     } else if (lower.includes('1080p') || lower.includes('full hd') || lower.includes('720p') || lower.includes('hd')) {
-      icon = <Tv2 size={11} style={{ color: '#60a5fa', marginRight: '4px', flexShrink: 0 }} />;
-      color = '#60a5fa'; // bright blue
-      bg = 'rgba(96, 165, 250, 0.12)';
-      border = 'rgba(96, 165, 250, 0.3)';
+      icon = <Tv2 size={11} style={{ color: color, marginRight: '4px', flexShrink: 0 }} />;
+      if (!customColor) {
+        color = '#60a5fa'; // bright blue
+        bg = 'rgba(96, 165, 250, 0.12)';
+        border = 'rgba(96, 165, 250, 0.3)';
+      }
     } else if (lower.includes('shared')) {
-      icon = <Zap size={11} style={{ color: '#60a5fa', marginRight: '4px', flexShrink: 0 }} />;
-      color = '#60a5fa'; // bright blue
-      bg = 'rgba(96, 165, 250, 0.12)';
-      border = 'rgba(96, 165, 250, 0.3)';
+      icon = <Zap size={11} style={{ color: color, marginRight: '4px', flexShrink: 0 }} />;
+      if (!customColor) {
+        color = '#60a5fa'; // bright blue
+        bg = 'rgba(96, 165, 250, 0.12)';
+        border = 'rgba(96, 165, 250, 0.3)';
+      }
     } else if (lower.includes('private') || lower.includes('individual')) {
-      icon = <ShieldCheck size={11} style={{ color: '#34d399', marginRight: '4px', flexShrink: 0 }} />;
-      color = '#34d399'; // bright emerald
-      bg = 'rgba(52, 211, 153, 0.12)';
-      border = 'rgba(52, 211, 153, 0.3)';
+      icon = <ShieldCheck size={11} style={{ color: color, marginRight: '4px', flexShrink: 0 }} />;
+      if (!customColor) {
+        color = '#34d399'; // bright emerald
+        bg = 'rgba(52, 211, 153, 0.12)';
+        border = 'rgba(52, 211, 153, 0.3)';
+      }
     } else if (lower.includes('game') || lower.includes('pc') || lower.includes('playstation') || lower.includes('xbox') || lower.includes('ps5') || lower.includes('ps4') || lower.includes('ps3') || lower.includes('ps2') || lower.includes('seat')) {
-      icon = <Gamepad2 size={11} style={{ color: '#fbbf24', marginRight: '4px', flexShrink: 0 }} />;
-      color = '#fbbf24'; // bright amber
-      bg = 'rgba(251, 191, 36, 0.12)';
-      border = 'rgba(251, 191, 36, 0.3)';
+      icon = <Gamepad2 size={11} style={{ color: color, marginRight: '4px', flexShrink: 0 }} />;
+      if (!customColor) {
+        color = '#fbbf24'; // bright amber
+        bg = 'rgba(251, 191, 36, 0.12)';
+        border = 'rgba(251, 191, 36, 0.3)';
+      }
     } else if (lower.includes('premium')) {
-      icon = <Award size={11} style={{ color: '#fbbf24', marginRight: '4px', flexShrink: 0 }} />;
-      color = '#fbbf24'; // bright gold
-      bg = 'rgba(251, 191, 36, 0.12)';
-      border = 'rgba(251, 191, 36, 0.3)';
+      icon = <Award size={11} style={{ color: color, marginRight: '4px', flexShrink: 0 }} />;
+      if (!customColor) {
+        color = '#fbbf24'; // bright gold
+        bg = 'rgba(251, 191, 36, 0.12)';
+        border = 'rgba(251, 191, 36, 0.3)';
+      }
     }
     
     return (
@@ -1175,7 +1187,7 @@ export default function App() {
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
                             <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>
-                              {renderPlanLabel(plan.label)}
+                              {renderPlanLabel(plan.label, tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor))}
                             </span>
                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                               <span style={{ 
@@ -1520,7 +1532,7 @@ export default function App() {
 
               {/* Selected Plan */}
               <div className="popup-plan-chip">
-                <strong>{renderPlanLabel(popup.plan.label)}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
+                <strong>{renderPlanLabel(popup.plan.label, popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor))}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
                 <strong style={{ color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</strong>
               </div>
 
