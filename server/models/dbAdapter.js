@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema({}, { strict: false });
 const adminSchema = new mongoose.Schema({
   username: { type: String, default: 'Ai+rizwan#1974000hussain!#/' },
   password: { type: String, default: '@#12Rizwan55Hussain/!#7861974000!12' },
-  email: { type: String, default: 'zeeshanshussain0999@gmail.com' },
+  email: { type: String, default: 'zeeshanhussain0999@gmail.com' },
   otp: { type: String, default: null },
   otpExpires: { type: Date, default: null }
 }, { strict: false });

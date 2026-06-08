@@ -12,12 +12,12 @@ const Admin = require('./models/Admin');
 // Seed default admin credentials in database if not present
 async function seedAdminUser() {
   try {
-    const existing = await Admin.findOne({ email: 'zeeshanshussain0999@gmail.com' });
+    const existing = await Admin.findOne({ email: 'zeeshanhussain0999@gmail.com' });
     if (!existing) {
       await Admin.insert({
         username: 'Ai+rizwan#1974000hussain!#/',
         password: '@#12Rizwan55Hussain/!#7861974000!12',
-        email: 'zeeshanshussain0999@gmail.com',
+        email: 'zeeshanhussain0999@gmail.com',
         otp: null,
         otpExpires: null
       });
