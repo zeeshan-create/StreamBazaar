@@ -542,6 +542,48 @@ export default function App() {
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
   };
 
+  const renderDescription = (desc) => {
+    if (!desc) return null;
+    const highlights = [
+      { word: 'offline', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.12)', border: 'rgba(251, 191, 36, 0.25)' },
+      { word: 'shared', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)', border: 'rgba(96, 165, 250, 0.25)' },
+      { word: 'sharing', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)', border: 'rgba(96, 165, 250, 0.25)' },
+      { word: 'private', color: '#34d399', bg: 'rgba(52, 211, 153, 0.12)', border: 'rgba(52, 211, 153, 0.25)' },
+      { word: 'purchase', color: '#c084fc', bg: 'rgba(192, 132, 252, 0.12)', border: 'rgba(192, 132, 252, 0.25)' },
+      { word: 'personal', color: '#f472b6', bg: 'rgba(244, 114, 182, 0.12)', border: 'rgba(244, 114, 182, 0.25)' }
+    ];
+
+    const words = highlights.map(h => h.word);
+    const regex = new RegExp(`\\b(${words.join('|')})\\b`, 'gi');
+    const parts = desc.split(regex);
+
+    return parts.map((part, index) => {
+      const match = highlights.find(h => h.word === part.toLowerCase());
+      if (match) {
+        return (
+          <span 
+            key={index} 
+            style={{ 
+              color: match.color, 
+              background: match.bg, 
+              border: `1px solid ${match.border}`,
+              padding: '1px 6px',
+              borderRadius: '4px',
+              fontWeight: '700',
+              fontSize: '0.72rem',
+              margin: '0 2px',
+              display: 'inline-block',
+              verticalAlign: 'middle'
+            }}
+          >
+            {part}
+          </span>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   return (
     <div className="app-container">
       {/* ── NAVBAR ─────────────────────────────────────────────── */}
@@ -781,7 +823,7 @@ export default function App() {
                           <div>
                             <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: 'var(--text)' }}>{product.name}</h3>
                             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', marginTop: '0.25rem', lineHeight: 1.4, maxWidth: '200px' }}>
-                              {product.description || "Offline game activation for PC. Full updates supported."}
+                              {renderDescription(product.description || "Offline game activation for PC. Full updates supported.")}
                             </p>
                           </div>
                         </div>
@@ -947,7 +989,7 @@ export default function App() {
                         )}
                       </div>
                       <div className="card-desc" style={{ marginTop: isGamingCategory(product.category) ? '0.2rem' : '0' }}>
-                        {product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : '')}
+                        {renderDescription(product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : ''))}
                       </div>
                     </div>
                     {(() => {
@@ -1354,7 +1396,12 @@ export default function App() {
                 })()}
                 <div>
                   <div className="popup-title">{popup.product.name}</div>
-                  <div className="popup-subtitle">1 Device Seat Access</div>
+                  <div className="popup-subtitle" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-mid)', fontWeight: 'normal' }}>
+                      {renderDescription(popup.product.description || (isGamingCategory(popup.product.category) ? 'Offline PC Access.' : ''))}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', opacity: 0.8, fontWeight: 'normal' }}>1 Device Seat Access</span>
+                  </div>
                 </div>
               </div>
 
