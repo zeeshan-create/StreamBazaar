@@ -1510,6 +1510,22 @@ export default function AdminDashboard() {
                                       />
                                     )}
                                   </div>
+                                  {isGamingCategory(editForm.category) && (
+                                    <div className="admin-form-group">
+                                      <label>Gaming Platform</label>
+                                      <select 
+                                        className="admin-form-input" 
+                                        value={editForm.platform || ''} 
+                                        onChange={e => setEditForm({...editForm, platform: e.target.value})}
+                                      >
+                                        <option value="">Auto-detect (Recommended)</option>
+                                        <option value="steam">Steam</option>
+                                        <option value="playstation">PlayStation</option>
+                                        <option value="xbox">Xbox</option>
+                                        <option value="epic">Epic Games</option>
+                                      </select>
+                                    </div>
+                                  )}
                                   <div className="admin-form-group">
                                     <label>Brand Colors (Auto-Extracted)</label>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -1927,6 +1943,22 @@ export default function AdminDashboard() {
                                 />
                               )}
                             </div>
+                            {isGamingCategory(editForm.category) && (
+                              <div className="admin-form-group">
+                                <label>Gaming Platform</label>
+                                <select 
+                                  className="admin-form-input" 
+                                  value={editForm.platform || ''} 
+                                  onChange={e => setEditForm({...editForm, platform: e.target.value})}
+                                >
+                                  <option value="">Auto-detect (Recommended)</option>
+                                  <option value="steam">Steam</option>
+                                  <option value="playstation">PlayStation</option>
+                                  <option value="xbox">Xbox</option>
+                                  <option value="epic">Epic Games</option>
+                                </select>
+                              </div>
+                            )}
                             <div className="admin-form-group">
                               <label>Brand Colors (Auto-Extracted)</label>
                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

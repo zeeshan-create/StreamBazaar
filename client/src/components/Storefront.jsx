@@ -282,6 +282,104 @@ const getGameIcon = (label) => {
   return null;
 };
 
+
+const getGamingPlatform = (product) => {
+  if (!product) return 'steam';
+
+  // 1. Check if platform is explicitly stored
+  if (product.platform) {
+    const p = product.platform.toLowerCase();
+    if (p === 'xbox' || p === 'playstation' || p === 'epic' || p === 'steam') {
+      return p;
+    }
+  }
+
+  // 2. Check product name
+  const name = (product.name || '').toLowerCase();
+  if (name.includes('xbox')) return 'xbox';
+  if (name.includes('playstation') || name.includes('ps5') || name.includes('ps4') || name.includes('ps3') || name.includes('ps2')) return 'playstation';
+  if (name.includes('epic')) return 'epic';
+  if (name.includes('steam')) return 'steam';
+
+  // 3. Check plans (label, duration, quality, description)
+  if (Array.isArray(product.plans)) {
+    for (const plan of product.plans) {
+      const label = (plan.label || '').toLowerCase();
+      const duration = (plan.duration || '').toLowerCase();
+      const quality = (plan.quality || '').toLowerCase();
+      const desc = (product.description || '').toLowerCase();
+
+      if (label.includes('xbox') || duration.includes('xbox') || quality.includes('xbox') || desc.includes('xbox')) return 'xbox';
+      if (label.includes('playstation') || label.includes('ps5') || label.includes('ps4') || label.includes('ps3') || label.includes('ps2') ||
+          duration.includes('playstation') || duration.includes('ps5') || duration.includes('ps4') ||
+          quality.includes('playstation') || quality.includes('ps5') || quality.includes('ps4') ||
+          desc.includes('playstation') || desc.includes('ps5') || desc.includes('ps4')) {
+        return 'playstation';
+      }
+      if (label.includes('epic') || duration.includes('epic') || quality.includes('epic') || desc.includes('epic')) return 'epic';
+      if (label.includes('steam') || duration.includes('steam') || quality.includes('steam') || desc.includes('steam')) return 'steam';
+    }
+  }
+
+  // 4. Check product description
+  const desc = (product.description || '').toLowerCase();
+  if (desc.includes('xbox')) return 'xbox';
+  if (desc.includes('playstation') || desc.includes('ps5') || desc.includes('ps4') || desc.includes('ps3') || desc.includes('ps2')) return 'playstation';
+  if (desc.includes('epic')) return 'epic';
+  if (desc.includes('steam')) return 'steam';
+
+  // 5. Check customIcon URL (excluding general hosting hostnames like steamstatic/steamcommunity/akamai)
+  const icon = (product.customIcon || '').toLowerCase();
+  if (icon.includes('xbox')) return 'xbox';
+  if (icon.includes('playstation') || icon.includes('sony') || icon.includes('psn')) return 'playstation';
+  if (icon.includes('epic') || icon.includes('lutris') || icon.includes('epicgames')) return 'epic';
+  if (icon.includes('steam') && !icon.includes('steamstatic') && !icon.includes('steamcommunity') && !icon.includes('akamai')) return 'steam';
+
+  return 'steam'; // Fallback
+};
+
+const getGamingPlatformDetails = (product, size = 10) => {
+  const platform = getGamingPlatform(product);
+  if (platform === 'xbox') {
+    return {
+      label: 'XBOX',
+      icon: (
+        <svg viewBox="0 0 16 16" width={size} height={size} fill="currentColor" style={{ flexShrink: 0 }}>
+          <path d="M7.202 15.967a8 8 0 0 1-3.552-1.26c-.898-.585-1.101-.826-1.101-1.306 0-.965 1.062-2.656 2.879-4.583C6.459 7.723 7.897 6.44 8.052 6.475c.302.068 2.718 2.423 3.622 3.531 1.43 1.753 2.088 3.189 1.754 3.829-.254.486-1.83 1.437-2.987 1.802-.954.301-2.207.429-3.239.33m-5.866-3.57C.589 11.253.212 10.127.03 8.497c-.06-.539-.038-.846.137-1.95.218-1.377 1.002-2.97 1.945-3.95.401-.417.437-.427.926-.263.595.2 1.23.638 2.213 1.528l.574.519-.313.385C4.056 6.553 2.52 9.086 1.94 10.653c-.315.852-.442 1.707-.306 2.063.091.24.007.15-.3-.319Zm13.101.195c.074-.36-.019-1.02-.238-1.687-.473-1.443-2.055-4.128-3.508-5.953l-.457-.575.494-.454c.646-.593 1.095-.948 1.58-1.25.381-.237.927-.448 1.161-.448.145 0 .654.528 1.065 1.104a8.4 8.4 0 0 1 1.343 3.102c.153.728.166 2.286.024 3.012a9.5 9.5 0 0 1-.6 1.893c-.179.393-.624 1.156-.82 1.404-.1.128-.1.127-.043-.148ZM7.335 1.952c-.67-.34-1.704-.705-2.276-.803a4 4 0 0 0-.759-.043c-.471.024-.45 0 .306-.358A7.8 7.8 0 0 1 6.47.128c.8-.169 2.306-.17 3.094-.005.85.18 1.853.552 2.418.9l.168.103-.385-.02c-.766-.038-1.88.27-3.078.853-.361.176-.676.316-.699.312a12 12 0 0 1-.654-.319Z" />
+        </svg>
+      )
+    };
+  }
+  if (platform === 'playstation') {
+    return {
+      label: 'PLAYSTATION',
+      icon: (
+        <svg viewBox="0 0 16 16" width={size} height={size} fill="currentColor" style={{ flexShrink: 0 }}>
+          <path d="M15.858 11.451c-.313.395-1.079.676-1.079.676l-5.696 2.046v-1.509l4.192-1.493c.476-.17.549-.412.162-.538-.386-.127-1.085-.09-1.56.08l-2.794.984v-1.566l.161-.054s.807-.286 1.942-.412c1.135-.125 2.525.017 3.616.43 1.23.39 1.368.962 1.056 1.356M9.625 8.883v-3.86c0-.453-.083-.87-.508-.988-.326-.105-.528.198-.528.65v9.664l-2.606-.827V2c1.108.206 2.722.692 3.59.985 2.207.757 2.955 1.7 2.955 3.825 0 2.071-1.278 2.856-2.903 2.072Zm-8.424 3.625C-.061 12.15-.271 11.41.304 10.984c.532-.394 1.436-.69 1.436-.69l3.737-1.33v1.515l-2.69.963c-.474.17-.547.411-.161.538.386.126 1.085.09 1.56-.08l1.29-.469v1.356l-.257.043a8.45 8.45 0 0 1-4.018-.323Z" />
+        </svg>
+      )
+    };
+  }
+  if (platform === 'epic') {
+    return {
+      label: 'EPIC',
+      icon: (
+        <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" style={{ flexShrink: 0 }}>
+          <path d="M12 0L1.75 3v13.5L12 24l10.25-7.5V3L12 0zm7.25 15.5l-7.25 5.3-7.25-5.3V5.5l7.25-2.1 7.25 2.1v10z"/>
+        </svg>
+      )
+    };
+  }
+  return {
+    label: 'STEAM',
+    icon: (
+      <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" style={{ flexShrink: 0 }}>
+        <path d="M12 .002C5.378.002.001 5.378.001 12c0 5.485 3.68 10.113 8.745 11.583l1.834-2.617c-.12-.047-.234-.1-.34-.17a1.996 1.996 0 0 1-1.042-2.196l-3.238-1.57a3.468 3.468 0 0 1-.365-2.072 3.486 3.486 0 1 1 5.568-1.393l3.187 1.545a1.986 1.986 0 0 1 2.894 1.13c.287.97.027 2.016-.677 2.723l1.833 2.616c5.064-1.47 8.745-6.098 8.745-11.583 0-6.622-5.377-11.998-12-11.998zm-7.6 15.485c-.88-.002-1.6-.723-1.6-1.602 0-.882.72-1.602 1.6-1.602.88.002 1.6.723 1.6 1.602 0 .88-.72 1.6-1.6 1.602z"/>
+      </svg>
+    )
+  };
+};
+
 const CATEGORIES = [
   { id: 'all',       name: 'All',       icon: <LayoutGrid size={15} /> },
   { id: 'Streaming', name: 'Streaming', icon: <Tv2       size={15} /> },
@@ -924,14 +1022,15 @@ export default function App() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div style={{ display: 'flex', gap: '1rem' }}>
                           {(() => {
-                            const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames'))) || (product.name && product.name.toLowerCase().includes('epic'));
+                            const platform = getGamingPlatform(product);
+                            const isVerticalRatio = platform === 'epic' || platform === 'playstation' || platform === 'xbox';
                             return (
                               <img 
                                 src={product.customIcon || getGameIcon(product.name) || getFavicon(product.name)} 
                                 alt={product.name} 
                                 style={{ 
                                   width: '68px', 
-                                  height: isEpicGame ? '92px' : '68px', 
+                                  height: isVerticalRatio ? '92px' : '68px', 
                                   borderRadius: '12px', 
                                   objectFit: 'cover',
                                   boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
@@ -949,20 +1048,11 @@ export default function App() {
                             </div>
                         </div>
                         {(() => {
-                          const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames'))) || (product.name && product.name.toLowerCase().includes('epic'));
+                          const platformDetails = getGamingPlatformDetails(product, 12);
                           return (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '0.25rem 0.75rem', borderRadius: '999px', border: `1px solid ${tooDarkGame ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, background: tooDarkGame ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, fontSize: '0.75rem', fontWeight: 700, color: tooDarkGame ? '#ff6b00' : effectiveColor, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
-                              {isEpicGame ? (
-                                <>
-                                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 0L1.75 3v13.5L12 24l10.25-7.5V3L12 0zm7.25 15.5l-7.25 5.3-7.25-5.3V5.5l7.25-2.1 7.25 2.1v10z"/></svg>
-                                  EPIC GAMES
-                                </>
-                              ) : (
-                                <>
-                                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 .002C5.378.002.001 5.378.001 12c0 5.485 3.68 10.113 8.745 11.583l1.834-2.617c-.12-.047-.234-.1-.34-.17a1.996 1.996 0 0 1-1.042-2.196l-3.238-1.57a3.468 3.468 0 0 1-.365-2.072 3.486 3.486 0 1 1 5.568-1.393l3.187 1.545a1.986 1.986 0 0 1 2.894 1.13c.287.97.027 2.016-.677 2.723l1.833 2.616c5.064-1.47 8.745-6.098 8.745-11.583 0-6.622-5.377-11.998-12-11.998zm-7.6 15.485c-.88-.002-1.6-.723-1.6-1.602 0-.882.72-1.602 1.6-1.602.88.002 1.6.723 1.6 1.602 0 .88-.72 1.6-1.6 1.602z"/></svg>
-                                  STEAM
-                                </>
-                              )}
+                              {platformDetails.icon}
+                              {platformDetails.label === 'EPIC' ? 'EPIC GAMES' : platformDetails.label}
                             </div>
                           );
                         })()}
@@ -1117,38 +1207,29 @@ export default function App() {
                       </div>
                     </div>
                     {(() => {
-                      const isEpicGame = (product.customIcon && (product.customIcon.includes('lutris') || product.customIcon.includes('igdb') || product.customIcon.includes('epicgames') || product.customIcon.includes('epic'))) || (product.name && product.name.toLowerCase().includes('epic'));
                       if (isGamingCategory(product.category)) {
-                         return (
-                            <div style={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: '3px', 
-                              padding: '0.2rem 0.5rem', 
-                              borderRadius: '50px', 
-                              border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, 
-                              background: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, 
-                              fontSize: '0.65rem', 
-                              fontWeight: 700, 
-                              color: tooDark ? '#ff6b00' : effectiveColor, 
-                              whiteSpace: 'nowrap', 
-                              letterSpacing: '0.5px', 
-                              alignSelf: 'flex-start', 
-                              marginTop: '2px' 
-                            }}>
-                              {isEpicGame ? (
-                                <>
-                                  <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 0L1.75 3v13.5L12 24l10.25-7.5V3L12 0zm7.25 15.5l-7.25 5.3-7.25-5.3V5.5l7.25-2.1 7.25 2.1v10z"/></svg>
-                                  EPIC
-                                </>
-                              ) : (
-                                <>
-                                  <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" style={{ flexShrink: 0 }}><path d="M12 .002C5.378.002.001 5.378.001 12c0 5.485 3.68 10.113 8.745 11.583l1.834-2.617c-.12-.047-.234-.1-.34-.17a1.996 1.996 0 0 1-1.042-2.196l-3.238-1.57a3.468 3.468 0 0 1-.365-2.072 3.486 3.486 0 1 1 5.568-1.393l3.187 1.545a1.986 1.986 0 0 1 2.894 1.13c.287.97.027 2.016-.677 2.723l1.833 2.616c5.064-1.47 8.745-6.098 8.745-11.583 0-6.622-5.377-11.998-12-11.998zm-7.6 15.485c-.88-.002-1.6-.723-1.6-1.602 0-.882.72-1.602 1.6-1.602.88.002 1.6.723 1.6 1.602 0 .88-.72 1.6-1.6 1.602z"/></svg>
-                                  STEAM
-                                </>
-                              )}
-                            </div>
-                         );
+                        const platformDetails = getGamingPlatformDetails(product, 10);
+                        return (
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '3px', 
+                            padding: '0.2rem 0.5rem', 
+                            borderRadius: '50px', 
+                            border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, 
+                            background: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, 
+                            fontSize: '0.65rem', 
+                            fontWeight: 700, 
+                            color: tooDark ? '#ff6b00' : effectiveColor, 
+                            whiteSpace: 'nowrap', 
+                            letterSpacing: '0.5px', 
+                            alignSelf: 'flex-start', 
+                            marginTop: '2px' 
+                          }}>
+                            {platformDetails.icon}
+                            {platformDetails.label === 'EPIC' ? 'EPIC' : platformDetails.label}
+                          </div>
+                        );
                       }
                       return (
                         <span
