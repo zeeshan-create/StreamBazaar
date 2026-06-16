@@ -46,6 +46,11 @@ const fetchWithTimeout = async (url, options = {}, timeout = 3000) => {
   }
 };
 
+const migrateSteamUrl = (url) => {
+  if (!url) return url;
+  return url.replace(/https:\/\/cdn\.akamai\.steamstatic\.com\/steam\/(apps|subs|bundles)\//g, 'https://shared.akamai.steamstatic.com/store_item_assets/steam/$1/');
+};
+
 let twitchTokenInfo = null;
 
 async function getTwitchToken() {
@@ -89,121 +94,121 @@ const POPULAR_EGS_GAMES = [
   {
     name: "Marvel's Spider-Man Remastered",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co4w1w.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Marvel's Spider-Man: Miles Morales",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co582f.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817120/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Marvel's Spider-Man 2",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co6mkv.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "God of War",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co1tpx.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "God of War Ragnarök",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co582b.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2322010/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Grand Theft Auto V",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co2lbd.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Red Dead Redemption 2",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co1q1f.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Elden Ring",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co4p96.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Black Myth: Wukong",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co7d6v.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Cyberpunk 2077",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co2mo1.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Alan Wake 2",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co6mkh.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1496790/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Hogwarts Legacy",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co6525.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Ghost of Tsushima DIRECTOR'S CUT",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co843a.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "The Last of Us Part I",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co55h3.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Uncharted: Legacy of Thieves Collection",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co3w40.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659420/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "EA SPORTS FC 25",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co8g5w.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2690060/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Horizon Forbidden West Complete Edition",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co7m30.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2420110/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "WWE 2K24",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co7ss3.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Forza Horizon 5",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co3w7y.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/capsule_184x69.jpg',
     type: 'Game'
   },
   {
     name: "Assassin's Creed Mirage",
     domain: 'Epic Games',
-    icon: 'https://lutris.net/media/igdb/cover_big/co6845.jpg',
+    icon: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2893930/capsule_184x69.jpg',
     type: 'Game'
   }
 ];
@@ -231,255 +236,286 @@ const CACHE_TTL = 300000; // 5 minutes cache
     }
     
     try {
-      let results = [];
       const qLower = q.toLowerCase();
+      const searchPromises = [];
 
-      // 0. Match local high-fidelity Epic Games Store fallback database
-      const localMatches = POPULAR_EGS_GAMES.filter(g => g.name.toLowerCase().includes(qLower));
-      if (localMatches.length > 0) {
-        results = [...results, ...localMatches];
-      }
+      // 0. Local Epic Games Store fallback database
+      const searchLocal = async () => {
+        return POPULAR_EGS_GAMES.filter(g => g.name.toLowerCase().includes(qLower));
+      };
+      searchPromises.push(searchLocal());
 
-      // 0.5. Fetch directly from Epic Games Store GraphQL
-      try {
-        const egsQuery = `
-        query searchStoreQuery($keywords: String, $count: Int, $country: String!, $locale: String) {
-          Catalog {
-            searchStore(keywords: $keywords, count: $count, country: $country, locale: $locale) {
-              elements {
-                title
-                id
-                keyImages {
-                  type
-                  url
+      // 0.5. Epic Games Store GraphQL
+      const searchEgs = async () => {
+        try {
+          const egsQuery = `
+          query searchStoreQuery($keywords: String, $count: Int, $country: String!, $locale: String) {
+            Catalog {
+              searchStore(keywords: $keywords, count: $count, country: $country, locale: $locale) {
+                elements {
+                  title
+                  id
+                  keyImages {
+                    type
+                    url
+                  }
                 }
               }
             }
           }
-        }
-        `;
-        const egsRes = await fetchWithTimeout('https://store.epicgames.com/graphql', {
-          method: 'POST',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: egsQuery,
-            variables: { keywords: q, count: 6, country: 'US', locale: 'en-US' }
-          })
-        }, 3000);
-        
-        let egsData = null;
-        if (egsRes.ok && egsRes.headers.get('content-type')?.includes('application/json')) {
-          egsData = await egsRes.json();
-        }
-        const elements = egsData?.data?.Catalog?.searchStore?.elements;
-        if (elements && elements.length > 0) {
-          const egsSearchResults = elements.map(item => {
-            let bestImg = '';
-            if (item.keyImages && item.keyImages.length > 0) {
-              const wide = item.keyImages.find(img => img.type === 'OfferImageWide');
-              const tall = item.keyImages.find(img => img.type === 'OfferImageTall');
-              const thumb = item.keyImages.find(img => img.type === 'Thumbnail');
-              const logo = item.keyImages.find(img => img.type === 'ProductLogo');
-              bestImg = (wide?.url || tall?.url || thumb?.url || logo?.url || item.keyImages[0]?.url || '').trim();
-            }
-            return {
-              name: item.title,
-              domain: 'Epic Games',
-              icon: bestImg || 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/1200px-Epic_Games_logo.svg.png',
-              type: 'Game'
-            };
-          }).filter(g => g.name);
-
-          const uniqueEgsResults = egsSearchResults.filter(egr => !results.some(r => r.name.toLowerCase() === egr.name.toLowerCase()));
-          results = [...results, ...uniqueEgsResults];
-        }
-      } catch (err) {
-        console.log('EGS store GraphQL search error:', err.message);
-      }
-      
-      // 1. Fetch Steam Games (Using official storefront search for rate-limit resilience)
-      try {
-        const steamRes = await fetchWithTimeout(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(q)}&l=english&cc=US`, {}, 3000);
-        const steamData = await steamRes.json();
-        
-        if (steamData && steamData.items && steamData.items.length > 0) {
-          const gameResults = steamData.items.slice(0, 5).map(item => {
-            let iconUrl = item.tiny_image || `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg`;
-            if (iconUrl.includes('?')) {
-              iconUrl = iconUrl.split('?')[0];
-            }
-            return {
-              name: item.name,
-              domain: 'Steam Game',
-              icon: iconUrl,
-              type: 'Game'
-            };
-          });
-          
-          // Deduplicate based on name
-          const uniqueSteamResults = gameResults.filter(gr => !results.some(r => r.name.toLowerCase() === gr.name.toLowerCase()));
-          results = [...results, ...uniqueSteamResults];
-        }
-      } catch (err) {
-        console.log('Steam store search error:', err.message);
-      }
-
-      // 1.1. Fetch RAWG Games (if API key is present)
-      try {
-        const rawgKey = process.env.RAWG_API_KEY;
-        if (rawgKey) {
-          const rawgRes = await fetchWithTimeout(`https://api.rawg.io/api/games?search=${encodeURIComponent(q)}&key=${rawgKey}`, {}, 3000);
-          if (rawgRes.ok) {
-            const rawgData = await rawgRes.json();
-            if (rawgData && Array.isArray(rawgData.results)) {
-              const rawgResults = rawgData.results.slice(0, 5).map(item => ({
-                name: item.name,
-                domain: 'RAWG Game',
-                icon: item.background_image || '',
-                type: 'Game'
-              }));
-              const uniqueRawgResults = rawgResults.filter(rr => !results.some(r => r.name.toLowerCase() === rr.name.toLowerCase()));
-              results = [...results, ...uniqueRawgResults];
-            }
-          }
-        }
-      } catch (err) {
-        console.log('RAWG search error:', err.message);
-      }
-
-      // 1.2. Fetch IGDB Games (if Twitch credentials are present)
-      try {
-        const token = await getTwitchToken();
-        const clientId = process.env.TWITCH_CLIENT_ID;
-        if (token && clientId) {
-          const igdbRes = await fetchWithTimeout('https://api.igdb.com/v4/games', {
+          `;
+          const egsRes = await fetchWithTimeout('https://store.epicgames.com/graphql', {
             method: 'POST',
             headers: {
-              'Client-ID': clientId,
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'text/plain'
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Content-Type': 'application/json'
             },
-            body: `search "${q.replace(/"/g, '\\"')}"; fields name, cover.url, cover.image_id; limit 5;`
+            body: JSON.stringify({
+              query: egsQuery,
+              variables: { keywords: q, count: 6, country: 'US', locale: 'en-US' }
+            })
           }, 3000);
           
-          if (igdbRes.ok) {
-            const igdbData = await igdbRes.json();
-            if (Array.isArray(igdbData)) {
-              const igdbResults = igdbData.map(item => {
-                let iconUrl = '';
-                if (item.cover && item.cover.image_id) {
-                  iconUrl = `https://images.igdb.com/igdb/image/upload/t_cover_big/${item.cover.image_id}.jpg`;
-                } else if (item.cover && item.cover.url) {
-                  iconUrl = item.cover.url.startsWith('//') ? 'https:' + item.cover.url : item.cover.url;
-                }
-                return {
+          let egsData = null;
+          if (egsRes.ok && egsRes.headers.get('content-type')?.includes('application/json')) {
+            egsData = await egsRes.json();
+          }
+          const elements = egsData?.data?.Catalog?.searchStore?.elements;
+          if (elements && elements.length > 0) {
+            return elements.map(item => {
+              let bestImg = '';
+              if (item.keyImages && item.keyImages.length > 0) {
+                const wide = item.keyImages.find(img => img.type === 'OfferImageWide');
+                const tall = item.keyImages.find(img => img.type === 'OfferImageTall');
+                const thumb = item.keyImages.find(img => img.type === 'Thumbnail');
+                const logo = item.keyImages.find(img => img.type === 'ProductLogo');
+                bestImg = (wide?.url || tall?.url || thumb?.url || logo?.url || item.keyImages[0]?.url || '').trim();
+              }
+              return {
+                name: item.title,
+                domain: 'Epic Games',
+                icon: bestImg || 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/1200px-Epic_Games_logo.svg.png',
+                type: 'Game'
+              };
+            }).filter(g => g.name);
+          }
+        } catch (err) {
+          console.log('EGS store GraphQL search error:', err.message);
+        }
+        return [];
+      };
+      searchPromises.push(searchEgs());
+
+      // 1. Steam Games Store Search
+      const searchSteam = async () => {
+        try {
+          const steamRes = await fetchWithTimeout(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(q)}&l=english&cc=US`, {}, 3000);
+          const steamData = await steamRes.json();
+          if (steamData && steamData.items && steamData.items.length > 0) {
+            return steamData.items.slice(0, 5).map(item => {
+              let iconUrl = item.tiny_image || `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${item.id}/header.jpg`;
+              if (iconUrl.includes('?')) {
+                iconUrl = iconUrl.split('?')[0];
+              }
+              return {
+                name: item.name,
+                domain: 'Steam Game',
+                icon: migrateSteamUrl(iconUrl),
+                type: 'Game'
+              };
+            });
+          }
+        } catch (err) {
+          console.log('Steam store search error:', err.message);
+        }
+        return [];
+      };
+      searchPromises.push(searchSteam());
+
+      // 1.1. RAWG Games
+      const searchRawg = async () => {
+        try {
+          const rawgKey = process.env.RAWG_API_KEY;
+          if (rawgKey) {
+            const rawgRes = await fetchWithTimeout(`https://api.rawg.io/api/games?search=${encodeURIComponent(q)}&key=${rawgKey}`, {}, 3000);
+            if (rawgRes.ok) {
+              const rawgData = await rawgRes.json();
+              if (rawgData && Array.isArray(rawgData.results)) {
+                return rawgData.results.slice(0, 5).map(item => ({
                   name: item.name,
-                  domain: 'IGDB Game',
-                  icon: iconUrl,
+                  domain: 'RAWG Game',
+                  icon: item.background_image || '',
                   type: 'Game'
+                }));
+              }
+            }
+          }
+        } catch (err) {
+          console.log('RAWG search error:', err.message);
+        }
+        return [];
+      };
+      searchPromises.push(searchRawg());
+
+      // 1.2. IGDB Games
+      const searchIgdb = async () => {
+        try {
+          const token = await getTwitchToken();
+          const clientId = process.env.TWITCH_CLIENT_ID;
+          if (token && clientId) {
+            const igdbRes = await fetchWithTimeout('https://api.igdb.com/v4/games', {
+              method: 'POST',
+              headers: {
+                'Client-ID': clientId,
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'text/plain'
+              },
+              body: `search "${q.replace(/"/g, '\\"')}"; fields name, cover.url, cover.image_id; limit 5;`
+            }, 3000);
+            
+            if (igdbRes.ok) {
+              const igdbData = await igdbRes.json();
+              if (Array.isArray(igdbData)) {
+                return igdbData.map(item => {
+                  let iconUrl = '';
+                  if (item.cover && item.cover.image_id) {
+                    iconUrl = `https://images.igdb.com/igdb/image/upload/t_cover_big/${item.cover.image_id}.jpg`;
+                  } else if (item.cover && item.cover.url) {
+                    iconUrl = item.cover.url.startsWith('//') ? 'https:' + item.cover.url : item.cover.url;
+                  }
+                  return {
+                    name: item.name,
+                    domain: 'IGDB Game',
+                    icon: iconUrl,
+                    type: 'Game'
+                  };
+                });
+              }
+            }
+          }
+        } catch (err) {
+          console.log('IGDB search error:', err.message);
+        }
+        return [];
+      };
+      searchPromises.push(searchIgdb());
+
+      // 1.5. Lutris/Epic Games
+      const searchLutris = async () => {
+        try {
+          const lutrisRes = await fetchWithTimeout(`https://lutris.net/api/games?search=${encodeURIComponent(q)}`, {}, 5000);
+          const lutrisData = await lutrisRes.json();
+          if (lutrisData && lutrisData.results && lutrisData.results.length > 0) {
+            return lutrisData.results.slice(0, 5).map(item => {
+              let iconUrl = item.coverart || item.banner_url || `https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/1200px-Epic_Games_logo.svg.png`;
+              if (iconUrl && iconUrl.startsWith('/')) {
+                iconUrl = 'https://lutris.net' + iconUrl;
+              }
+              return {
+                name: item.name,
+                domain: 'IGDB Game',
+                icon: iconUrl,
+                type: 'Game'
+              };
+            });
+          }
+        } catch (err) {
+          console.log('Lutris/Epic search error:', err.message);
+        }
+        return [];
+      };
+      searchPromises.push(searchLutris());
+
+      // 1.8. Logo.dev Search
+      const searchLogoDev = async () => {
+        if (process.env.LOGO_DEV_SECRET_KEY) {
+          try {
+            const logoDevRes = await fetchWithTimeout(`https://api.logo.dev/search?q=${encodeURIComponent(q)}`, {
+              headers: {
+                'Authorization': `Bearer ${process.env.LOGO_DEV_SECRET_KEY}`
+              }
+            }, 3000);
+            let logoDevData = null;
+            if (logoDevRes.ok && logoDevRes.headers.get('content-type')?.includes('application/json')) {
+              logoDevData = await logoDevRes.json();
+            }
+            if (logoDevData && Array.isArray(logoDevData)) {
+              const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
+              return logoDevData.slice(0, 5).map(item => {
+                let iconUrl = item.logo_url;
+                if (pubToken && iconUrl) {
+                  iconUrl = iconUrl.replace('YOUR_PUBLISHABLE_KEY', pubToken);
+                }
+                const displayName = item.name || (item.domain ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : 'Brand');
+                return {
+                  name: displayName,
+                  domain: item.domain,
+                  icon: iconUrl,
+                  type: 'OTT/Brand'
                 };
               });
-              const uniqueIgdbResults = igdbResults.filter(ir => !results.some(r => r.name.toLowerCase() === ir.name.toLowerCase()));
-              results = [...results, ...uniqueIgdbResults];
             }
+          } catch (err) {
+            console.log('Logo.dev search error:', err.message);
           }
         }
-      } catch (err) {
-        console.log('IGDB search error:', err.message);
-      }
+        return [];
+      };
+      searchPromises.push(searchLogoDev());
 
-      // 1.5. Fetch Epic Games (Lutris/IGDB)
-      try {
-        const lutrisRes = await fetchWithTimeout(`https://lutris.net/api/games?search=${encodeURIComponent(q)}`, {}, 3000);
-        const lutrisData = await lutrisRes.json();
-        if (lutrisData && lutrisData.results && lutrisData.results.length > 0) {
-          const epicResults = lutrisData.results.slice(0, 5).map(item => {
-            let iconUrl = item.coverart || item.banner_url || `https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/1200px-Epic_Games_logo.svg.png`;
-            if (iconUrl && iconUrl.startsWith('/')) {
-              iconUrl = 'https://lutris.net' + iconUrl;
-            }
-            return {
-              name: item.name,
-              domain: 'IGDB Game',
-              icon: iconUrl,
-              type: 'Game'
-            };
-          });
-          
-          // Deduplicate based on name
-          const filteredEpicResults = epicResults.filter(er => !results.some(r => r.name.toLowerCase() === er.name.toLowerCase()));
-          results = [...results, ...filteredEpicResults];
-        }
-      } catch (err) {
-        console.log('Lutris/Epic search error:', err.message);
-      }
-      
-      // 1.8. Fetch Logo.dev Search (If Secret Key is set)
-      if (process.env.LOGO_DEV_SECRET_KEY) {
+      // 2. Brandfetch Search
+      const searchBrandfetch = async () => {
         try {
-          const logoDevRes = await fetchWithTimeout(`https://api.logo.dev/search?q=${encodeURIComponent(q)}`, {
-            headers: {
-              'Authorization': `Bearer ${process.env.LOGO_DEV_SECRET_KEY}`
-            }
-          }, 3000);
-          let logoDevData = null;
-          if (logoDevRes.ok && logoDevRes.headers.get('content-type')?.includes('application/json')) {
-            logoDevData = await logoDevRes.json();
+          const brandRes = await fetchWithTimeout(`https://api.brandfetch.io/v2/search/${encodeURIComponent(q)}`, {}, 3000);
+          let brandData = null;
+          if (brandRes.ok && brandRes.headers.get('content-type')?.includes('application/json')) {
+            brandData = await brandRes.json();
           }
-          if (logoDevData && Array.isArray(logoDevData)) {
+          if (brandData && brandData.length > 0) {
             const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
-            const logoDevResults = logoDevData.slice(0, 5).map(item => {
-              let iconUrl = item.logo_url;
-              if (pubToken && iconUrl) {
-                iconUrl = iconUrl.replace('YOUR_PUBLISHABLE_KEY', pubToken);
-              }
-              const displayName = item.name || (item.domain ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : 'Brand');
+            return brandData.slice(0, 3).map(brand => {
+              const persistentIcon = brand.domain 
+                ? (pubToken ? `https://img.logo.dev/${brand.domain}?token=${pubToken}` : `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`) 
+                : (brand.icon || `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`);
+              const displayName = brand.name || (brand.domain ? brand.domain.split('.')[0].charAt(0).toUpperCase() + brand.domain.split('.')[0].slice(1) : 'Brand');
               return {
                 name: displayName,
-                domain: item.domain,
-                icon: iconUrl,
+                domain: brand.domain,
+                icon: persistentIcon,
                 type: 'OTT/Brand'
               };
             });
-            // Deduplicate logo.dev search results based on domain name
-            const filteredLogoDevResults = logoDevResults.filter(ldr => !results.some(r => r.domain.toLowerCase() === ldr.domain.toLowerCase()));
-            results = [...filteredLogoDevResults, ...results];
           }
         } catch (err) {
-          console.log('Logo.dev search error:', err.message);
+          console.log('Brandfetch error:', err.message);
         }
-      }
+        return [];
+      };
+      searchPromises.push(searchBrandfetch());
+
+      const promiseResults = await Promise.allSettled(searchPromises);
+      let results = [];
+      const logoDevResults = [];
       
-      // 2. Fetch OTT Brands
-      try {
-        const brandRes = await fetchWithTimeout(`https://api.brandfetch.io/v2/search/${encodeURIComponent(q)}`, {}, 3000);
-        let brandData = null;
-        if (brandRes.ok && brandRes.headers.get('content-type')?.includes('application/json')) {
-          brandData = await brandRes.json();
+      promiseResults.forEach((res, index) => {
+        if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+          if (index === 6) { // LogoDev search is the 6th promise
+            logoDevResults.push(...res.value);
+          } else {
+            res.value.forEach(item => {
+              if (item && item.name && !results.some(r => r.name.toLowerCase() === item.name.toLowerCase())) {
+                results.push(item);
+              }
+            });
+          }
         }
-        
-        if (brandData && brandData.length > 0) {
-          const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
-          const brandResults = brandData.slice(0, 3).map(brand => {
-            const persistentIcon = brand.domain 
-              ? (pubToken ? `https://img.logo.dev/${brand.domain}?token=${pubToken}` : `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`) 
-              : (brand.icon || `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`);
-            const displayName = brand.name || (brand.domain ? brand.domain.split('.')[0].charAt(0).toUpperCase() + brand.domain.split('.')[0].slice(1) : 'Brand');
-            return {
-              name: displayName,
-              domain: brand.domain,
-              icon: persistentIcon,
-              type: 'OTT/Brand'
-            };
-          });
-          results = [...results, ...brandResults];
-        }
-      } catch (err) {
-        console.log('Brandfetch error:', err.message);
+      });
+
+      if (logoDevResults.length > 0) {
+        const filteredLogoDev = logoDevResults.filter(ldr => !results.some(r => r.domain && r.domain.toLowerCase() === ldr.domain.toLowerCase()));
+        results = [...filteredLogoDev, ...results];
       }
+
       searchCache.set(cacheKey, {
         timestamp: Date.now(),
         data: results
@@ -901,7 +937,8 @@ app.get('/api/proxy-image', async (req, res) => {
   }
 
   try {
-    const response = await fetchWithTimeout(targetUrl, {
+    const cleanUrl = migrateSteamUrl(targetUrl);
+    const response = await fetchWithTimeout(cleanUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       }

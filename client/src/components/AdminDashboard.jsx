@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit2, Trash2, Save, X, LayoutDashboard, 
@@ -63,8 +63,8 @@ const MOCK_USERS = [
 const MOCK_MEDIA = [
   { id: 1, name: "YouTube Premium cover", url: "https://www.google.com/s2/favicons?domain=youtube.com&sz=128", date: "2026-05-10" },
   { id: 2, name: "Netflix UHD capsule cover", url: "https://www.google.com/s2/favicons?domain=netflix.com&sz=128", date: "2026-05-12" },
-  { id: 3, name: "Steam Gaming wide capsule", url: "https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg", date: "2026-05-15" },
-  { id: 4, name: "GTA V capsule cover", url: "https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_184x69.jpg", date: "2026-05-18" }
+  { id: 3, name: "Steam Gaming wide capsule", url: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg", date: "2026-05-15" },
+  { id: 4, name: "GTA V capsule cover", url: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/capsule_184x69.jpg", date: "2026-05-18" }
 ];
 
 const DOMAINS = {
@@ -116,40 +116,40 @@ const DOMAINS = {
 };
 
 const GAME_IMGS = {
-  'wwe 2k25': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
-  'wwe bundles': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
-  'forza horizon 5': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_184x69.jpg',
-  'gta v': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_184x69.jpg',
-  'gta trilogy': 'https://cdn.akamai.steamstatic.com/steam/apps/1546930/capsule_184x69.jpg',
-  'spider-man 2': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
-  'spider-man series': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
-  'uncharted': 'https://cdn.akamai.steamstatic.com/steam/apps/1659420/capsule_184x69.jpg',
+  'wwe 2k25': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg',
+  'wwe bundles': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg',
+  'forza horizon 5': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/capsule_184x69.jpg',
+  'gta v': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/capsule_184x69.jpg',
+  'gta trilogy': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1546930/capsule_184x69.jpg',
+  'spider-man 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
+  'spider-man series': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
+  'uncharted': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659420/capsule_184x69.jpg',
   'crimson desert': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=120&auto=format&fit=crop&q=60',
-  'the last of us': 'https://cdn.akamai.steamstatic.com/steam/apps/1888930/capsule_184x69.jpg',
-  'black myth wukong': 'https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_184x69.jpg',
-  'ghost of tsushima': 'https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_184x69.jpg',
-  'elden ring': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg',
-  'resident evil': 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/capsule_184x69.jpg',
-  'hogwarts legacy': 'https://cdn.akamai.steamstatic.com/steam/apps/990080/capsule_184x69.jpg',
-  'god of war': 'https://cdn.akamai.steamstatic.com/steam/apps/1593500/capsule_184x69.jpg',
-  'cyberpunk 2077': 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_184x69.jpg',
-  'pragmata': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg',
-  'assassin\'s creed': 'https://cdn.akamai.steamstatic.com/steam/apps/2208920/capsule_184x69.jpg',
-  'khazan': 'https://cdn.akamai.steamstatic.com/steam/apps/2801450/capsule_184x69.jpg', // Placeholder
-  'f1 24': 'https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_184x69.jpg',
-  'f1 25': 'https://cdn.akamai.steamstatic.com/steam/apps/3059520/capsule_184x69.jpg',
-  'stellar blade': 'https://cdn.akamai.steamstatic.com/steam/apps/3489700/capsule_184x69.jpg',
-  'mafia': 'https://cdn.akamai.steamstatic.com/steam/apps/1030840/capsule_184x69.jpg',
-  'tekken 7': 'https://cdn.akamai.steamstatic.com/steam/apps/389730/capsule_184x69.jpg',
-  'tekken 8': 'https://cdn.akamai.steamstatic.com/steam/apps/1778820/capsule_184x69.jpg',
-  'expedition 33': 'https://cdn.akamai.steamstatic.com/steam/apps/2690040/capsule_184x69.jpg',
-  'red dead redemption': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
-  'hitman': 'https://cdn.akamai.steamstatic.com/steam/apps/1659040/capsule_184x69.jpg',
-  'rockstar pack': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
-  'far cry': 'https://cdn.akamai.steamstatic.com/steam/apps/2369390/capsule_184x69.jpg',
-  'poppy playtime': 'https://cdn.akamai.steamstatic.com/steam/apps/1721470/capsule_184x69.jpg',
-  'minecraft': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg', // placeholder
-  'special steam accounts': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg', // placeholder
+  'the last of us': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/capsule_184x69.jpg',
+  'black myth wukong': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/capsule_184x69.jpg',
+  'ghost of tsushima': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/capsule_184x69.jpg',
+  'elden ring': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_184x69.jpg',
+  'resident evil': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2050650/capsule_184x69.jpg',
+  'hogwarts legacy': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/capsule_184x69.jpg',
+  'god of war': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/capsule_184x69.jpg',
+  'cyberpunk 2077': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/capsule_184x69.jpg',
+  'pragmata': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1240440/capsule_184x69.jpg',
+  'assassin\'s creed': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2208920/capsule_184x69.jpg',
+  'khazan': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2801450/capsule_184x69.jpg', // Placeholder
+  'f1 24': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2488620/capsule_184x69.jpg',
+  'f1 25': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3059520/capsule_184x69.jpg',
+  'stellar blade': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3489700/capsule_184x69.jpg',
+  'mafia': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1030840/capsule_184x69.jpg',
+  'tekken 7': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/389730/capsule_184x69.jpg',
+  'tekken 8': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1778820/capsule_184x69.jpg',
+  'expedition 33': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2690040/capsule_184x69.jpg',
+  'red dead redemption': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg',
+  'hitman': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659040/capsule_184x69.jpg',
+  'rockstar pack': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg',
+  'far cry': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2369390/capsule_184x69.jpg',
+  'poppy playtime': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1721470/capsule_184x69.jpg',
+  'minecraft': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1240440/capsule_184x69.jpg', // placeholder
+  'special steam accounts': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_184x69.jpg', // placeholder
 };
 
 const BRAND_COLORS = {
@@ -222,11 +222,28 @@ const getFavicon = (serviceName) => {
 
 const getGameIcon = (gameName) => {
   if (!gameName) return null;
-  const lowerName = gameName.toLowerCase();
+  const cleanName = gameName.toLowerCase().replace(/[^a-z0-9]/g, '');
   for (let key in GAME_IMGS) {
-    if (lowerName.includes(key)) return GAME_IMGS[key];
+    const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (cleanName.includes(cleanKey) || cleanKey.includes(cleanName)) return GAME_IMGS[key];
   }
   return null;
+};
+
+const highlightMatch = (text, query) => {
+  if (!query || !text) return <span>{text}</span>;
+  const parts = text.split(new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
+  return (
+    <span>
+      {parts.map((part, i) => 
+        part.toLowerCase() === query.toLowerCase() ? (
+          <span key={i} style={{ color: 'var(--color-primary, #6366f1)', fontWeight: '700' }}>{part}</span>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
 };
 
 const DESC_OPTIONS = [
@@ -441,8 +458,8 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
              if (!iconSrc && !editForm.name) return null;
              return (
                <div style={{ 
-                 width: isGaming ? '48px' : '48px', 
-                 height: isGaming ? '64px' : '48px', 
+                 width: isGaming ? '120px' : '48px', 
+                 height: '48px', 
                  borderRadius: isGaming ? '6px' : '8px', 
                  overflow: 'hidden',
                  background: '#222',
@@ -488,8 +505,8 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                  {suggestions.map((s, idx) => (
                     <div key={idx} onClick={() => handleSelect(s)} style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--color-background)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                        <div style={{ 
-                         width: s.type === 'Game' ? '36px' : '36px', 
-                         height: s.type === 'Game' ? '48px' : '36px', 
+                         width: s.type === 'Game' ? '120px' : '36px', 
+                         height: '45px', 
                          borderRadius: '4px', 
                          overflow: 'hidden', 
                          background: '#111', 
@@ -529,7 +546,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                          </div>
                        </div>
                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                          <span style={{ fontWeight: '600' }}>{s.name}</span>
+                          <span style={{ fontWeight: '600' }}>{highlightMatch(s.name, editForm.name || '')}</span>
                           <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{s.domain}</span>
                        </div>
                        <span style={{ fontSize: '10px', padding: '2px 6px', background: s.type === 'Game' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(99, 102, 241, 0.2)', color: s.type === 'Game' ? '#4ade80' : '#818cf8', borderRadius: '4px' }}>{s.type}</span>
@@ -1009,14 +1026,16 @@ export default function AdminDashboard() {
     setApiKey(`sb_live_${randomHex}`);
   };
 
-  const filteredServices = services.filter(s => {
-    const sName = s.name || '';
-    const sCat = s.category || '';
-    const matchesSearch = sName.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
-                          sCat.toLowerCase().includes(debouncedSearch.toLowerCase());
-    const matchesCategory = activeCategoryFilter === 'All' || s.category === activeCategoryFilter;
-    return matchesSearch && matchesCategory;
-  }).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  const filteredServices = useMemo(() => {
+    return services.filter(s => {
+      const sName = s.name || '';
+      const sCat = s.category || '';
+      const matchesSearch = sName.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
+                            sCat.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const matchesCategory = activeCategoryFilter === 'All' || s.category === activeCategoryFilter;
+      return matchesSearch && matchesCategory;
+    }).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  }, [services, debouncedSearch, activeCategoryFilter]);
 
   return (
     <div className="admin-layout-wrapper">
@@ -1716,9 +1735,9 @@ export default function AdminDashboard() {
                                 <div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                                     <div style={{ 
-                                      width: isGamingCategory(s.category) ? '48px' : '48px', 
-                                      height: isGamingCategory(s.category) ? '64px' : '48px', 
-                                      borderRadius: isGamingCategory(s.category) ? '8px' : '12px', 
+                                      width: isGamingCategory(s.category) ? '120px' : '48px', 
+                                      height: '45px', 
+                                      borderRadius: isGamingCategory(s.category) ? '6px' : '12px', 
                                       background: `${s.color}22`, 
                                       border: `1px solid ${s.color}33`, 
                                       display: 'flex', 

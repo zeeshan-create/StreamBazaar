@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
@@ -273,13 +273,31 @@ const GAME_IMGS = {
   'special steam accounts': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg', // placeholder
 };
 const getGameIcon = (label) => {
-  const lowercase = label.toLowerCase();
+  if (!label) return null;
+  const cleanName = label.toLowerCase().replace(/[^a-z0-9]/g, '');
   for (const key in GAME_IMGS) {
-    if (lowercase.includes(key)) {
+    const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (cleanName.includes(cleanKey) || cleanKey.includes(cleanName)) {
       return GAME_IMGS[key];
     }
   }
   return null;
+};
+
+const highlightMatch = (text, query) => {
+  if (!query || !text) return <span>{text}</span>;
+  const parts = text.split(new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
+  return (
+    <span>
+      {parts.map((part, i) => 
+        part.toLowerCase() === query.toLowerCase() ? (
+          <span key={i} style={{ color: 'var(--color-primary, #6366f1)', fontWeight: '700' }}>{part}</span>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
 };
 
 
@@ -301,23 +319,30 @@ const getGamingPlatform = (product) => {
   if (name.includes('epic')) return 'epic';
   if (name.includes('steam')) return 'steam';
 
-  // 3. Check plans (label, duration, quality, description)
+  // 3. Check plans (label, duration, quality, description, supportedDevices)
   if (Array.isArray(product.plans)) {
     for (const plan of product.plans) {
       const label = (plan.label || '').toLowerCase();
       const duration = (plan.duration || '').toLowerCase();
       const quality = (plan.quality || '').toLowerCase();
       const desc = (product.description || '').toLowerCase();
+      const devices = Array.isArray(plan.supportedDevices) 
+        ? plan.supportedDevices.map(d => d.toLowerCase()) 
+        : [];
 
-      if (label.includes('xbox') || duration.includes('xbox') || quality.includes('xbox') || desc.includes('xbox')) return 'xbox';
+      if (label.includes('xbox') || duration.includes('xbox') || quality.includes('xbox') || desc.includes('xbox') ||
+          devices.includes('xbox') || devices.includes('xbox s') || devices.includes('xbox x')) return 'xbox';
       if (label.includes('playstation') || label.includes('ps5') || label.includes('ps4') || label.includes('ps3') || label.includes('ps2') ||
           duration.includes('playstation') || duration.includes('ps5') || duration.includes('ps4') ||
           quality.includes('playstation') || quality.includes('ps5') || quality.includes('ps4') ||
-          desc.includes('playstation') || desc.includes('ps5') || desc.includes('ps4')) {
+          desc.includes('playstation') || desc.includes('ps5') || desc.includes('ps4') ||
+          devices.includes('ps4') || devices.includes('ps5') || devices.includes('playstation') || devices.includes('ps2') || devices.includes('ps3')) {
         return 'playstation';
       }
-      if (label.includes('epic') || duration.includes('epic') || quality.includes('epic') || desc.includes('epic')) return 'epic';
-      if (label.includes('steam') || duration.includes('steam') || quality.includes('steam') || desc.includes('steam')) return 'steam';
+      if (label.includes('epic') || duration.includes('epic') || quality.includes('epic') || desc.includes('epic') ||
+          devices.includes('epic') || devices.includes('epic games')) return 'epic';
+      if (label.includes('steam') || duration.includes('steam') || quality.includes('steam') || desc.includes('steam') ||
+          devices.includes('steam')) return 'steam';
     }
   }
 
@@ -373,10 +398,48 @@ const getGamingPlatformDetails = (product, size = 10) => {
   return {
     label: 'STEAM',
     icon: (
-      <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" style={{ flexShrink: 0 }}>
-        <path d="M12 .002C5.378.002.001 5.378.001 12c0 5.485 3.68 10.113 8.745 11.583l1.834-2.617c-.12-.047-.234-.1-.34-.17a1.996 1.996 0 0 1-1.042-2.196l-3.238-1.57a3.468 3.468 0 0 1-.365-2.072 3.486 3.486 0 1 1 5.568-1.393l3.187 1.545a1.986 1.986 0 0 1 2.894 1.13c.287.97.027 2.016-.677 2.723l1.833 2.616c5.064-1.47 8.745-6.098 8.745-11.583 0-6.622-5.377-11.998-12-11.998zm-7.6 15.485c-.88-.002-1.6-.723-1.6-1.602 0-.882.72-1.602 1.6-1.602.88.002 1.6.723 1.6 1.602 0 .88-.72 1.6-1.6 1.602z"/>
+      <svg viewBox="0 0 16 16" width={Math.round(size * 1.35)} height={Math.round(size * 1.35)} fill="currentColor" style={{ flexShrink: 0 }}>
+        <path d="M.329 10.333A8.01 8.01 0 0 0 7.99 16C12.414 16 16 12.418 16 8s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 7.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 8.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 10.333Z"/>
+        <path d="M4.868 12.683a1.715 1.715 0 0 0 1.318-3.165 1.7 1.7 0 0 0-1.263-.02l1.023.424a1.261 1.261 0 1 1-.97 2.33l-.99-.41a1.7 1.7 0 0 0 .882.84Zm3.726-6.687a2.03 2.03 0 0 0 2.027 2.029 2.03 2.03 0 0 0 2.027-2.029 2.03 2.03 0 0 0-2.027-2.027 2.03 2.03 0 0 0-2.027 2.027m2.03-1.527a1.524 1.524 0 1 1-.002 3.048 1.524 1.524 0 0 1 .002-3.048"/>
       </svg>
     )
+  };
+};
+
+const getPlatformBadgeStyles = (platform, tooDark, effectiveColor) => {
+  const plat = (platform || '').toLowerCase();
+  if (plat === 'steam') {
+    return {
+      border: '1px solid rgba(175, 143, 79, 0.4)',
+      background: 'rgba(175, 143, 79, 0.15)',
+      color: '#af8f4f'
+    };
+  }
+  if (plat === 'playstation') {
+    return {
+      border: '1px solid rgba(175, 143, 79, 0.4)',
+      background: 'rgba(175, 143, 79, 0.15)',
+      color: '#af8f4f'
+    };
+  }
+  if (plat === 'xbox') {
+    return {
+      border: '1px solid rgba(34, 197, 94, 0.4)',
+      background: 'rgba(34, 197, 94, 0.15)',
+      color: '#22c55e'
+    };
+  }
+  if (plat === 'epic') {
+    return {
+      border: '1px solid rgba(0, 120, 242, 0.4)',
+      background: 'rgba(0, 120, 242, 0.15)',
+      color: '#0078f2'
+    };
+  }
+  return {
+    border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, 
+    background: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, 
+    color: tooDark ? '#ff6b00' : effectiveColor
   };
 };
 
@@ -493,6 +556,7 @@ export default function App() {
     fetch(`${API_BASE}/api/plans?v=${cacheBuster}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
+        let gameIdx = 0;
         const formatted = d.map((p, idx) => {
           const lower = p.name.toLowerCase();
           
@@ -504,20 +568,30 @@ export default function App() {
              if (matchedBrand) p.color = BRAND_COLORS[matchedBrand];
           }
 
-          const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
-          const sanitizeColor = (c) => {
-            if (!c) return null;
-            c = c.trim();
-            if (/^[0-9A-Fa-f]{3,6}$/.test(c)) return '#' + c;
-            return c;
-          };
-          const rawColor = sanitizeColor(p.color);
-          const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
-          p.effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : rawColor;
-
           if (!p.category || p.category.trim() === '') {
              const matchedCat = Object.keys(BRAND_CATEGORIES).find(k => lower.includes(k));
              p.category = matchedCat ? BRAND_CATEGORIES[matchedCat] : 'Streaming';
+          }
+
+          const VIBRANT_COLORS = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
+          
+          const isGaming = isGamingCategory(p.category);
+          
+          if (isGaming) {
+            // For gaming products, assign sequential vibrant colors to prevent repeats.
+            // This bypasses the dark red/monotonous database primaryColors which cause repetitive color schemes.
+            p.effectiveColor = VIBRANT_COLORS[gameIdx % VIBRANT_COLORS.length];
+            gameIdx++;
+          } else {
+            const sanitizeColor = (c) => {
+              if (!c) return null;
+              c = c.trim();
+              if (/^[0-9A-Fa-f]{3,6}$/.test(c)) return '#' + c;
+              return c;
+            };
+            const rawColor = sanitizeColor(p.color);
+            const isDarkColor = (c) => !c || ['#000000', '#111111', '#222222', '#333333', '#444444', '#1a1a1a', '#0d0f17', 'black', 'transparent'].includes(c.toLowerCase());
+            p.effectiveColor = isDarkColor(rawColor) ? VIBRANT_COLORS[idx % VIBRANT_COLORS.length] : rawColor;
           }
           
           return p;
@@ -541,12 +615,12 @@ export default function App() {
     // Initial fetch
     fetchPlans();
     
-    // Live polling (15 seconds) for updates when the tab is active in the foreground
+    // Live polling (1.5 seconds) for updates when the tab is active in the foreground
     const interval = setInterval(() => {
       if (!document.hidden) {
         fetchPlans();
       }
-    }, 15000);
+    }, 1500);
     
     // Sync instantly when user tabs back or page becomes visible
     const handleSync = () => {
@@ -568,22 +642,24 @@ export default function App() {
     return () => document.removeEventListener('keydown', handleKey);
   }, [handleKey]);
 
-  const filtered = plans.filter(p => {
-    const q = searchTerm.toLowerCase();
-    const pCat = p.category ? p.category.trim().toLowerCase() : '';
-    const aCat = activeCategory.trim().toLowerCase();
-    
-    const matchSearch = p.name.toLowerCase().includes(q) || pCat.includes(q);
-    const matchCat    = aCat === 'all' || pCat === aCat || (aCat === 'gaming' && isGamingCategory(pCat));
-    return matchSearch && matchCat;
-  }).sort((a, b) => {
-    // Gaming cards always appear last
-    const aIsGaming = isGamingCategory(a.category);
-    const bIsGaming = isGamingCategory(b.category);
-    if (aIsGaming && !bIsGaming) return 1;
-    if (!aIsGaming && bIsGaming) return -1;
-    return 0;
-  });
+  const filtered = useMemo(() => {
+    return plans.filter(p => {
+      const q = searchTerm.toLowerCase();
+      const pCat = p.category ? p.category.trim().toLowerCase() : '';
+      const aCat = activeCategory.trim().toLowerCase();
+      
+      const matchSearch = p.name.toLowerCase().includes(q) || pCat.includes(q);
+      const matchCat    = aCat === 'all' || pCat === aCat || (aCat === 'gaming' && isGamingCategory(pCat));
+      return matchSearch && matchCat;
+    }).sort((a, b) => {
+      // Gaming cards always appear last
+      const aIsGaming = isGamingCategory(a.category);
+      const bIsGaming = isGamingCategory(b.category);
+      if (aIsGaming && !bIsGaming) return 1;
+      if (!aIsGaming && bIsGaming) return -1;
+      return 0;
+    });
+  }, [plans, searchTerm, activeCategory]);
 
   const openPopup = (product, plan) => {
     setPopup({ product, plan, device: null });
@@ -709,20 +785,10 @@ export default function App() {
     if (!config) return null;
     
     return (
-      <span style={{
-        display: 'inline-flex',
-        alignItems: 'center',
+      <span className="product-badge-sharing" style={{
         color: config.color,
         background: config.bg,
-        border: `1px solid ${config.border}`,
-        padding: '2px 8px',
-        borderRadius: '6px',
-        fontSize: '0.65rem',
-        fontWeight: '800',
-        textTransform: 'uppercase',
-        letterSpacing: '0.04em',
-        alignSelf: 'flex-start',
-        lineHeight: 1
+        border: `1px solid ${config.border}`
       }}>
         {config.icon}
         {config.label}
@@ -939,9 +1005,9 @@ export default function App() {
                            }
                         }, 100);
                      }}>
-                       <img src={product.customIcon || getFavicon(product.name)} className="search-result-logo" alt={product.name} />
+                       <img src={product.customIcon || getFavicon(product.name)} className="search-result-logo" style={isGamingCategory(product.category) ? { width: '96px', height: '36px', objectFit: 'cover', borderRadius: '4px' } : {}} alt={product.name} />
                        <div className="search-result-info">
-                         <div className="search-result-name">{product.name}</div>
+                         <div className="search-result-name">{highlightMatch(product.name, searchTerm)}</div>
                          <div className="search-result-price" style={{ color: isColorTooDark(effectiveColor) ? '#ffffff' : effectiveColor, fontWeight: '700' }}>Starts at {formattedPrice}</div>
                        </div>
                      </div>
@@ -1048,9 +1114,11 @@ export default function App() {
                             </div>
                         </div>
                         {(() => {
+                          const platform = getGamingPlatform(product);
                           const platformDetails = getGamingPlatformDetails(product, 12);
+                          const badgeStyle = getPlatformBadgeStyles(platform, tooDarkGame, effectiveColor);
                           return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '0.25rem 0.75rem', borderRadius: '999px', border: `1px solid ${tooDarkGame ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, background: tooDarkGame ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, fontSize: '0.75rem', fontWeight: 700, color: tooDarkGame ? '#ff6b00' : effectiveColor, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '0.25rem 0.75rem', borderRadius: '999px', border: badgeStyle.border, background: badgeStyle.background, fontSize: '0.75rem', fontWeight: 700, color: badgeStyle.color, whiteSpace: 'nowrap', marginTop: '0.5rem', letterSpacing: '0.5px' }}>
                               {platformDetails.icon}
                               {platformDetails.label === 'EPIC' ? 'EPIC GAMES' : platformDetails.label}
                             </div>
@@ -1127,15 +1195,12 @@ export default function App() {
                   }}
                 >
                   {/* Card Header */}
-                  <div className="card-header" style={{ alignItems: isGamingCategory(product.category) ? 'flex-start' : 'center', gap: '0.85rem' }}>
+                  <div className="card-header">
                     <div
-                      className="card-logo-wrap"
+                      className={`card-logo-wrap ${isGamingCategory(product.category) ? 'gaming-logo-wrap' : ''}`}
                       style={{ 
                         background: tooDark ? 'rgba(255, 107, 0, 0.05)' : `${effectiveColor}18`, 
                         border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.2)' : `${effectiveColor}30`}`,
-                        width: isGamingCategory(product.category) ? '65px' : '52px',
-                        height: isGamingCategory(product.category) ? '86px' : '52px',
-                        borderRadius: isGamingCategory(product.category) ? '10px' : '14px',
                         boxShadow: isGamingCategory(product.category) ? '0 4px 12px rgba(0,0,0,0.3)' : 'none'
                       }}
                     >
@@ -1154,14 +1219,14 @@ export default function App() {
                               height: '100%',
                               objectFit: isGaming ? 'cover' : 'contain',
                               padding: isGaming ? '0' : '4px',
-                              borderRadius: isGaming ? '10px' : '8px'
+                              borderRadius: isGaming ? '6px' : '8px'
                             }}
                              onError={(e) => {
                                if (!e.target.dataset.triedProxy) {
                                  e.target.dataset.triedProxy = 'true';
                                  e.target.src = getProxiedUrl(imgUrl);
                                  return;
-                               }
+                                }
                                if (imgUrl === product.customIcon) {
                                  const fallback = isGaming ? (product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : getFavicon(product.name);
                                  if (fallback && fallback !== product.customIcon) {
@@ -1180,70 +1245,60 @@ export default function App() {
                       })()}
                     </div>
                     <div className="card-title-area">
-                      <div 
-                        className="card-name"
-                        style={{
-                          whiteSpace: isGamingCategory(product.category) ? 'normal' : 'nowrap',
-                          lineHeight: isGamingCategory(product.category) ? '1.2' : 'inherit',
-                          fontSize: isGamingCategory(product.category) ? '1.02rem' : '1.1rem'
-                        }}
-                      >
-                        {product.name}
-                        {product.status && product.status !== 'Available' && (
-                          <span className="status-badge-inline" style={{ 
-                            background: product.status === 'Coming Soon' ? '#fbbf2422' : '#ef444422',
-                            color: product.status === 'Coming Soon' ? '#fbbf24' : '#ef4444',
-                            border: `1px solid ${product.status === 'Coming Soon' ? '#fbbf2444' : '#ef444444'}`
-                          }}>
-                            {product.status}
-                          </span>
-                        )}
+                      <div className="card-name-row">
+                        <div className="card-name">
+                          {product.name}
+                          {product.status && product.status !== 'Available' && product.status.toLowerCase() !== 'out of stock' && product.status.toLowerCase() !== 'coming soon' && (
+                            <span className="status-badge-inline" style={{ 
+                              background: product.status === 'Coming Soon' ? '#fbbf2422' : '#ef444422',
+                              color: product.status === 'Coming Soon' ? '#fbbf24' : '#ef4444',
+                              border: `1px solid ${product.status === 'Coming Soon' ? '#fbbf2444' : '#ef444444'}`
+                            }}>
+                              {product.status}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="card-desc" style={{ marginTop: isGamingCategory(product.category) ? '0.2rem' : '0.1rem', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+
+                      <div className="card-badges-row">
+                        {(() => {
+                          if (isGamingCategory(product.category)) {
+                            const platform = getGamingPlatform(product);
+                            const platformDetails = getGamingPlatformDetails(product, 10);
+                            const badgeStyle = getPlatformBadgeStyles(platform, tooDark, effectiveColor);
+                            return (
+                              <div
+                                className="card-badge-platform"
+                                style={badgeStyle}
+                              >
+                                {platformDetails.icon}
+                                {platformDetails.label === 'EPIC' ? 'EPIC' : platformDetails.label}
+                              </div>
+                            );
+                          }
+                          return (
+                            <span
+                              className="card-badge"
+                              style={{ 
+                                background: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}18`), 
+                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.3)' : `${effectiveColor}30`)}` 
+                              }}
+                            >
+                              {product.category ? product.category.toUpperCase() : 'STREAMING'}
+                            </span>
+                          );
+                        })()}
+
                         {renderProductTypeBadge(product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : ''), product.category)}
+                      </div>
+
+                      <div className="card-desc">
                         <span style={{ color: 'var(--text-mid)', fontSize: '0.78rem', lineHeight: '1.4' }}>
                           {product.description || (isGamingCategory(product.category) ? 'Offline PC Access.' : '')}
                         </span>
                       </div>
                     </div>
-                    {(() => {
-                      if (isGamingCategory(product.category)) {
-                        const platformDetails = getGamingPlatformDetails(product, 10);
-                        return (
-                          <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '3px', 
-                            padding: '0.2rem 0.5rem', 
-                            borderRadius: '50px', 
-                            border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.3)' : `${effectiveColor}40`}`, 
-                            background: tooDark ? 'rgba(255, 107, 0, 0.1)' : `${effectiveColor}15`, 
-                            fontSize: '0.65rem', 
-                            fontWeight: 700, 
-                            color: tooDark ? '#ff6b00' : effectiveColor, 
-                            whiteSpace: 'nowrap', 
-                            letterSpacing: '0.5px', 
-                            alignSelf: 'flex-start', 
-                            marginTop: '2px' 
-                          }}>
-                            {platformDetails.icon}
-                            {platformDetails.label === 'EPIC' ? 'EPIC' : platformDetails.label}
-                          </div>
-                        );
-                      }
-                      return (
-                        <span
-                          className="card-badge"
-                          style={{ 
-                            background: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}18`), 
-                            color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
-                            border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.3)' : `${effectiveColor}30`)}` 
-                          }}
-                        >
-                          {product.category ? product.category.toUpperCase() : 'STREAMING'}
-                        </span>
-                      );
-                    })()}
                   </div>
 
                   {/* Plans */}
@@ -1306,7 +1361,11 @@ export default function App() {
                                       : `0 2px 10px ${effectiveColor}30`)
                               }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</span>
                             <motion.span
-                              className={`plan-row-buy ${product.status && product.status !== 'Available' ? 'disabled' : ''}`}
+                              className={`plan-row-buy ${
+                                product.status && product.status !== 'Available'
+                                  ? ((product.status.toLowerCase() === 'out of stock' || product.status.toLowerCase() === 'coming soon') ? 'oos-glowing' : 'disabled')
+                                  : ''
+                              }`}
                               style={{ 
                                 border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.45)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.45)' : `${effectiveColor}50`)}`, 
                                 color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor) 
@@ -1597,7 +1656,7 @@ export default function App() {
                       alt={popup.product.name}
                       className="popup-logo"
                       onError={() => setImgErr(p => ({ ...p, [`popup-${popup.product.name}`]: true }))}
-                      style={isGaming ? { width: '48px', height: '64px', objectFit: 'cover', borderRadius: '8px' } : { width: '48px', height: '48px', objectFit: 'contain' }}
+                       style={isGaming ? { width: '120px', height: '45px', objectFit: 'cover', borderRadius: '6px' } : { width: '48px', height: '48px', objectFit: 'contain' }}
                     />
                   );
                 })()}
