@@ -2,7 +2,10 @@
 
 // ── CUSTOM ICON OVERRIDES ──────────────────────────────────────────────────
 export const CUSTOM_ICONS = {
-  'hoichoi': 'https://image.hoichoicdn.com/unsafe/036eddfd1906-4e4a-863b-3ae0a06796de-hoichoi_Gradient_Logo.svg'
+  'hoichoi': 'https://image.hoichoicdn.com/unsafe/036eddfd1906-4e4a-863b-3ae0a06796de-hoichoi_Gradient_Logo.svg',
+  'discovery plus': 'https://upload.wikimedia.org/wikipedia/commons/6/61/Discovery_Plus_logo.svg',
+  'discovery+': 'https://upload.wikimedia.org/wikipedia/commons/6/61/Discovery_Plus_logo.svg',
+  'discovery': 'https://upload.wikimedia.org/wikipedia/commons/6/61/Discovery_Plus_logo.svg'
 };
 
 // ── GAME COVER IMAGES ──────────────────────────────────────────────────────
