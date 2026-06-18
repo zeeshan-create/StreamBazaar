@@ -10,6 +10,14 @@ import {
 import { Link } from 'react-router-dom';
 import { Vibrant } from 'node-vibrant/browser';
 import '../App.css';
+import { 
+  getFavicon, 
+  getGameIcon, 
+  isGamingCategory, 
+  getDomainFromUrl,
+  BRAND_CATEGORIES,
+  BRAND_COLORS
+} from '../utils/logoHelper';
 
 const API_BASE = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
 
@@ -67,168 +75,6 @@ const MOCK_MEDIA = [
   { id: 4, name: "GTA V capsule cover", url: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/capsule_184x69.jpg", date: "2026-05-18" }
 ];
 
-const DOMAINS = {
-  'netflix': 'netflix.com',
-  'youtube': 'youtube.com',
-  'amazon': 'primevideo.com',
-  'prime': 'primevideo.com',
-  'hotstar': 'hotstar.com',
-  'jio hotstar': 'hotstar.com',
-  'jio': 'jiocinema.com',
-  'jiocinema': 'jiocinema.com',
-  'sony': 'sonyliv.com',
-  'sonyliv': 'sonyliv.com',
-  'zee5': 'zee5.com',
-  'chatgpt': 'openai.com',
-  'claude': 'anthropic.com',
-  'canva': 'canva.com',
-  'spotify': 'spotify.com',
-  'crunchyroll': 'crunchyroll.com',
-  'discord': 'discord.com',
-  'disney': 'disneyplus.com',
-  'hoichoi': 'hoichoi.tv',
-  'discovery plus': 'discoveryplus.in',
-  'discovery': 'discoveryplus.in',
-  'airtel xstream': 'airtelxstream.in',
-  'airtel': 'airtelxstream.in',
-  'iptv': 'iptv-org.github.io',
-  'ullu': 'ullu.app',
-  'aha': 'aha.video',
-  'altbalaji': 'altt.co.in',
-  'voot': 'voot.com',
-  'sun nxt': 'sunnxt.com',
-  'sunnxt': 'sunnxt.com',
-  'lionsgate': 'lionsgateplay.com',
-  'epic on': 'epicon.in',
-  'eros now': 'erosnow.com',
-  'nord vpn': 'nordvpn.com',
-  'nordvpn': 'nordvpn.com',
-  'nord': 'nordvpn.com',
-  'surfshark': 'surfshark.com',
-  'express vpn': 'expressvpn.com',
-  'expressvpn': 'expressvpn.com',
-  'vpn': 'nordvpn.com',
-  'epic': 'epicgames.com',
-  'server': 'digitalocean.com',
-  'stream server': 'plex.tv',
-  'ott': 'netflix.com',
-  'kaspersky': 'kaspersky.com'
-};
-
-const GAME_IMGS = {
-  'wwe 2k25': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg',
-  'wwe bundles': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg',
-  'forza horizon 5': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/capsule_184x69.jpg',
-  'gta v': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/capsule_184x69.jpg',
-  'gta trilogy': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1546930/capsule_184x69.jpg',
-  'spider-man 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
-  'spider-man series': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
-  'uncharted': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659420/capsule_184x69.jpg',
-  'crimson desert': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=120&auto=format&fit=crop&q=60',
-  'the last of us': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/capsule_184x69.jpg',
-  'black myth wukong': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/capsule_184x69.jpg',
-  'ghost of tsushima': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/capsule_184x69.jpg',
-  'elden ring': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_184x69.jpg',
-  'resident evil': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2050650/capsule_184x69.jpg',
-  'hogwarts legacy': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/capsule_184x69.jpg',
-  'god of war': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/capsule_184x69.jpg',
-  'cyberpunk 2077': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/capsule_184x69.jpg',
-  'pragmata': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1240440/capsule_184x69.jpg',
-  'assassin\'s creed': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2208920/capsule_184x69.jpg',
-  'khazan': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2801450/capsule_184x69.jpg', // Placeholder
-  'f1 24': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2488620/capsule_184x69.jpg',
-  'f1 25': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3059520/capsule_184x69.jpg',
-  'stellar blade': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3489700/capsule_184x69.jpg',
-  'mafia': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1030840/capsule_184x69.jpg',
-  'tekken 7': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/389730/capsule_184x69.jpg',
-  'tekken 8': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1778820/capsule_184x69.jpg',
-  'expedition 33': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2690040/capsule_184x69.jpg',
-  'red dead redemption': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg',
-  'hitman': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659040/capsule_184x69.jpg',
-  'rockstar pack': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg',
-  'far cry': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2369390/capsule_184x69.jpg',
-  'poppy playtime': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1721470/capsule_184x69.jpg',
-  'minecraft': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1240440/capsule_184x69.jpg', // placeholder
-  'special steam accounts': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_184x69.jpg', // placeholder
-};
-
-const BRAND_COLORS = {
-  'netflix': '#e50914',
-  'youtube': '#ff0000',
-  'amazon': '#00a8e1',
-  'prime': '#00a8e1',
-  'hotstar': '#030b14',
-  'jio hotstar': '#030b14',
-  'sony': '#df1827',
-  'sonyliv': '#df1827',
-  'zee5': '#8224e3',
-  'chatgpt': '#10a37f',
-  'claude': '#d97757',
-  'canva': '#00c4cc',
-  'spotify': '#1db954',
-  'discord': '#5865f2',
-  'nordvpn': '#4687ff',
-  'surfshark': '#00d6aa'
-};
-
-const BRAND_CATEGORIES = {
-  'netflix': 'Streaming',
-  'youtube': 'Streaming',
-  'amazon': 'Streaming',
-  'prime': 'Streaming',
-  'hotstar': 'Streaming',
-  'jio hotstar': 'Streaming',
-  'sony': 'Streaming',
-  'sonyliv': 'Streaming',
-  'zee5': 'Streaming',
-  'chatgpt': 'AI+',
-  'claude': 'AI+',
-  'canva': 'AI+',
-  'spotify': 'Streaming',
-  'nordvpn': 'VPN',
-  'surfshark': 'VPN',
-  'iptv': 'Streaming',
-  'hoichoi': 'Streaming'
-};
-
-const CUSTOM_ICONS = {
-  'airtel': 'https://icon.horse/icon/airtelxstream.in',
-  'discovery': 'https://icon.horse/icon/discoveryplus.in'
-};
-
-const getFavicon = (serviceName) => {
-  if (!serviceName) return null;
-  const lowerName = serviceName.toLowerCase().trim();
-  
-  const matchedCustom = Object.keys(CUSTOM_ICONS).find(k => lowerName.includes(k));
-  if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
-
-  const matchedKey = Object.keys(DOMAINS).find(key => lowerName.includes(key));
-  let domain;
-  if (matchedKey) {
-    domain = DOMAINS[matchedKey];
-  } else {
-    domain = `${lowerName.split(' ')[0].replace(/[^a-z0-9]/g, '')}.com`;
-  }
-
-  // Use Logo.dev CDN if a token is configured
-  const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-  if (token) {
-    return `https://img.logo.dev/${domain}?token=${token}`;
-  }
-
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
-};
-
-const getGameIcon = (gameName) => {
-  if (!gameName) return null;
-  const cleanName = gameName.toLowerCase().replace(/[^a-z0-9]/g, '');
-  for (let key in GAME_IMGS) {
-    const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (cleanName.includes(cleanKey) || cleanKey.includes(cleanName)) return GAME_IMGS[key];
-  }
-  return null;
-};
 
 const highlightMatch = (text, query) => {
   if (!query || !text) return <span>{text}</span>;
@@ -270,11 +116,7 @@ const DURATION_OPTIONS = [
 const PLATFORMS = ['TV', 'PC', 'iOS', 'Android', 'Laptop', 'PS2', 'PS3', 'PS4', 'PS5', 'Xbox', 'Xbox S', 'Xbox X'];
 
 
-const isGamingCategory = (cat) => {
-  if (!cat) return false;
-  const c = cat.toLowerCase().trim();
-  return c === 'gaming' || c === 'steam' || c === 'playstation' || c === 'xbox' || c === 'epic' || c === 'steam gaming' || c === 'games' || c === 'game' || c.includes('gaming') || c.includes('game');
-};
+
 
 const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
   const [dragActive, setDragActive] = React.useState(false);
@@ -454,7 +296,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
           {(() => {
              const isGaming = isGamingCategory(editForm.category);
-             const iconSrc = editForm.customIcon || (isGaming ? (getGameIcon(editForm.name) || getFavicon(editForm.name)) : getFavicon(editForm.name));
+             const iconSrc = getFavicon(editForm.name, editForm.customIcon);
              if (!iconSrc && !editForm.name) return null;
              return (
                <div style={{ 
@@ -474,18 +316,15 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                      src={iconSrc} style={{ width: '100%', height: '100%', objectFit: isGaming ? 'cover' : 'contain', padding: isGaming ? '0' : '4px' }} 
                      alt="Preview" 
                      onError={(e) => {
+                       if (e.target.src.includes('clearbit.com')) {
+                         const domain = getDomainFromUrl(e.target.src);
+                         e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                         return;
+                       }
                        if (!e.target.dataset.triedProxy) {
                          e.target.dataset.triedProxy = 'true';
                          e.target.src = getProxiedUrl(iconSrc);
                          return;
-                       }
-                       if (iconSrc === editForm.customIcon) {
-                         const fallback = isGaming ? (getGameIcon(editForm.name) || getFavicon(editForm.name)) : getFavicon(editForm.name);
-                         if (fallback && fallback !== editForm.customIcon) {
-                           e.target.src = fallback;
-                           e.target.dataset.triedProxy = '';
-                           return;
-                         }
                        }
                        setImgError(true);
                      }}
@@ -1748,22 +1587,18 @@ export default function AdminDashboard() {
                                     }}>
                                       {isGamingCategory(s.category) ? (
                                         <img 
-                                          src={s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name)} 
+                                          src={s.plans?.[0]?.image || getFavicon(s.name, s.customIcon)} 
                                           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                           onError={(e) => {
-                                            const direct = s.customIcon || s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name);
-                                            if (!e.target.dataset.triedProxy) {
-                                              e.target.dataset.triedProxy = 'true';
-                                              e.target.src = getProxiedUrl(direct);
+                                            if (e.target.src.includes('clearbit.com')) {
+                                              const domain = getDomainFromUrl(e.target.src);
+                                              e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
                                               return;
                                             }
-                                            if (s.customIcon) {
-                                              const fallback = s.plans?.[0]?.image || getGameIcon(s.name) || getFavicon(s.name);
-                                              if (fallback && fallback !== s.customIcon) {
-                                                e.target.src = fallback;
-                                                e.target.dataset.triedProxy = '';
-                                                return;
-                                              }
+                                            if (!e.target.dataset.triedProxy) {
+                                              e.target.dataset.triedProxy = 'true';
+                                              e.target.src = getProxiedUrl(e.target.src);
+                                              return;
                                             }
                                             e.target.style.display = 'none'; 
                                             e.target.nextSibling.style.display = 'block'; 
@@ -1771,22 +1606,18 @@ export default function AdminDashboard() {
                                         />
                                       ) : (
                                         <img 
-                                          src={s.customIcon || getFavicon(s.name)} 
+                                          src={getFavicon(s.name, s.customIcon)} 
                                           style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} 
                                           onError={(e) => {
-                                            const direct = s.customIcon || getFavicon(s.name);
-                                            if (!e.target.dataset.triedProxy) {
-                                              e.target.dataset.triedProxy = 'true';
-                                              e.target.src = getProxiedUrl(direct);
+                                            if (e.target.src.includes('clearbit.com')) {
+                                              const domain = getDomainFromUrl(e.target.src);
+                                              e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
                                               return;
                                             }
-                                            if (s.customIcon) {
-                                              const fallback = getFavicon(s.name);
-                                              if (fallback && fallback !== s.customIcon) {
-                                                e.target.src = fallback;
-                                                e.target.dataset.triedProxy = '';
-                                                return;
-                                              }
+                                            if (!e.target.dataset.triedProxy) {
+                                              e.target.dataset.triedProxy = 'true';
+                                              e.target.src = getProxiedUrl(e.target.src);
+                                              return;
                                             }
                                             e.target.style.display = 'none'; 
                                             e.target.nextSibling.style.display = 'block'; 

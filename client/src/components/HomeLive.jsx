@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import "../App.css";
+import { 
+  getFavicon, 
+  getGameIcon, 
+  getDomainFromUrl 
+} from "../utils/logoHelper";
 
 // ── CONFIG & CONSTANTS ────────────────────────────────────────────────────────
 
@@ -12,135 +17,6 @@ const getProxiedUrl = (url) => {
   if (url.startsWith("data:")) return url;
   if (url.startsWith("/") || url.startsWith("http://localhost") || url.startsWith("https://streambazaar")) return url;
   return `${API_BASE}/api/proxy-image?url=${encodeURIComponent(url)}`;
-};
-
-const DOMAINS = {
-  "youtube premium": "youtube.com",
-  "youtube music": "music.youtube.com",
-  "youtube": "youtube.com",
-  "sony liv": "sonyliv.com",
-  "sony": "sonyliv.com",
-  "sonyliv": "sonyliv.com",
-  "netflix": "netflix.com",
-  "amazon prime": "primevideo.com",
-  "amazon": "primevideo.com",
-  "prime": "primevideo.com",
-  "hoichoi tv": "hoichoi.tv",
-  "hoichoi": "hoichoi.tv",
-  "discovery plus": "discoveryplus.com",
-  "discovery": "discoveryplus.com",
-  "airtel xstream": "airtelxstream.in",
-  "airtel": "airtelxstream.in",
-  "apple music": "music.apple.com",
-  "apple tv+": "tv.apple.com",
-  "spotify premium": "spotify.com",
-  "spotify": "spotify.com",
-  "linkedin premium": "linkedin.com",
-  "adobe creative": "adobe.com",
-  "google one": "one.google.com",
-  "jio hotstar": "jiohotstar.com",
-  "jio": "jiocinema.com",
-  "jiocinema": "jiocinema.com",
-  "zee5": "zee5.com",
-  "surfshark vpn": "surfshark.com",
-  "surfshark": "surfshark.com",
-  "nordvpn": "nordvpn.com",
-  "nord": "nordvpn.com",
-  "steam gaming": "store.steampowered.com",
-  "steam": "store.steampowered.com",
-  "playstation": "playstation.com",
-  "microsoft copilot": "microsoft.com",
-  "chatgpt plus": "openai.com",
-  "chatgpt": "openai.com",
-  "claude ai": "claude.ai",
-  "claude": "anthropic.com",
-  "canva pro": "canva.com",
-  "canva": "canva.com",
-  "picsart pro": "picsart.com",
-  "envato elements": "elements.envato.com",
-  "grok ai": "x.ai",
-  "elevenlabs": "elevenlabs.io",
-  "iptv": "iptvsmarters.com",
-  "lionsgate play": "lionsgateplay.com",
-  "lionsgate": "lionsgateplay.com",
-  "crunchy roll": "crunchyroll.com",
-  "crunchyroll": "crunchyroll.com",
-  "ullu": "ullu.app",
-  "aha": "aha.video",
-  "altbalaji": "altt.co.in",
-  "voot": "voot.com",
-  "sun nxt": "sunnxt.com",
-  "sunnxt": "sunnxt.com",
-  "epic on": "epicon.in",
-  "eros now": "erosnow.com",
-  "kaspersky": "kaspersky.com",
-  "express vpn": "expressvpn.com",
-  "expressvpn": "expressvpn.com",
-  "vpn": "nordvpn.com",
-  "epic": "epicgames.com",
-  "server": "digitalocean.com",
-  "stream server": "plex.tv",
-  "ott": "netflix.com"
-};
-
-const GAME_IMGS = {
-  "wwe 2k25": "https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg",
-  "wwe bundles": "https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg",
-  "forza horizon 5": "https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_184x69.jpg",
-  "gta v": "https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_184x69.jpg",
-  "gta trilogy": "https://cdn.akamai.steamstatic.com/steam/apps/1546930/capsule_184x69.jpg",
-  "spider-man 2": "https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg",
-  "spider-man series": "https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg",
-  "uncharted": "https://cdn.akamai.steamstatic.com/steam/apps/1659420/capsule_184x69.jpg",
-  "the last of us": "https://cdn.akamai.steamstatic.com/steam/apps/1888930/capsule_184x69.jpg",
-  "black myth wukong": "https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_184x69.jpg",
-  "ghost of tsushima": "https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_184x69.jpg",
-  "elden ring": "https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg",
-  "resident evil": "https://cdn.akamai.steamstatic.com/steam/apps/2050650/capsule_184x69.jpg",
-  "hogwarts legacy": "https://cdn.akamai.steamstatic.com/steam/apps/990080/capsule_184x69.jpg",
-  "god of war": "https://cdn.akamai.steamstatic.com/steam/apps/1593500/capsule_184x69.jpg",
-  "cyberpunk 2077": "https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_184x69.jpg",
-  "pragmata": "https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg",
-  "assassin's creed": "https://cdn.akamai.steamstatic.com/steam/apps/2208920/capsule_184x69.jpg",
-  "f1 24": "https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_184x69.jpg",
-  "f1 25": "https://cdn.akamai.steamstatic.com/steam/apps/3059520/capsule_184x69.jpg",
-  "stellar blade": "https://cdn.akamai.steamstatic.com/steam/apps/3489700/capsule_184x69.jpg",
-  "mafia": "https://cdn.akamai.steamstatic.com/steam/apps/1030840/capsule_184x69.jpg",
-  "tekken 7": "https://cdn.akamai.steamstatic.com/steam/apps/389730/capsule_184x69.jpg",
-  "tekken 8": "https://cdn.akamai.steamstatic.com/steam/apps/1778820/capsule_184x69.jpg",
-  "expedition 33": "https://cdn.akamai.steamstatic.com/steam/apps/2690040/capsule_184x69.jpg",
-  "red dead redemption": "https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg",
-  "hitman": "https://cdn.akamai.steamstatic.com/steam/apps/1659040/capsule_184x69.jpg",
-  "far cry": "https://cdn.akamai.steamstatic.com/steam/apps/2369390/capsule_184x69.jpg",
-  "poppy playtime": "https://cdn.akamai.steamstatic.com/steam/apps/1721470/capsule_184x69.jpg"
-};
-
-const getGameIcon = (gameName) => {
-  if (!gameName) return null;
-  const cleanName = gameName.toLowerCase().replace(/[^a-z0-9]/g, '');
-  for (let key in GAME_IMGS) {
-    const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (cleanName.includes(cleanKey) || cleanKey.includes(cleanName)) return GAME_IMGS[key];
-  }
-  return null;
-};
-
-const getFavicon = (serviceName) => {
-  if (!serviceName) return null;
-  const lowerName = serviceName.toLowerCase().trim();
-  const gameIcon = getGameIcon(serviceName);
-  if (gameIcon) return gameIcon;
-
-  let domain = DOMAINS[lowerName];
-  if (!domain) {
-    domain = `${lowerName.replace(/[^a-z0-9]/g, "")}.com`;
-  }
-
-  const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-  if (token) {
-    return `https://img.logo.dev/${domain}?token=${token}`;
-  }
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
 };
 
 const getProfileBadgeDetails = (desc) => {
@@ -434,10 +310,22 @@ export default function HomeLive() {
                 {(() => {
                   const inlineLogo = getInlineLogo(popup.product.name);
                   if (inlineLogo) return inlineLogo;
-                  const isGaming = popup.product.category === "Gaming";
-                  const imgUrl = popup.product.originalProduct?.customIcon || (isGaming ? getGameIcon(popup.product.name) : null) || getFavicon(popup.product.name);
+                   const isGaming = popup.product.category === "Gaming";
+                  const imgUrl = getFavicon(popup.product.name, popup.product.originalProduct?.customIcon);
                   if (imgUrl) {
-                    return <img src={getProxiedUrl(imgUrl)} alt="" style={{ width: "100%", height: "100%", objectFit: isGaming ? "cover" : "contain", padding: isGaming ? "0" : "4px" }} />;
+                    return (
+                      <img 
+                        src={getProxiedUrl(imgUrl)} 
+                        alt="" 
+                        onError={(e) => {
+                          if (e.target.src.includes('clearbit.com')) {
+                            const domain = getDomainFromUrl(e.target.src);
+                            e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                          }
+                        }}
+                        style={{ width: "100%", height: "100%", objectFit: isGaming ? "cover" : "contain", padding: isGaming ? "0" : "4px" }} 
+                      />
+                    );
                   }
                   return <span style={{ fontSize: 20, color: popup.product.accent, fontWeight: "bold" }}>{popup.product.name[0]}</span>;
                 })()}
@@ -525,7 +413,7 @@ function ProductCard({ p, openPopup }) {
             if (inlineLogo) return inlineLogo;
 
             const isGaming = p.category === "Gaming";
-            const imgUrl = p.originalProduct?.customIcon || (isGaming ? getGameIcon(p.name) : null) || getFavicon(p.name);
+            const imgUrl = getFavicon(p.name, p.originalProduct?.customIcon);
 
             if (imgUrl) {
               return (
@@ -539,6 +427,11 @@ function ProductCard({ p, openPopup }) {
                     padding: isGaming ? "0" : "4px"
                   }}
                   onError={(e) => {
+                    if (e.target.src.includes('clearbit.com')) {
+                      const domain = getDomainFromUrl(e.target.src);
+                      e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                      return;
+                    }
                     e.target.style.display = "none";
                     e.target.nextSibling.style.display = "flex";
                   }}

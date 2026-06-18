@@ -10,6 +10,17 @@ import {
 import '../App.css';
 import ChatWidget from '../ChatWidget';
 import FomoToast from './FomoToast';
+import { 
+  getFavicon, 
+  getGameIcon, 
+  isGamingCategory, 
+  getDomainFromUrl,
+  DOMAINS, 
+  BRAND_COLORS, 
+  BRAND_CATEGORIES, 
+  GAME_IMGS 
+} from '../utils/logoHelper';
+
 
 const isColorTooDark = (c) => {
   if (!c) return true;
@@ -77,12 +88,6 @@ const getProxiedUrl = (url) => {
   return `${API_BASE}/api/proxy-image?url=${encodeURIComponent(url)}`;
 };
 
-const isGamingCategory = (cat) => {
-  if (!cat) return false;
-  const c = cat.toLowerCase().trim();
-  return c === 'gaming' || c === 'steam' || c === 'playstation' || c === 'xbox' || c === 'epic' || c === 'steam gaming' || c === 'games' || c === 'game' || c.includes('gaming') || c.includes('game');
-};
-
 const renderPlaceholder = (name, isGaming, color) => {
   const firstLetter = name ? name.trim().charAt(0).toUpperCase() : '?';
   const accentColor = color || '#6366f1';
@@ -111,178 +116,7 @@ const renderPlaceholder = (name, isGaming, color) => {
   );
 };
 
-const DOMAINS = {
-  'youtube premium': 'youtube.com',
-  'youtube music': 'music.youtube.com',
-  'youtube': 'youtube.com',
-  'sony liv': 'sonyliv.com',
-  'sony': 'sonyliv.com',
-  'sonyliv': 'sonyliv.com',
-  'netflix': 'netflix.com',
-  'amazon prime': 'primevideo.com',
-  'amazon': 'primevideo.com',
-  'prime': 'primevideo.com',
-  'hoichoi tv': 'hoichoi.tv',
-  'hoichoi': 'hoichoi.tv',
-  'discovery plus': 'discoveryplus.com',
-  'discovery': 'discoveryplus.com',
-  'airtel xstream': 'airtelxstream.in',
-  'airtel': 'airtelxstream.in',
-  'apple music': 'music.apple.com',
-  'apple tv+': 'tv.apple.com',
-  'spotify premium': 'spotify.com',
-  'spotify': 'spotify.com',
-  'linkedin premium': 'linkedin.com',
-  'adobe creative': 'adobe.com',
-  'google one': 'one.google.com',
-  'jio hotstar': 'jiohotstar.com',
-  'jio': 'jiocinema.com',
-  'jiocinema': 'jiocinema.com',
-  'zee5': 'zee5.com',
-  'surfshark vpn': 'surfshark.com',
-  'surfshark': 'surfshark.com',
-  'nordvpn': 'nordvpn.com',
-  'nord': 'nordvpn.com',
-  'steam gaming': 'store.steampowered.com',
-  'steam': 'store.steampowered.com',
-  'playstation': 'playstation.com',
-  'microsoft copilot': 'microsoft.com',
-  'chatgpt plus': 'openai.com',
-  'chatgpt': 'openai.com',
-  'claude ai': 'claude.ai',
-  'claude': 'anthropic.com',
-  'canva pro': 'canva.com',
-  'canva': 'canva.com',
-  'picsart pro': 'picsart.com',
-  'envato elements': 'elements.envato.com',
-  'grok ai': 'x.ai',
-  'elevenlabs': 'elevenlabs.io',
-  'iptv': 'iptvsmarters.com',
-  'lionsgate play': 'lionsgateplay.com',
-  'lionsgate': 'lionsgateplay.com',
-  'crunchy roll': 'crunchyroll.com',
-  'crunchyroll': 'crunchyroll.com',
-  'ullu': 'ullu.app',
-  'aha': 'aha.video',
-  'altbalaji': 'altt.co.in',
-  'voot': 'voot.com',
-  'sun nxt': 'sunnxt.com',
-  'sunnxt': 'sunnxt.com',
-  'epic on': 'epicon.in',
-  'eros now': 'erosnow.com',
-  'kaspersky': 'kaspersky.com',
-  'express vpn': 'expressvpn.com',
-  'expressvpn': 'expressvpn.com',
-  'vpn': 'nordvpn.com',
-  'epic': 'epicgames.com',
-  'server': 'digitalocean.com',
-  'stream server': 'plex.tv',
-  'ott': 'netflix.com'
-};
 
-const BRAND_COLORS = {
-  'netflix': '#e50914',
-  'youtube': '#ff0000',
-  'amazon': '#00a8e1',
-  'prime': '#00a8e1',
-  'hotstar': '#030b14',
-  'jio hotstar': '#030b14',
-  'jio': '#c5286e',
-  'jiocinema': '#c5286e',
-  'sony': '#df1827',
-  'sonyliv': '#df1827',
-  'zee5': '#8224e3',
-  'chatgpt': '#10a37f',
-  'claude': '#d97757',
-  'canva': '#00c4cc',
-  'spotify': '#1db954',
-  'discord': '#5865f2',
-  'discovery': '#0f4ff5',
-  'airtel': '#ff0000',
-  'lionsgate': '#f5ce38',
-  'aha': '#ff6d00',
-  'ullu': '#eeb914',
-  'nord': '#4687ff',
-  'nordvpn': '#4687ff',
-  'surfshark': '#00d6aa'
-};
-
-const BRAND_CATEGORIES = {
-  'netflix': 'Streaming',
-  'youtube': 'Streaming',
-  'amazon': 'Streaming',
-  'prime': 'Streaming',
-  'hotstar': 'Streaming',
-  'jio hotstar': 'Streaming',
-  'jio': 'Streaming',
-  'jiocinema': 'Streaming',
-  'sony': 'Streaming',
-  'sonyliv': 'Streaming',
-  'zee5': 'Streaming',
-  'chatgpt': 'AI+',
-  'claude': 'AI+',
-  'canva': 'AI+',
-  'spotify': 'Streaming',
-  'discord': 'AI+',
-  'discovery': 'Streaming',
-  'airtel': 'Streaming',
-  'lionsgate': 'Streaming',
-  'aha': 'Streaming',
-  'ullu': 'Streaming',
-  'nord': 'VPN',
-  'nordvpn': 'VPN',
-  'surfshark': 'VPN',
-  'iptv': 'Streaming',
-  'hoichoi': 'Streaming'
-};
-
-const GAME_IMGS = {
-  'wwe 2k25': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
-  'wwe bundles': 'https://cdn.akamai.steamstatic.com/steam/apps/2315690/capsule_184x69.jpg',
-  'forza horizon 5': 'https://cdn.akamai.steamstatic.com/steam/apps/1551360/capsule_184x69.jpg',
-  'gta v': 'https://cdn.akamai.steamstatic.com/steam/apps/271590/capsule_184x69.jpg',
-  'gta trilogy': 'https://cdn.akamai.steamstatic.com/steam/apps/1546930/capsule_184x69.jpg',
-  'spider-man 2': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
-  'spider-man series': 'https://cdn.akamai.steamstatic.com/steam/apps/1817070/capsule_184x69.jpg',
-  'uncharted': 'https://cdn.akamai.steamstatic.com/steam/apps/1659420/capsule_184x69.jpg',
-  'crimson desert': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=120&auto=format&fit=crop&q=60',
-  'the last of us': 'https://cdn.akamai.steamstatic.com/steam/apps/1888930/capsule_184x69.jpg',
-  'black myth wukong': 'https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_184x69.jpg',
-  'ghost of tsushima': 'https://cdn.akamai.steamstatic.com/steam/apps/2215430/capsule_184x69.jpg',
-  'elden ring': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg',
-  'resident evil': 'https://cdn.akamai.steamstatic.com/steam/apps/2050650/capsule_184x69.jpg',
-  'hogwarts legacy': 'https://cdn.akamai.steamstatic.com/steam/apps/990080/capsule_184x69.jpg',
-  'god of war': 'https://cdn.akamai.steamstatic.com/steam/apps/1593500/capsule_184x69.jpg',
-  'cyberpunk 2077': 'https://cdn.akamai.steamstatic.com/steam/apps/1091500/capsule_184x69.jpg',
-  'pragmata': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg',
-  'assassin\'s creed': 'https://cdn.akamai.steamstatic.com/steam/apps/2208920/capsule_184x69.jpg',
-  'khazan': 'https://cdn.akamai.steamstatic.com/steam/apps/2801450/capsule_184x69.jpg', // Placeholder
-  'f1 24': 'https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_184x69.jpg',
-  'f1 25': 'https://cdn.akamai.steamstatic.com/steam/apps/3059520/capsule_184x69.jpg',
-  'stellar blade': 'https://cdn.akamai.steamstatic.com/steam/apps/3489700/capsule_184x69.jpg',
-  'mafia': 'https://cdn.akamai.steamstatic.com/steam/apps/1030840/capsule_184x69.jpg',
-  'tekken 7': 'https://cdn.akamai.steamstatic.com/steam/apps/389730/capsule_184x69.jpg',
-  'tekken 8': 'https://cdn.akamai.steamstatic.com/steam/apps/1778820/capsule_184x69.jpg',
-  'expedition 33': 'https://cdn.akamai.steamstatic.com/steam/apps/2690040/capsule_184x69.jpg',
-  'red dead redemption': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
-  'hitman': 'https://cdn.akamai.steamstatic.com/steam/apps/1659040/capsule_184x69.jpg',
-  'rockstar pack': 'https://cdn.akamai.steamstatic.com/steam/apps/1174180/capsule_184x69.jpg',
-  'far cry': 'https://cdn.akamai.steamstatic.com/steam/apps/2369390/capsule_184x69.jpg',
-  'poppy playtime': 'https://cdn.akamai.steamstatic.com/steam/apps/1721470/capsule_184x69.jpg',
-  'minecraft': 'https://cdn.akamai.steamstatic.com/steam/apps/1240440/capsule_184x69.jpg', // placeholder
-  'special steam accounts': 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_184x69.jpg', // placeholder
-};
-const getGameIcon = (label) => {
-  if (!label) return null;
-  const cleanName = label.toLowerCase().replace(/[^a-z0-9]/g, '');
-  for (const key in GAME_IMGS) {
-    const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (cleanName.includes(cleanKey) || cleanKey.includes(cleanName)) {
-      return GAME_IMGS[key];
-    }
-  }
-  return null;
-};
 
 const highlightMatch = (text, query) => {
   if (!query || !text) return <span>{text}</span>;
@@ -686,37 +520,7 @@ export default function App() {
     setPopup(null);
   };
 
-  const CUSTOM_ICONS = {
-    'airtel': 'https://icon.horse/icon/airtelxstream.in',
-    'discovery': 'https://icon.horse/icon/discoveryplus.in'
-  };
 
-    const getFavicon = name => {
-    if (!name) return null;
-    const lowerName = name.toLowerCase();
-    
-    // Check custom overrides first
-    const matchedCustom = Object.keys(CUSTOM_ICONS).find(k => lowerName.includes(k));
-    if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
-
-    const gameIcon = getGameIcon(name);
-    if (gameIcon) return gameIcon;
-
-    let domain = DOMAINS[lowerName];
-    if (!domain) {
-      // Smart domain fallback based on name
-      domain = `${lowerName.replace(/[^a-z0-9]/g, '')}.com`;
-    }
-    
-    // Use Logo.dev CDN if token is available
-    const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-    if (token) {
-      return `https://img.logo.dev/${domain}?token=${token}`;
-    }
-    
-    // Use high-quality Google Favicons API (sz=256 ensures high resolution)
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
-  };
 
   const renderProductTypeBadge = (desc, category) => {
     if (!desc) return null;
@@ -1005,7 +809,18 @@ export default function App() {
                            }
                         }, 100);
                      }}>
-                       <img src={product.customIcon || getFavicon(product.name)} className="search-result-logo" style={isGamingCategory(product.category) ? { width: '96px', height: '36px', objectFit: 'cover', borderRadius: '4px' } : {}} alt={product.name} />
+                       <img 
+                          src={getFavicon(product.name, product.customIcon)} 
+                          className="search-result-logo" 
+                          style={isGamingCategory(product.category) ? { width: '96px', height: '36px', objectFit: 'cover', borderRadius: '4px' } : {}} 
+                          alt={product.name} 
+                          onError={(e) => {
+                            if (e.target.src.includes('clearbit.com')) {
+                              const domain = getDomainFromUrl(e.target.src);
+                              e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                            }
+                          }}
+                        />
                        <div className="search-result-info">
                          <div className="search-result-name">{highlightMatch(product.name, searchTerm)}</div>
                          <div className="search-result-price" style={{ color: isColorTooDark(effectiveColor) ? '#ffffff' : effectiveColor, fontWeight: '700' }}>Starts at {formattedPrice}</div>
@@ -1090,9 +905,8 @@ export default function App() {
                           {(() => {
                             const platform = getGamingPlatform(product);
                             const isVerticalRatio = platform === 'epic' || platform === 'playstation' || platform === 'xbox';
-                            return (
                               <img 
-                                src={product.customIcon || getGameIcon(product.name) || getFavicon(product.name)} 
+                                src={getFavicon(product.name, product.customIcon)} 
                                 alt={product.name} 
                                 style={{ 
                                   width: '68px', 
@@ -1102,9 +916,15 @@ export default function App() {
                                   boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
                                   border: '1px solid rgba(255,255,255,0.1)'
                                 }}
-                                onError={(e) => { e.target.style.display = 'none'; }}
+                                onError={(e) => {
+                                  if (e.target.src.includes('clearbit.com')) {
+                                    const domain = getDomainFromUrl(e.target.src);
+                                    e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                                    return;
+                                  }
+                                  e.target.style.display = 'none';
+                                }}
                               />
-                            );
                           })()}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '0.25rem' }}>
                               {renderProductTypeBadge(product.description || "Offline game activation for PC. Full updates supported.", product.category)}
@@ -1206,7 +1026,9 @@ export default function App() {
                     >
                       {(() => {
                         const isGaming = isGamingCategory(product.category);
-                        const imgUrl = isGaming ? (product.customIcon || product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : (product.customIcon || getFavicon(product.name));
+                        const imgUrl = isGaming 
+                          ? (product.plans?.[0]?.image || getFavicon(product.name, product.customIcon)) 
+                          : getFavicon(product.name, product.customIcon);
                         if (imgErr[product.name] || !imgUrl) {
                           return renderPlaceholder(product.name, isGaming, effectiveColor);
                         }
@@ -1221,25 +1043,19 @@ export default function App() {
                               padding: isGaming ? '0' : '4px',
                               borderRadius: isGaming ? '6px' : '8px'
                             }}
-                             onError={(e) => {
-                               if (!e.target.dataset.triedProxy) {
-                                 e.target.dataset.triedProxy = 'true';
-                                 e.target.src = getProxiedUrl(imgUrl);
-                                 return;
-                                }
-                               if (imgUrl === product.customIcon) {
-                                 const fallback = isGaming ? (product.plans?.[0]?.image || getGameIcon(product.name) || getFavicon(product.name)) : getFavicon(product.name);
-                                 if (fallback && fallback !== product.customIcon) {
-                                   if (!e.target.dataset.triedFallback) {
-                                     e.target.dataset.triedFallback = 'true';
-                                     e.target.src = fallback;
-                                     e.target.dataset.triedProxy = ''; // Reset proxy flag for fallback
-                                     return;
-                                   }
-                                 }
-                               }
-                               setImgErr(p => ({ ...p, [product.name]: true }));
-                             }}
+                            onError={(e) => {
+                              if (e.target.src.includes('clearbit.com')) {
+                                const domain = getDomainFromUrl(e.target.src);
+                                e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                                return;
+                              }
+                              if (!e.target.dataset.triedProxy) {
+                                e.target.dataset.triedProxy = 'true';
+                                e.target.src = getProxiedUrl(imgUrl);
+                                return;
+                              }
+                              setImgErr(p => ({ ...p, [product.name]: true }));
+                            }}
                           />
                         );
                       })()}
@@ -1642,7 +1458,9 @@ export default function App() {
               <div className="popup-header">
                 {(() => {
                   const isGaming = isGamingCategory(popup.product.category);
-                  const imgUrl = (isGaming || popup.plan.image) ? (popup.plan.image || getGameIcon(popup.plan.label) || popup.product.customIcon || getGameIcon(popup.product.name) || getFavicon(popup.product.name)) : (popup.product.customIcon || getFavicon(popup.product.name));
+                  const imgUrl = (isGaming || popup.plan.image) 
+                    ? (popup.plan.image || getFavicon(popup.product.name, popup.product.customIcon)) 
+                    : getFavicon(popup.product.name, popup.product.customIcon);
                   if (imgErr[`popup-${popup.product.name}`] || !imgUrl) {
                     return (
                       <div style={{ width: '48px', height: '48px', flexShrink: 0 }}>
@@ -1655,8 +1473,15 @@ export default function App() {
                       src={getProxiedUrl(imgUrl)}
                       alt={popup.product.name}
                       className="popup-logo"
-                      onError={() => setImgErr(p => ({ ...p, [`popup-${popup.product.name}`]: true }))}
-                       style={isGaming ? { width: '120px', height: '45px', objectFit: 'cover', borderRadius: '6px' } : { width: '48px', height: '48px', objectFit: 'contain' }}
+                      onError={(e) => {
+                        if (e.target.src.includes('clearbit.com')) {
+                          const domain = getDomainFromUrl(e.target.src);
+                          e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                          return;
+                        }
+                        setImgErr(p => ({ ...p, [`popup-${popup.product.name}`]: true }));
+                      }}
+                      style={isGaming ? { width: '120px', height: '45px', objectFit: 'cover', borderRadius: '6px' } : { width: '48px', height: '48px', objectFit: 'contain' }}
                     />
                   );
                 })()}
