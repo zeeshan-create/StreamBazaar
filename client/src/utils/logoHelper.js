@@ -1574,6 +1574,9 @@ export const getDomainFromUrl = (url) => {
   return null;
 };
 
+// Pre-sorted DOMAIN keys by length descending to ensure longer/more specific brands match first
+const SORTED_DOMAIN_KEYS = Object.keys(DOMAINS).sort((a, b) => b.length - a.length);
+
 /**
  * Dynamically resolves Logo.dev, Clearbit, or Google Favicon URLs for a service.
  * Performs dynamic upgrade from google favicon URLs if token is available.
@@ -1608,7 +1611,7 @@ export const getFavicon = (name, customIcon = null) => {
     if (gameIcon) return gameIcon;
 
     // Resolve domain from DOMAINS dictionary
-    const matchedKey = Object.keys(DOMAINS).find(key => lowerName.includes(key));
+    const matchedKey = SORTED_DOMAIN_KEYS.find(key => lowerName.includes(key));
     if (matchedKey) {
       domain = DOMAINS[matchedKey];
     } else {
