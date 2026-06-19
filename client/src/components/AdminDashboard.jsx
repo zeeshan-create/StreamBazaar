@@ -355,7 +355,7 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
                          flexShrink: 0
                        }}>
                           {(() => {
-                            const directUrl = s.icon || (s.type === 'Game' ? (getGameIcon(s.name) || '') : `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`);
+                            const directUrl = getFavicon(s.name, s.icon || (s.type === 'Game' ? (getGameIcon(s.name) || '') : `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`));
                             return (
                               <img 
                                 src={directUrl} style={{ width: '100%', height: '100%', objectFit: s.type === 'Game' ? 'cover' : 'contain', padding: s.type === 'Game' ? '0' : '2px' }} 

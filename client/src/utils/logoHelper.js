@@ -2,10 +2,13 @@
 
 // ── CUSTOM ICON OVERRIDES ──────────────────────────────────────────────────
 export const CUSTOM_ICONS = {
-  'hoichoi': 'https://image.hoichoicdn.com/unsafe/036eddfd1906-4e4a-863b-3ae0a06796de-hoichoi_Gradient_Logo.svg',
-  'discovery plus': 'https://upload.wikimedia.org/wikipedia/commons/6/61/Discovery_Plus_logo.svg',
-  'discovery+': 'https://upload.wikimedia.org/wikipedia/commons/6/61/Discovery_Plus_logo.svg',
-  'discovery': 'https://upload.wikimedia.org/wikipedia/commons/6/61/Discovery_Plus_logo.svg'
+  'hoichoi': '/hoichoi.jpg',
+  'discovery plus': '/discoveryplus.jpg',
+  'discovery+': '/discoveryplus.jpg',
+  'discovery': '/discoveryplus.jpg',
+  'lionsgate': '/lionsgateplay.jpg',
+  'lionsgate play': '/lionsgateplay.jpg',
+  'lionsgateplay': '/lionsgateplay.jpg'
 };
 
 // ── GAME COVER IMAGES ──────────────────────────────────────────────────────
@@ -1585,12 +1588,35 @@ const SORTED_DOMAIN_KEYS = Object.keys(DOMAINS).sort((a, b) => b.length - a.leng
  * Performs dynamic upgrade from google favicon URLs if token is available.
  */
 export const getFavicon = (name, customIcon = null) => {
+  // Check CUSTOM_ICONS first by matching name
+  if (name) {
+    const lowerName = name.toLowerCase().trim();
+    const sortedCustomKeys = Object.keys(CUSTOM_ICONS).sort((a, b) => b.length - a.length);
+    const matchedCustom = sortedCustomKeys.find(k => {
+      if (lowerName === k) return true;
+      if (lowerName.startsWith(k + ' ') || lowerName.endsWith(' ' + k)) {
+        return lowerName.length < k.length + 8;
+      }
+      return false;
+    });
+    if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
+  }
+
+  // Also check if customIcon contains signature references to overrides
+  if (customIcon) {
+    const lowerIcon = customIcon.toLowerCase();
+    if (lowerIcon.includes('lionsgate') || lowerIcon.includes('lionsgateplay.com')) return CUSTOM_ICONS['lionsgate'];
+    if (lowerIcon.includes('discovery') || lowerIcon.includes('discovery.co.za')) return CUSTOM_ICONS['discovery'];
+    if (lowerIcon.includes('hoichoi') || lowerIcon.includes('hoichoicdn')) return CUSTOM_ICONS['hoichoi'];
+  }
+
   // If customIcon is a local base64 upload or a customized non-favicon, non-cdn URL, return it directly
   if (
     customIcon && 
     !customIcon.includes('google.com/s2/favicons') && 
     !customIcon.includes('logo.dev') &&
-    !customIcon.includes('clearbit.com')
+    !customIcon.includes('clearbit.com') &&
+    !customIcon.includes('brandfetch.io')
   ) {
     return customIcon;
   }
@@ -1605,10 +1631,6 @@ export const getFavicon = (name, customIcon = null) => {
   if (!domain && name) {
     const lowerName = name.toLowerCase().trim();
     
-    // Check CUSTOM_ICONS first
-    const matchedCustom = Object.keys(CUSTOM_ICONS).find(k => lowerName.includes(k));
-    if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
-
     // Check GAME_IMGS
     const gameIcon = getGameIcon(name);
     if (gameIcon) return gameIcon;

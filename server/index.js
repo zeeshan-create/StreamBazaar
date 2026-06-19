@@ -516,6 +516,23 @@ const CACHE_TTL = 300000; // 5 minutes cache
         results = [...filteredLogoDev, ...results];
       }
 
+      // Post-process to inject our high-fidelity local brand assets for streaming services
+      results = results.map(item => {
+        if (item.type === 'Game') return item;
+        const lowerName = item.name.toLowerCase();
+        const lowerDomain = (item.domain || '').toLowerCase();
+        if (lowerName.includes('hoichoi') || lowerDomain.includes('hoichoi')) {
+          return { ...item, icon: '/hoichoi.jpg' };
+        }
+        if (lowerName.includes('discovery') || lowerDomain.includes('discovery')) {
+          return { ...item, icon: '/discoveryplus.jpg' };
+        }
+        if (lowerName.includes('lionsgate') || lowerDomain.includes('lionsgate')) {
+          return { ...item, icon: '/lionsgateplay.jpg' };
+        }
+        return item;
+      });
+
       searchCache.set(cacheKey, {
         timestamp: Date.now(),
         data: results
