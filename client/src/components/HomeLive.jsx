@@ -449,7 +449,7 @@ function ProductCard({ p, openPopup }) {
                   padding: isGaming ? "0" : "4px"
                 }}
                 onError={(e) => {
-                  if (e.target.src.includes('clearbit.com')) {
+                  if (!e.target.src.includes('google.com/s2/favicons') && !e.target.src.startsWith('/') && !e.target.src.includes('placeholder')) {
                     const domain = getDomainFromUrl(imgUrl) || (p.name ? `${p.name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '')}.com` : 'google.com');
                     e.target.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
                     return;

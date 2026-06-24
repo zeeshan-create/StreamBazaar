@@ -1611,7 +1611,6 @@ export const getFavicon = (name, customIcon = null) => {
     const isHighFidelity = 
       lowerIcon.startsWith('/') ||
       lowerIcon.includes('logo.dev') ||
-      lowerIcon.includes('brandfetch.io') ||
       lowerIcon.includes('wikimedia.org') ||
       lowerIcon.includes('steamstatic') ||
       lowerIcon.includes('igdb') ||
