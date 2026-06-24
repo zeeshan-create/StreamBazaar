@@ -3,10 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 const API_BASE = import.meta.env.PROD ? "" : "http://localhost:5000";
 
 const getProxiedUrl = (url) => {
-  if (!url) return "";
-  if (url.startsWith("data:")) return url;
-  if (url.startsWith("/") || url.startsWith("http://localhost") || url.startsWith("https://streambazaar")) return url;
-  return `${API_BASE}/api/proxy-image?url=${encodeURIComponent(url)}`;
+  return url || "";
 };
 
 const highlightMatch = (text, query) => {

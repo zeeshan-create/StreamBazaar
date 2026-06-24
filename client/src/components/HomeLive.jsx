@@ -6,6 +6,7 @@ import {
   getGameIcon, 
   getDomainFromUrl 
 } from "../utils/logoHelper";
+import { unifiedSearch } from "../utils/mediaFallback";
 
 // ── CONFIG & CONSTANTS ────────────────────────────────────────────────────────
 
@@ -13,10 +14,7 @@ const TELEGRAM_LINK = "https://t.me/owner_trusted_streams";
 const API_BASE = import.meta.env.PROD ? "" : "http://localhost:5000";
 
 const getProxiedUrl = (url) => {
-  if (!url) return "";
-  if (url.startsWith("data:")) return url;
-  if (url.startsWith("/") || url.startsWith("http://localhost") || url.startsWith("https://streambazaar")) return url;
-  return `${API_BASE}/api/proxy-image?url=${encodeURIComponent(url)}`;
+  return url || "";
 };
 
 const getProfileBadgeDetails = (desc) => {
@@ -91,7 +89,8 @@ const getInlineLogo = (name) => {
   if (lower.includes("prime") || lower.includes("amazon")) return <PrimeLogoSq />;
   if (lower.includes("spotify")) return <SpotifyLogoSq />;
   if (lower.includes("youtube")) return <YoutubeLogoSq />;
-  if (lower.includes("disney") || lower.includes("hotstar") || lower.includes("jio hotstar")) return <DisneyLogoSq />;
+  if (lower.includes("jio hotstar") || lower.includes("jiohotstar") || lower.includes("hotstar")) return null;
+  if (lower.includes("disney")) return <DisneyLogoSq />;
   if (lower.includes("jio") || lower.includes("jiocinema")) return <HotstarLogoSq />;
   if (lower.includes("steam")) return <SteamLogoSq />;
   return null;
@@ -219,8 +218,27 @@ export default function HomeLive() {
 
   useEffect(() => {
     fetchPlans();
-    window.addEventListener("focus", fetchPlans);
-    return () => window.removeEventListener("focus", fetchPlans);
+    
+    // Live polling (1.5 seconds) for updates when the tab is active in the foreground
+    const interval = setInterval(() => {
+      if (!document.hidden) {
+        fetchPlans();
+      }
+    }, 1500);
+    
+    // Sync instantly when user tabs back or page becomes visible
+    const handleSync = () => {
+      fetchPlans();
+    };
+    
+    window.addEventListener("focus", handleSync);
+    document.addEventListener("visibilitychange", handleSync);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", handleSync);
+      document.removeEventListener("visibilitychange", handleSync);
+    };
   }, [fetchPlans]);
 
   const list = tab === "All" ? plans : plans.filter((p) => p.category.toLowerCase() === tab.toLowerCase());
@@ -310,24 +328,22 @@ export default function HomeLive() {
                 {(() => {
                   const inlineLogo = getInlineLogo(popup.product.name);
                   if (inlineLogo) return inlineLogo;
-                   const isGaming = popup.product.category === "Gaming";
+                  const isGaming = popup.product.category === "Gaming";
                   const imgUrl = getFavicon(popup.product.name, popup.product.originalProduct?.customIcon);
-                  if (imgUrl) {
-                    return (
-                      <img 
-                        src={getProxiedUrl(imgUrl)} 
-                        alt="" 
-                        onError={(e) => {
-                          if (e.target.src.includes('clearbit.com')) {
-                            const domain = getDomainFromUrl(e.target.src);
-                            e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
-                          }
-                        }}
-                        style={{ width: "100%", height: "100%", objectFit: isGaming ? "cover" : "contain", padding: isGaming ? "0" : "4px" }} 
-                      />
-                    );
-                  }
-                  return <span style={{ fontSize: 20, color: popup.product.accent, fontWeight: "bold" }}>{popup.product.name[0]}</span>;
+                  const displayUrl = imgUrl || (isGaming ? "/placeholder-game.png" : "/placeholder-ott.png");
+                  return (
+                    <img 
+                      src={getProxiedUrl(displayUrl)} 
+                      alt="" 
+                      onError={(e) => {
+                        if (!e.target.dataset.fallbackTried) {
+                          e.target.dataset.fallbackTried = 'true';
+                          e.target.src = isGaming ? "/placeholder-game.png" : "/placeholder-ott.png";
+                        }
+                      }}
+                      style={{ width: "100%", height: "100%", objectFit: isGaming ? "cover" : "contain", padding: isGaming ? "0" : "4px" }} 
+                    />
+                  );
                 })()}
               </div>
               <div style={S.modalTitleBlock}>
@@ -407,46 +423,42 @@ function ProductCard({ p, openPopup }) {
     >
       {/* CARD HEADER */}
       <div style={S.cardHead}>
-        <div style={{ ...S.logoBox, background: p.logoBg, border: `1.5px solid ${p.accent}33` }}>
+        <div style={{ 
+          ...(p.category === "Gaming" 
+            ? { width: 120, height: 45, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" } 
+            : S.logoBox), 
+          background: p.logoBg, 
+          border: `1.5px solid ${p.accent}33` 
+        }}>
           {(() => {
             const inlineLogo = getInlineLogo(p.name);
             if (inlineLogo) return inlineLogo;
 
             const isGaming = p.category === "Gaming";
             const imgUrl = getFavicon(p.name, p.originalProduct?.customIcon);
+            const displayUrl = imgUrl || (isGaming ? "/placeholder-game.png" : "/placeholder-ott.png");
 
-            if (imgUrl) {
-              return (
-                <img
-                  src={getProxiedUrl(imgUrl)}
-                  alt=""
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: isGaming ? "cover" : "contain",
-                    padding: isGaming ? "0" : "4px"
-                  }}
-                  onError={(e) => {
-                    if (e.target.src.includes('clearbit.com')) {
-                      const domain = getDomainFromUrl(e.target.src);
-                      e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
-                      return;
-                    }
-                    e.target.style.display = "none";
-                    e.target.nextSibling.style.display = "flex";
-                  }}
-                />
-              );
-            }
             return (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", fontSize: "20px", fontWeight: "bold", color: p.accent }}>
-                {p.name ? p.name.charAt(0).toUpperCase() : "?"}
-              </div>
+              <img
+                src={getProxiedUrl(displayUrl)}
+                alt=""
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: isGaming ? "cover" : "contain",
+                  padding: isGaming ? "0" : "4px"
+                }}
+                onError={(e) => {
+                  if (e.target.src.includes('clearbit.com')) {
+                    const domain = getDomainFromUrl(imgUrl) || (p.name ? `${p.name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '')}.com` : 'google.com');
+                    e.target.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
+                    return;
+                  }
+                  e.target.src = isGaming ? "/placeholder-game.png" : "/placeholder-ott.png";
+                }}
+              />
             );
           })()}
-          <div style={{ display: "none", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", fontSize: "20px", fontWeight: "bold", color: p.accent }}>
-            {p.name ? p.name.charAt(0).toUpperCase() : "?"}
-          </div>
         </div>
 
         {/* Name + badges */}

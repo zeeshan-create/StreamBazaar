@@ -12,12 +12,16 @@ const Admin = require('./models/Admin');
 // Seed default admin credentials in database if not present
 async function seedAdminUser() {
   try {
-    const existing = await Admin.findOne({ email: 'zeeshanhussain0999@gmail.com' });
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    const existing = await Admin.findOne({ email: adminEmail });
     if (!existing) {
       await Admin.insert({
-        username: 'Ai+rizwan#1974000hussain!#/',
-        password: '@#12Rizwan55Hussain/!#7861974000!12',
-        email: 'zeeshanhussain0999@gmail.com',
+        username: adminUsername,
+        password: adminPassword,
+        email: adminEmail,
         otp: null,
         otpExpires: null
       });
@@ -213,6 +217,45 @@ const POPULAR_EGS_GAMES = [
   }
 ];
 
+const POPULAR_OTT_BRANDS = [
+  {
+    name: 'JioHotstar',
+    domain: 'jiohotstar.com',
+    icon: '/jiohotstar.png',
+    type: 'OTT/Brand'
+  },
+  {
+    name: 'Hotstar',
+    domain: 'hotstar.com',
+    icon: '/jiohotstar.png',
+    type: 'OTT/Brand'
+  },
+  {
+    name: 'Jio Hotstar',
+    domain: 'jiohotstar.com',
+    icon: '/jiohotstar.png',
+    type: 'OTT/Brand'
+  },
+  {
+    name: 'Hoichoi',
+    domain: 'hoichoi.tv',
+    icon: '/hoichoi.jpg',
+    type: 'OTT/Brand'
+  },
+  {
+    name: 'Discovery+',
+    domain: 'discoveryplus.com',
+    icon: '/discoveryplus.jpg',
+    type: 'OTT/Brand'
+  },
+  {
+    name: 'Lionsgate Play',
+    domain: 'lionsgateplay.com',
+    icon: '/lionsgateplay.jpg',
+    type: 'OTT/Brand'
+  }
+];
+
 const searchCache = new Map();
 const CACHE_TTL = 300000; // 5 minutes cache
 
@@ -224,7 +267,8 @@ const CACHE_TTL = 300000; // 5 minutes cache
     const q = rawQ.replace(/[™®©]/g, '').replace(/\s+/g, ' ').trim();
     if (!q) return res.json([]);
     
-    const cacheKey = q.toLowerCase();
+    const reqCategory = req.query.category || 'auto';
+    const cacheKey = `${q.toLowerCase()}_${reqCategory.toLowerCase()}`;
     if (searchCache.has(cacheKey)) {
       const cached = searchCache.get(cacheKey);
       if (Date.now() - cached.timestamp < CACHE_TTL) {
@@ -238,12 +282,22 @@ const CACHE_TTL = 300000; // 5 minutes cache
     try {
       const qLower = q.toLowerCase();
       const searchPromises = [];
+      const isGameSearch = reqCategory.toLowerCase().includes('game') || reqCategory.toLowerCase().includes('gaming');
+      const isOttSearch = reqCategory.toLowerCase().includes('stream') || reqCategory.toLowerCase().includes('ott') || reqCategory.toLowerCase().includes('vpn') || reqCategory.toLowerCase().includes('ai');
+      const isAutoSearch = !isGameSearch && !isOttSearch;
 
-      // 0. Local Epic Games Store fallback database
+      // 0. Local fallback database
       const searchLocal = async () => {
-        return POPULAR_EGS_GAMES.filter(g => g.name.toLowerCase().includes(qLower));
+        let localResults = [];
+        if (isGameSearch || isAutoSearch) {
+          localResults = localResults.concat(POPULAR_EGS_GAMES.filter(g => g.name.toLowerCase().includes(qLower)));
+        }
+        if (isOttSearch || isAutoSearch) {
+          localResults = localResults.concat(POPULAR_OTT_BRANDS.filter(b => b.name.toLowerCase().includes(qLower)));
+        }
+        return localResults;
       };
-      searchPromises.push(searchLocal());
+      searchPromises.push({ key: 'local', promise: searchLocal() });
 
       // 0.5. Epic Games Store GraphQL
       const searchEgs = async () => {
@@ -304,7 +358,7 @@ const CACHE_TTL = 300000; // 5 minutes cache
         }
         return [];
       };
-      searchPromises.push(searchEgs());
+      searchPromises.push({ key: 'egs', promise: searchEgs() });
 
       // 1. Steam Games Store Search
       const searchSteam = async () => {
@@ -330,7 +384,7 @@ const CACHE_TTL = 300000; // 5 minutes cache
         }
         return [];
       };
-      searchPromises.push(searchSteam());
+      searchPromises.push({ key: 'steam', promise: searchSteam() });
 
       // 1.1. RAWG Games
       const searchRawg = async () => {
@@ -355,7 +409,7 @@ const CACHE_TTL = 300000; // 5 minutes cache
         }
         return [];
       };
-      searchPromises.push(searchRawg());
+      searchPromises.push({ key: 'rawg', promise: searchRawg() });
 
       // 1.2. IGDB Games
       const searchIgdb = async () => {
@@ -398,7 +452,7 @@ const CACHE_TTL = 300000; // 5 minutes cache
         }
         return [];
       };
-      searchPromises.push(searchIgdb());
+      searchPromises.push({ key: 'igdb', promise: searchIgdb() });
 
       // 1.5. Lutris/Epic Games
       const searchLutris = async () => {
@@ -424,12 +478,12 @@ const CACHE_TTL = 300000; // 5 minutes cache
         }
         return [];
       };
-      searchPromises.push(searchLutris());
+      searchPromises.push({ key: 'lutris', promise: searchLutris() });
 
       // 1.8. Logo.dev Search
       const searchLogoDev = async () => {
-        if (process.env.LOGO_DEV_SECRET_KEY) {
-          try {
+        try {
+          if (process.env.LOGO_DEV_SECRET_KEY) {
             const logoDevRes = await fetchWithTimeout(`https://api.logo.dev/search?q=${encodeURIComponent(q)}`, {
               headers: {
                 'Authorization': `Bearer ${process.env.LOGO_DEV_SECRET_KEY}`
@@ -440,11 +494,13 @@ const CACHE_TTL = 300000; // 5 minutes cache
               logoDevData = await logoDevRes.json();
             }
             if (logoDevData && Array.isArray(logoDevData)) {
-              const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
+              const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || 'live_6a1a28fd-6420-4492-aeb0-b297461d9de2';
               return logoDevData.slice(0, 5).map(item => {
                 let iconUrl = item.logo_url;
                 if (pubToken && iconUrl) {
                   iconUrl = iconUrl.replace('YOUR_PUBLISHABLE_KEY', pubToken);
+                } else if (!iconUrl && item.domain) {
+                  iconUrl = `https://img.logo.dev/${item.domain}?token=${pubToken}`;
                 }
                 const displayName = item.name || (item.domain ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : 'Brand');
                 return {
@@ -455,33 +511,115 @@ const CACHE_TTL = 300000; // 5 minutes cache
                 };
               });
             }
-          } catch (err) {
-            console.log('Logo.dev search error:', err.message);
           }
+
+          // Public endpoint fallback
+          const logoDevRes = await fetchWithTimeout(`https://www.logo.dev/api/search?q=${encodeURIComponent(q)}`, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Accept': 'application/json'
+            }
+          }, 3000);
+          let logoDevData = null;
+          if (logoDevRes.ok && logoDevRes.headers.get('content-type')?.includes('application/json')) {
+            logoDevData = await logoDevRes.json();
+          }
+          if (logoDevData && Array.isArray(logoDevData)) {
+            const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || 'live_6a1a28fd-6420-4492-aeb0-b297461d9de2';
+            return logoDevData.slice(0, 5).map(item => {
+              const iconUrl = `https://img.logo.dev/${item.domain}?token=${pubToken}`;
+              const displayName = item.name || (item.domain ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : 'Brand');
+              return {
+                name: displayName,
+                domain: item.domain,
+                icon: iconUrl,
+                type: 'OTT/Brand'
+              };
+            });
+          }
+        } catch (err) {
+          console.log('Logo.dev search error:', err.message);
         }
         return [];
       };
-      searchPromises.push(searchLogoDev());
+      searchPromises.push({ key: 'logodev', promise: searchLogoDev() });
 
       // 2. Brandfetch Search
       const searchBrandfetch = async () => {
         try {
-          const brandRes = await fetchWithTimeout(`https://api.brandfetch.io/v2/search/${encodeURIComponent(q)}`, {}, 3000);
+          const headers = {};
+          if (process.env.BRANDFETCH_SECRET_KEY) {
+            headers['Authorization'] = `Bearer ${process.env.BRANDFETCH_SECRET_KEY}`;
+          }
+          const brandRes = await fetchWithTimeout(`https://api.brandfetch.io/v2/search/${encodeURIComponent(q)}`, { headers }, 3000);
           let brandData = null;
           if (brandRes.ok && brandRes.headers.get('content-type')?.includes('application/json')) {
             brandData = await brandRes.json();
           }
           if (brandData && brandData.length > 0) {
-            const pubToken = process.env.VITE_LOGO_DEV_TOKEN || process.env.VITE_LOGO_DEV_PUBLISHABLE_KEY || process.env.LOGO_DEV_PUBLISHABLE_KEY || '';
+            if (process.env.BRANDFETCH_SECRET_KEY) {
+              try {
+                const detailPromises = brandData.slice(0, 3).map(async (brand) => {
+                  try {
+                    if (!brand.domain) return null;
+                    const detailRes = await fetchWithTimeout(
+                      `https://api.brandfetch.io/v2/brands/${brand.domain}`,
+                      { headers: { 'Authorization': `Bearer ${process.env.BRANDFETCH_SECRET_KEY}` } },
+                      2500
+                    );
+                    if (detailRes.ok && detailRes.headers.get('content-type')?.includes('application/json')) {
+                      return await detailRes.json();
+                    }
+                  } catch (e) {
+                    console.log(`Failed to fetch Brandfetch details for ${brand.domain}:`, e.message);
+                  }
+                  return null;
+                });
+
+                const detailsResults = await Promise.all(detailPromises);
+                const detailedItems = [];
+                detailsResults.forEach((details, index) => {
+                  const originalBrand = brandData[index];
+                  if (details && Array.isArray(details.logos) && details.logos.length > 0) {
+                    details.logos.forEach(logo => {
+                      if (Array.isArray(logo.formats) && logo.formats.length > 0) {
+                        const format = logo.formats.find(f => f.format === 'png' || f.format === 'svg') || logo.formats[0];
+                        if (format && format.src) {
+                          const typeLabel = logo.type ? logo.type.charAt(0).toUpperCase() + logo.type.slice(1) : 'Logo';
+                          const themeLabel = logo.theme ? logo.theme.charAt(0).toUpperCase() + logo.theme.slice(1) : '';
+                          const variantName = `${details.name || originalBrand.name} (${typeLabel}${themeLabel ? ' - ' + themeLabel : ''})`;
+                          detailedItems.push({
+                            name: variantName,
+                            domain: details.domain || originalBrand.domain,
+                            icon: format.src,
+                            type: 'OTT/Brand'
+                          });
+                        }
+                      }
+                    });
+                  }
+                });
+
+                if (detailedItems.length > 0) {
+                  return detailedItems;
+                }
+              } catch (err) {
+                console.log('Error resolving Brandfetch detailed logos:', err.message);
+              }
+            }
+
             return brandData.slice(0, 3).map(brand => {
-              const persistentIcon = brand.domain 
-                ? (pubToken ? `https://img.logo.dev/${brand.domain}?token=${pubToken}` : `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`) 
-                : (brand.icon || `https://www.google.com/s2/favicons?domain=${brand.domain}&sz=256`);
+              let logoUrl = brand.icon;
+              const cTokenMatch = brand.icon ? brand.icon.match(/[?&]c=([^&]+)/) : null;
+              const cToken = cTokenMatch ? cTokenMatch[1] : '1ax1781966806943bfumLaCV7mvIC5iK4g';
+              if (brand.domain) {
+                logoUrl = `https://cdn.brandfetch.io/domain/${brand.domain}?c=${cToken}`;
+              }
               const displayName = brand.name || (brand.domain ? brand.domain.split('.')[0].charAt(0).toUpperCase() + brand.domain.split('.')[0].slice(1) : 'Brand');
               return {
                 name: displayName,
                 domain: brand.domain,
-                icon: persistentIcon,
+                icon: logoUrl,
                 type: 'OTT/Brand'
               };
             });
@@ -491,46 +629,108 @@ const CACHE_TTL = 300000; // 5 minutes cache
         }
         return [];
       };
-      searchPromises.push(searchBrandfetch());
+      searchPromises.push({ key: 'brandfetch', promise: searchBrandfetch() });
 
-      const promiseResults = await Promise.allSettled(searchPromises);
+      // Filter promises based on category selector
+      const activePromises = searchPromises.filter(p => {
+        if (p.key === 'logodev' || p.key === 'brandfetch') {
+          return isOttSearch || isAutoSearch;
+        }
+        return isGameSearch || isAutoSearch;
+      });
+
+      const promiseResults = await Promise.allSettled(activePromises.map(p => p.promise));
       let results = [];
-      const logoDevResults = [];
       
       promiseResults.forEach((res, index) => {
+        const key = activePromises[index].key;
         if (res.status === 'fulfilled' && Array.isArray(res.value)) {
-          if (index === 6) { // LogoDev search is the 6th promise
-            logoDevResults.push(...res.value);
-          } else {
-            res.value.forEach(item => {
-              if (item && item.name && !results.some(r => r.name.toLowerCase() === item.name.toLowerCase())) {
-                results.push(item);
+          res.value.forEach(item => {
+            if (item && item.name) {
+              const sourceLabel = key === 'logodev' ? 'Logo.dev' : key === 'brandfetch' ? 'Brandfetch' : key === 'local' ? 'Local' : key.toUpperCase();
+              const itemWithSource = { ...item, source: sourceLabel };
+              
+              // Only filter duplicate if they have the exact same icon URL
+              const isDuplicate = results.some(r => {
+                return r.icon && item.icon && r.icon.toLowerCase().trim() === item.icon.toLowerCase().trim();
+              });
+              
+              if (!isDuplicate) {
+                results.push(itemWithSource);
               }
-            });
-          }
+            }
+          });
         }
       });
 
-      if (logoDevResults.length > 0) {
-        const filteredLogoDev = logoDevResults.filter(ldr => !results.some(r => r.domain && r.domain.toLowerCase() === ldr.domain.toLowerCase()));
-        results = [...filteredLogoDev, ...results];
-      }
-
       // Post-process to inject our high-fidelity local brand assets for streaming services
+      const BACKEND_OVERRIDES = {
+        'hoichoi': '/hoichoi.jpg',
+        'discovery': '/discoveryplus.jpg',
+        'lionsgate': '/lionsgateplay.jpg',
+        'jiohotstar': '/jiohotstar.png',
+        'jio hotstar': '/jiohotstar.png',
+        'hotstar': '/jiohotstar.png'
+      };
+
       results = results.map(item => {
         if (item.type === 'Game') return item;
         const lowerName = item.name.toLowerCase();
         const lowerDomain = (item.domain || '').toLowerCase();
-        if (lowerName.includes('hoichoi') || lowerDomain.includes('hoichoi')) {
-          return { ...item, icon: '/hoichoi.jpg' };
-        }
-        if (lowerName.includes('discovery') || lowerDomain.includes('discovery')) {
-          return { ...item, icon: '/discoveryplus.jpg' };
-        }
-        if (lowerName.includes('lionsgate') || lowerDomain.includes('lionsgate')) {
-          return { ...item, icon: '/lionsgateplay.jpg' };
+        for (const key of Object.keys(BACKEND_OVERRIDES)) {
+          if (lowerName.includes(key) || lowerDomain.includes(key)) {
+            return { ...item, icon: BACKEND_OVERRIDES[key] };
+          }
         }
         return item;
+      });
+
+      // Sort results by match quality to the query 'qLower'
+      results.sort((a, b) => {
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+        const domA = (a.domain || '').toLowerCase();
+        const domB = (b.domain || '').toLowerCase();
+
+        // 1. Exact match for name
+        const exactNameA = nameA === qLower;
+        const exactNameB = nameB === qLower;
+        if (exactNameA && !exactNameB) return -1;
+        if (!exactNameA && exactNameB) return 1;
+
+        // 2. Exact match for domain stem
+        const stemA = domA.split('.')[0];
+        const stemB = domB.split('.')[0];
+        const exactStemA = stemA === qLower;
+        const exactStemB = stemB === qLower;
+        if (exactStemA && !exactStemB) return -1;
+        if (!exactStemA && exactStemB) return 1;
+
+        // 3. Name starts with the query
+        const startsA = nameA.startsWith(qLower);
+        const startsB = nameB.startsWith(qLower);
+        if (startsA && !startsB) return -1;
+        if (!startsA && startsB) return 1;
+
+        // 4. Domain starts with the query
+        const domStartsA = domA.startsWith(qLower);
+        const domStartsB = domB.startsWith(qLower);
+        if (domStartsA && !domStartsB) return -1;
+        if (!domStartsA && domStartsB) return 1;
+
+        // 5. Name contains the query
+        const containsA = nameA.includes(qLower);
+        const containsB = nameB.includes(qLower);
+        if (containsA && !containsB) return -1;
+        if (!containsA && containsB) return 1;
+
+        // 6. Domain contains the query
+        const domContainsA = domA.includes(qLower);
+        const domContainsB = domB.includes(qLower);
+        if (domContainsA && !domContainsB) return -1;
+        if (!domContainsA && domContainsB) return 1;
+
+        return 0;
       });
 
       searchCache.set(cacheKey, {

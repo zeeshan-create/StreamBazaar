@@ -18,7 +18,11 @@ async function run() {
   console.log("Connected successfully");
   const Admin = mongoose.model('Admin', new mongoose.Schema({}, { strict: false }));
   
-  // Update all admins
+  // Delete the misspelled admin record
+  const deleteResult = await Admin.deleteMany({ email: 'zeeshanshussain0999@gmail.com' });
+  console.log("Deleted misspelled admins:", deleteResult.deletedCount);
+  
+  // Update all remaining admins to correct email
   await Admin.updateMany(
     {},
     { 
@@ -27,7 +31,28 @@ async function run() {
       }
     }
   );
-  console.log("All Admins updated successfully to zeeshanhussain0999@gmail.com!");
+  console.log("Updated remaining admins to zeeshanhussain0999@gmail.com");
+
+  // Keep only one admin to prevent duplicates
+  const allAdmins = await Admin.find({});
+  if (allAdmins.length > 1) {
+    const keepId = allAdmins[0]._id;
+    const deleteResult = await Admin.deleteMany({ _id: { $ne: keepId } });
+    console.log("Deleted duplicate admins:", deleteResult.deletedCount);
+  }
+
+  // If no admin left, seed a default one
+  const adminCount = await Admin.countDocuments({});
+  if (adminCount === 0) {
+    await Admin.create({
+      username: 'Ai+rizwan#1974000hussain!#/',
+      password: '@#12Rizwan55Hussain/!#7861974000!12',
+      email: 'zeeshanhussain0999@gmail.com',
+      otp: null,
+      otpExpires: null
+    });
+    console.log("Seeded new default admin record.");
+  }
   
   const updatedAdmins = await Admin.find({}).lean();
   console.log("Current Admin collection contents:", JSON.stringify(updatedAdmins, null, 2));

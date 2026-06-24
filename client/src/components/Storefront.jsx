@@ -40,6 +40,12 @@ const isColorTooDark = (c) => {
   return false;
 };
 
+const isJioHotstarOrHotstar = (name) => {
+  if (!name) return false;
+  const lower = name.toLowerCase();
+  return lower.includes('jiohotstar') || lower.includes('jio hotstar') || lower.includes('hotstar');
+};
+
 const CustomIcons = {
   Apple: () => (
     <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
@@ -82,10 +88,7 @@ const TELEGRAM_LINK = 'https://t.me/owner_trusted_streams';
 const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
 
 const getProxiedUrl = (url) => {
-  if (!url) return '';
-  if (url.startsWith('data:')) return url;
-  if (url.startsWith('/') || url.startsWith('http://localhost') || url.startsWith('https://streambazaar')) return url;
-  return `${API_BASE}/api/proxy-image?url=${encodeURIComponent(url)}`;
+  return url || '';
 };
 
 const renderPlaceholder = (name, isGaming, color) => {
@@ -810,7 +813,7 @@ export default function App() {
                         }, 100);
                      }}>
                        <img 
-                          src={getFavicon(product.name, product.customIcon)} 
+                          src={getProxiedUrl(getFavicon(product.name, product.customIcon))} 
                           className="search-result-logo" 
                           style={isGamingCategory(product.category) ? { width: '96px', height: '36px', objectFit: 'cover', borderRadius: '4px' } : {}} 
                           alt={product.name} 
@@ -1006,7 +1009,7 @@ export default function App() {
                   animate="visible"
                   exit="exit"
                   style={{ 
-                    '--card-accent': (product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : (tooDark ? '#ff6b00' : effectiveColor),
+                    '--card-accent': (product.name && isJioHotstarOrHotstar(product.name)) ? '#ff2a7f' : (tooDark ? '#ff6b00' : effectiveColor),
                     border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.35)' : `${effectiveColor}60`}`,
                     background: 'var(--card)',
                     boxShadow: tooDark 
@@ -1030,7 +1033,7 @@ export default function App() {
                           ? (product.plans?.[0]?.image || getFavicon(product.name, product.customIcon)) 
                           : getFavicon(product.name, product.customIcon);
                         if (imgErr[product.name] || !imgUrl) {
-                          return renderPlaceholder(product.name, isGaming, effectiveColor);
+                          return <img src={isGaming ? '/placeholder-game.png' : '/placeholder-ott.png'} alt={product.name} style={{ width: '100%', height: '100%', objectFit: isGaming ? 'cover' : 'contain', padding: isGaming ? '0' : '4px', borderRadius: isGaming ? '6px' : '8px' }} />;
                         }
                         return (
                           <img
@@ -1045,16 +1048,11 @@ export default function App() {
                             }}
                             onError={(e) => {
                               if (e.target.src.includes('clearbit.com')) {
-                                const domain = getDomainFromUrl(e.target.src);
-                                e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                                const domain = getDomainFromUrl(imgUrl) || (product.name ? `${product.name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '')}.com` : 'google.com');
+                                e.target.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
                                 return;
                               }
-                              if (!e.target.dataset.triedProxy) {
-                                e.target.dataset.triedProxy = 'true';
-                                e.target.src = getProxiedUrl(imgUrl);
-                                return;
-                              }
-                              setImgErr(p => ({ ...p, [product.name]: true }));
+                              e.target.src = isGaming ? '/placeholder-game.png' : '/placeholder-ott.png';
                             }}
                           />
                         );
@@ -1096,9 +1094,9 @@ export default function App() {
                             <span
                               className="card-badge"
                               style={{ 
-                                background: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}18`), 
-                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
-                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.3)' : `${effectiveColor}30`)}` 
+                                background: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && isJioHotstarOrHotstar(product.name)) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}18`), 
+                                color: tooDark ? '#ff6b00' : ((product.name && isJioHotstarOrHotstar(product.name)) ? '#ff2a7f' : effectiveColor), 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && isJioHotstarOrHotstar(product.name)) ? 'rgba(255, 42, 127, 0.3)' : `${effectiveColor}30`)}` 
                               }}
                             >
                               {product.category ? product.category.toUpperCase() : 'STREAMING'}
@@ -1141,7 +1139,7 @@ export default function App() {
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: 0, paddingRight: '10px' }}>
                             <span className="plan-row-label" style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>
-                              {renderPlanLabel(plan.label, tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor))}
+                              {renderPlanLabel(plan.label, tooDark ? '#ff6b00' : ((product.name && isJioHotstarOrHotstar(product.name)) ? '#ff2a7f' : effectiveColor))}
                             </span>
                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                               <span style={{ 
@@ -1149,9 +1147,9 @@ export default function App() {
                                 fontWeight: 'bold', 
                                 padding: '2px 6px', 
                                 borderRadius: '4px', 
-                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}20`), 
-                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
-                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.25)' : `${effectiveColor}40`)}`, 
+                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.1)' : ((product.name && isJioHotstarOrHotstar(product.name)) ? 'rgba(255, 42, 127, 0.1)' : `${effectiveColor}20`), 
+                                color: tooDark ? '#ff6b00' : ((product.name && isJioHotstarOrHotstar(product.name)) ? '#ff2a7f' : effectiveColor), 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.25)' : ((product.name && isJioHotstarOrHotstar(product.name)) ? 'rgba(255, 42, 127, 0.25)' : `${effectiveColor}40`)}`, 
                                 whiteSpace: 'nowrap' 
                               }}>
                                 {plan.duration}
@@ -1166,13 +1164,13 @@ export default function App() {
                           
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
                             <span className="plan-row-price" style={{ 
-                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor),
+                                color: tooDark ? '#ff6b00' : ((product.name && isJioHotstarOrHotstar(product.name)) ? '#ff2a7f' : effectiveColor),
                                 fontWeight: '900', 
                                 fontSize: '1.15rem', 
                                 letterSpacing: '0.5px',
                                 textShadow: tooDark 
                                   ? '0 0 10px rgba(255, 107, 0, 0.5), 0 0 20px rgba(255, 107, 0, 0.25)' 
-                                  : ((product.name && product.name.toLowerCase().includes('jiohotstar')) 
+                                  : ((product.name && isJioHotstarOrHotstar(product.name)) 
                                       ? '0 0 10px rgba(255, 42, 127, 0.4), 0 0 20px rgba(255, 42, 127, 0.2)' 
                                       : `0 2px 10px ${effectiveColor}30`)
                               }}>{(plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '')}</span>
@@ -1183,14 +1181,14 @@ export default function App() {
                                   : ''
                               }`}
                               style={{ 
-                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.45)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.45)' : `${effectiveColor}50`)}`, 
-                                color: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor) 
+                                border: `1px solid ${tooDark ? 'rgba(255, 107, 0, 0.45)' : ((product.name && isJioHotstarOrHotstar(product.name)) ? 'rgba(255, 42, 127, 0.45)' : `${effectiveColor}50`)}`, 
+                                color: tooDark ? '#ff6b00' : ((product.name && isJioHotstarOrHotstar(product.name)) ? '#ff2a7f' : effectiveColor) 
                               }}
                               whileHover={product.status === 'Available' ? { 
                                 scale: 1.05, 
-                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.15)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? 'rgba(255, 42, 127, 0.15)' : `${effectiveColor}30`), 
-                                borderColor: tooDark ? '#ff6b00' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '#ff2a7f' : effectiveColor), 
-                                boxShadow: tooDark ? '0 0 10px rgba(255, 107, 0, 0.4)' : ((product.name && product.name.toLowerCase().includes('jiohotstar')) ? '0 0 10px rgba(255, 42, 127, 0.4)' : `0 0 10px ${effectiveColor}40`) 
+                                backgroundColor: tooDark ? 'rgba(255, 107, 0, 0.15)' : ((product.name && isJioHotstarOrHotstar(product.name)) ? 'rgba(255, 42, 127, 0.15)' : `${effectiveColor}30`), 
+                                borderColor: tooDark ? '#ff6b00' : ((product.name && isJioHotstarOrHotstar(product.name)) ? '#ff2a7f' : effectiveColor), 
+                                boxShadow: tooDark ? '0 0 10px rgba(255, 107, 0, 0.4)' : ((product.name && isJioHotstarOrHotstar(product.name)) ? '0 0 10px rgba(255, 42, 127, 0.4)' : `0 0 10px ${effectiveColor}40`) 
                               } : {}}
                             >
                               {product.status && product.status !== 'Available' ? product.status : 'Buy'}
@@ -1447,7 +1445,7 @@ export default function App() {
               variants={modalVariants}
               initial="hidden" animate="visible" exit="exit"
               onClick={e => e.stopPropagation()}
-              style={{ '--popup-color': popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}
+              style={{ '--popup-color': isJioHotstarOrHotstar(popup.product.name) ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}
             >
               {/* Close */}
               <button className="popup-close" onClick={() => setPopup(null)}>
@@ -1499,8 +1497,8 @@ export default function App() {
 
               {/* Selected Plan */}
               <div className="popup-plan-chip">
-                <strong>{renderPlanLabel(popup.plan.label, popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor))}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
-                <strong style={{ color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</strong>
+                <strong>{renderPlanLabel(popup.plan.label, isJioHotstarOrHotstar(popup.product.name) ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor))}</strong> {popup.plan.quality ? `· ${popup.plan.quality}` : ''} &nbsp;·&nbsp; {popup.plan.duration} &nbsp;·&nbsp;
+                <strong style={{ color: isJioHotstarOrHotstar(popup.product.name) ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</strong>
               </div>
 
               {/* Device Selector */}
@@ -1582,7 +1580,7 @@ export default function App() {
                 </div>
                 <div className="summary-price" style={{ gridColumn: '1 / -1' }}>
                   <label>Total Price</label>
-                  <span style={{ color: popup.product.name.toLowerCase().includes('jiohotstar') ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</span>
+                  <span style={{ color: isJioHotstarOrHotstar(popup.product.name) ? '#ff2a7f' : (isColorTooDark(popup.product.effectiveColor) ? '#ff6b00' : popup.product.effectiveColor) }}>{popup.plan.price}</span>
                 </div>
               </div>
 

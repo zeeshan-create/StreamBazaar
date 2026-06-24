@@ -1113,7 +1113,7 @@ select.admin-input option {
   .ott-card { padding: 1.25rem; border-radius: 14px; }
   .card-header { gap: 0.85rem; margin-bottom: 1rem; }
   .card-logo-wrap { width: 50px; height: 50px; border-radius: 13px; }
-  .gaming-logo-wrap { width: 100px !important; height: 38px !important; border-radius: 6px !important; }
+  .gaming-logo-wrap { width: 120px !important; height: 45px !important; border-radius: 6px !important; }
   .card-logo { width: 42px; height: 42px; }
   .card-name { font-size: 1.08rem; flex-wrap: wrap; }
   .card-badge { font-size: 0.62rem; padding: 0.15rem 0.5rem; border-radius: 6px; }
@@ -1202,7 +1202,7 @@ select.admin-input option {
   .ott-card { padding: 1rem; }
   .card-header { gap: 0.65rem; margin-bottom: 0.85rem; }
   .card-logo-wrap { width: 52px; height: 52px; border-radius: 12px; }
-  .gaming-logo-wrap { width: 82px !important; height: 31px !important; border-radius: 6px !important; }
+  .gaming-logo-wrap { width: 110px !important; height: 41px !important; border-radius: 6px !important; }
   .card-logo { width: 44px; height: 44px; }
   .card-name { font-size: 1.05rem; gap: 0.5rem; }
   .status-badge-inline { font-size: 0.55rem; padding: 1px 6px; }

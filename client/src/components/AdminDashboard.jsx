@@ -18,6 +18,7 @@ import {
   BRAND_CATEGORIES,
   BRAND_COLORS
 } from '../utils/logoHelper';
+import { unifiedSearch } from '../utils/mediaFallback';
 
 const API_BASE = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
 
@@ -118,11 +119,146 @@ const PLATFORMS = ['TV', 'PC', 'iOS', 'Android', 'Laptop', 'PS2', 'PS3', 'PS4', 
 
 
 
+const getDeterministicColorHex = (name) => {
+  if (!name) return '#6366f1';
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h = Math.abs(hash) % 360;
+  const h2rgb = (p, q, t) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  };
+  const s = 0.9, l = 0.52;
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const r = h2rgb(p, q, (h / 360) + 1/3);
+  const g = h2rgb(p, q, h / 360);
+  const b = h2rgb(p, q, (h / 360) - 1/3);
+  const toHex = (x) => {
+    const val = Math.round(x * 255).toString(16);
+    return val.length === 1 ? '0' + val : val;
+  };
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
+const ensureHighVibrancyColor = (hex) => {
+  if (!hex || hex === '#000000' || hex === '#ffffff') {
+    const defaultColors = ['#ff0055', '#00e5a0', '#00b8ff', '#ffaa00', '#b800ff', '#ff00aa', '#00ffcc', '#ff3366', '#33ccff', '#ffcc00'];
+    return defaultColors[Math.abs(hex ? hex.length : 0) % defaultColors.length];
+  }
+  let c = hex.replace(/^#/, '');
+  if (c.length === 3) {
+    c = c.split('').map(x => x + x).join('');
+  }
+  if (c.length !== 6) return hex;
+  let r = parseInt(c.substring(0, 2), 16) / 255;
+  let g = parseInt(c.substring(2, 4), 16) / 255;
+  let b = parseInt(c.substring(4, 6), 16) / 255;
+  let max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) {
+    h = s = 0;
+  } else {
+    let d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  h = Math.round(h * 360);
+  s = Math.max(s, 0.85);
+  l = Math.max(0.48, Math.min(l, 0.62));
+  const hue2rgb = (p, q, t) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  };
+  let r2, g2, b2;
+  if (s === 0) {
+    r2 = g2 = b2 = l;
+  } else {
+    let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    let p = 2 * l - q;
+    r2 = hue2rgb(p, q, (h / 360) + 1/3);
+    g2 = hue2rgb(p, q, h / 360);
+    b2 = hue2rgb(p, q, (h / 360) - 1/3);
+  }
+  const toHex = (x) => {
+    const val = Math.round(x * 255).toString(16);
+    return val.length === 1 ? '0' + val : val;
+  };
+  return `#${toHex(r2)}${toHex(g2)}${toHex(b2)}`;
+};
+
+const getSecondaryVibrantColor = (primaryHex) => {
+  let c = primaryHex.replace(/^#/, '');
+  if (c.length === 3) {
+    c = c.split('').map(x => x + x).join('');
+  }
+  if (c.length !== 6) return primaryHex;
+  let r = parseInt(c.substring(0, 2), 16) / 255;
+  let g = parseInt(c.substring(2, 4), 16) / 255;
+  let b = parseInt(c.substring(4, 6), 16) / 255;
+  let max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) {
+    h = s = 0;
+  } else {
+    let d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  h = Math.round(h * 360);
+  s = Math.max(s, 0.85);
+  l = Math.max(0.32, l - 0.15);
+  const hue2rgb = (p, q, t) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  };
+  let r2, g2, b2;
+  if (s === 0) {
+    r2 = g2 = b2 = l;
+  } else {
+    let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    let p = 2 * l - q;
+    r2 = hue2rgb(p, q, (h / 360) + 1/3);
+    g2 = hue2rgb(p, q, h / 360);
+    b2 = hue2rgb(p, q, (h / 360) - 1/3);
+  }
+  const toHex = (x) => {
+    const val = Math.round(x * 255).toString(16);
+    return val.length === 1 ? '0' + val : val;
+  };
+  return `#${toHex(r2)}${toHex(g2)}${toHex(b2)}`;
+};
+
 const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
   const [dragActive, setDragActive] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState([]);
   const searchTimeoutRef = React.useRef(null);
   const [imgError, setImgError] = React.useState(false);
+  const [searchType, setSearchType] = React.useState('auto'); // 'auto', 'Gaming', 'Streaming'
 
   React.useEffect(() => {
     return () => {
@@ -133,10 +269,17 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
   }, []);
 
   React.useEffect(() => {
+    if (editForm.category) {
+      const isGaming = isGamingCategory(editForm.category);
+      setSearchType(isGaming ? 'Gaming' : 'Streaming');
+    }
+  }, [editForm.category]);
+
+  React.useEffect(() => {
     setImgError(false);
   }, [editForm.customIcon, editForm.name]);
 
-  const handleSearch = (val) => {
+  const handleSearch = (val, currentSearchType = searchType) => {
     if (onNameChange) {
       onNameChange(val);
     } else {
@@ -150,26 +293,11 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
     if (val.length > 2) {
       searchTimeoutRef.current = setTimeout(async () => {
         try {
-          const gameRes = await fetch(`${API_BASE}/search-games?q=${encodeURIComponent(val)}`);
-          if (gameRes.ok) {
-            const gameData = await gameRes.json().catch(() => []);
-            if (Array.isArray(gameData)) {
-              const mapped = gameData.map(g => {
-                let persistentIcon = g.icon || g.logo;
-                if (g.type === 'OTT/Brand' && g.domain) {
-                  const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-                  persistentIcon = token ? `https://img.logo.dev/${g.domain}?token=${token}` : `https://www.google.com/s2/favicons?domain=${g.domain}&sz=256`;
-                }
-                const displayName = g.name || (g.domain && g.domain !== 'Steam Game' ? g.domain.split('.')[0].charAt(0).toUpperCase() + g.domain.split('.')[0].slice(1) : '') || 'Brand';
-                return {
-                  name: displayName,
-                  domain: g.domain || 'Steam Game',
-                  icon: persistentIcon,
-                  type: g.type || 'Game'
-                };
-              });
-              setSuggestions(mapped);
-            }
+          const suggestions = await unifiedSearch(val, currentSearchType);
+          setSuggestions(suggestions);
+          if (suggestions.length > 0) {
+            // Auto-select the first match immediately without clearing suggestions list
+            handleSelect(suggestions[0], false);
           }
         } catch (e) {
           console.error("Game search error:", e);
@@ -180,19 +308,20 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
     }
   };
 
-  const handleSelect = (item) => {
+  const handleSearchTypeChange = (newType) => {
+    setSearchType(newType);
+    if (editForm.name && editForm.name.length > 2) {
+      handleSearch(editForm.name, newType);
+    }
+  };
+
+  const handleSelect = (item, clearSuggestions = true) => {
     const isGameType = isGamingCategory(item.type) || item.type === 'Game';
 
     // Resolve the best persistent icon URL immediately
-    let bestIcon = item.icon || (item.domain && !item.domain.includes(' ')
+    const bestIcon = item.icon || (item.domain && !item.domain.includes(' ')
       ? `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`
       : null);
-    if (bestIcon && bestIcon.includes('brandfetch.io') && item.domain) {
-      const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-      bestIcon = token
-        ? `https://img.logo.dev/${item.domain}?token=${token}`
-        : `https://www.google.com/s2/favicons?domain=${item.domain}&sz=256`;
-    }
 
     // Determine category and default colors
     let resolvedCategory = isGameType ? 'Gaming' : 'Streaming';
@@ -209,22 +338,31 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
       }
     }
 
+    if (!matchedBrand || !BRAND_COLORS[matchedBrand]) {
+      resolvedPrimary = ensureHighVibrancyColor(getDeterministicColorHex(item.name || item.domain || 'Brand'));
+      resolvedSecondary = getSecondaryVibrantColor(resolvedPrimary);
+    }
+
     // Single atomic state update to prevent race conditions
     setEditForm(prev => {
       const categoryIsDefaultOrUnchanged = !prev.category || prev.category === 'Streaming' || prev.category === 'Gaming' || prev.category === prev.originalCategory;
-      const colorsAreDefaultOrUnchanged = !prev.primaryColor || prev.primaryColor === '#6366f1' || prev.primaryColor === '#000000' || prev.primaryColor === prev.originalPrimaryColor;
+      const newName = clearSuggestions
+        ? (item.name || (item.domain && item.domain !== 'Steam Game' ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : '') || 'Brand')
+        : prev.name;
       
       return {
         ...prev,
-        name: item.name || (item.domain && item.domain !== 'Steam Game' ? item.domain.split('.')[0].charAt(0).toUpperCase() + item.domain.split('.')[0].slice(1) : '') || 'Brand',
+        name: newName,
         customIcon: bestIcon,
         category: categoryIsDefaultOrUnchanged ? resolvedCategory : prev.category,
-        primaryColor: colorsAreDefaultOrUnchanged ? resolvedPrimary : prev.primaryColor,
-        secondaryColor: colorsAreDefaultOrUnchanged ? resolvedSecondary : prev.secondaryColor
+        primaryColor: resolvedPrimary,
+        secondaryColor: resolvedSecondary
       };
     });
 
-    setSuggestions([]);
+    if (clearSuggestions) {
+      setSuggestions([]);
+    }
 
     if (!bestIcon) return;
     const img = new Image();
@@ -232,14 +370,18 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
     img.onload = async () => {
       try {
         const palette = await Vibrant.from(img).getPalette();
-        const primary   = palette.Vibrant     ? palette.Vibrant.hex     : resolvedPrimary;
-        const secondary = palette.DarkVibrant ? palette.DarkVibrant.hex
-                        : palette.Muted       ? palette.Muted.hex       : resolvedSecondary;
-        setEditForm(prev => {
-          const colorsAreDefaultOrUnchanged = !prev.primaryColor || prev.primaryColor === '#6366f1' || prev.primaryColor === '#000000' || prev.primaryColor === prev.originalPrimaryColor || prev.primaryColor === resolvedPrimary;
-          if (!colorsAreDefaultOrUnchanged) return prev;
-          return { ...prev, primaryColor: primary, secondaryColor: secondary };
-        });
+        const rawPrimary = palette.Vibrant ? palette.Vibrant.hex : null;
+        const rawSecondary = palette.DarkVibrant ? palette.DarkVibrant.hex
+                           : palette.Muted ? palette.Muted.hex : null;
+
+        const primary = ensureHighVibrancyColor(rawPrimary || resolvedPrimary);
+        const secondary = rawSecondary ? getSecondaryVibrantColor(rawSecondary) : getSecondaryVibrantColor(primary);
+
+        setEditForm(prev => ({
+          ...prev,
+          primaryColor: primary,
+          secondaryColor: secondary
+        }));
       } catch (_) {
         // Keeping defaults if vibrant fails
       }
@@ -277,9 +419,16 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
         
         try {
           const palette = await Vibrant.from(img).getPalette();
-          if (palette.Vibrant) extractedPrimary = palette.Vibrant.hex;
-          if (palette.DarkVibrant) extractedSecondary = palette.DarkVibrant.hex;
-          else if (palette.Muted) extractedSecondary = palette.Muted.hex;
+          if (palette.Vibrant) {
+            extractedPrimary = ensureHighVibrancyColor(palette.Vibrant.hex);
+          }
+          if (palette.DarkVibrant) {
+            extractedSecondary = getSecondaryVibrantColor(palette.DarkVibrant.hex);
+          } else if (palette.Muted) {
+            extractedSecondary = getSecondaryVibrantColor(palette.Muted.hex);
+          } else {
+            extractedSecondary = getSecondaryVibrantColor(extractedPrimary);
+          }
         } catch(e) {}
         
         setEditForm(prev => ({ ...prev, customIcon: dataUrl, primaryColor: extractedPrimary, secondaryColor: extractedSecondary }));
@@ -290,9 +439,64 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
   };
 
   return (
-    <div style={{ marginBottom: '1.5rem', background: 'var(--color-surface)', borderRadius: '12px' }}>
+    <div style={{ marginBottom: '1.5rem', background: 'var(--color-surface)', borderRadius: '12px', padding: '10px' }}>
       <div className="admin-form-group">
         <label>Service/Game Title (Auto-Search)</label>
+        
+        {/* Pill selector for Category filtering */}
+        <div style={{ display: 'flex', background: 'var(--color-background)', padding: '4px', borderRadius: '8px', border: '1px solid var(--color-border)', marginBottom: '10px', width: 'fit-content' }}>
+          <button 
+            type="button" 
+            onClick={() => handleSearchTypeChange('auto')}
+            style={{ 
+              padding: '6px 12px', 
+              borderRadius: '6px', 
+              fontSize: '11px', 
+              fontWeight: 700, 
+              background: searchType === 'auto' ? 'linear-gradient(135deg, #7c3aed, #a855f7)' : 'transparent',
+              color: searchType === 'auto' ? '#fff' : 'var(--color-text-muted)',
+              transition: 'all 0.2s',
+              cursor: 'pointer'
+            }}
+          >
+            🔍 AUTO (All APIs)
+          </button>
+          <button 
+            type="button" 
+            onClick={() => handleSearchTypeChange('Gaming')}
+            style={{ 
+              padding: '6px 12px', 
+              borderRadius: '6px', 
+              fontSize: '11px', 
+              fontWeight: 700, 
+              background: searchType === 'Gaming' ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+              color: searchType === 'Gaming' ? '#4ade80' : 'var(--color-text-muted)',
+              border: searchType === 'Gaming' ? '1px solid rgba(34, 197, 94, 0.4)' : 'none',
+              transition: 'all 0.2s',
+              cursor: 'pointer'
+            }}
+          >
+            🎮 GAME ONLY
+          </button>
+          <button 
+            type="button" 
+            onClick={() => handleSearchTypeChange('Streaming')}
+            style={{ 
+              padding: '6px 12px', 
+              borderRadius: '6px', 
+              fontSize: '11px', 
+              fontWeight: 700, 
+              background: searchType === 'Streaming' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+              color: searchType === 'Streaming' ? '#818cf8' : 'var(--color-text-muted)',
+              border: searchType === 'Streaming' ? '1px solid rgba(99, 102, 241, 0.4)' : 'none',
+              transition: 'all 0.2s',
+              cursor: 'pointer'
+            }}
+          >
+            📺 OTT ONLY
+          </button>
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
           {(() => {
              const isGaming = isGamingCategory(editForm.category);
@@ -339,62 +543,147 @@ const LogoUploader = ({ editForm, setEditForm, getFavicon, onNameChange }) => {
           })()}
           <div style={{ flex: 1, position: 'relative' }}>
              <input className="admin-form-input" style={{ width: '100%' }} placeholder="Enter name to search brand (e.g. Netflix, Spotify)..." value={editForm.name || ''} onChange={e => handleSearch(e.target.value)} />
-             {suggestions.length > 0 && (
-               <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--color-surface)', border: '1px solid var(--color-border)', zIndex: 10, maxHeight: '200px', overflowY: 'auto', borderRadius: '8px', marginTop: '4px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
-                 {suggestions.map((s, idx) => (
-                    <div key={idx} onClick={() => handleSelect(s)} style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--color-background)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                       <div style={{ 
-                         width: s.type === 'Game' ? '120px' : '36px', 
-                         height: '45px', 
-                         borderRadius: '4px', 
-                         overflow: 'hidden', 
-                         background: '#111', 
-                         display: 'flex', 
-                         alignItems: 'center', 
-                         justifyContent: 'center',
-                         flexShrink: 0
-                       }}>
-                          {(() => {
-                            const directUrl = getFavicon(s.name, s.icon || (s.type === 'Game' ? (getGameIcon(s.name) || '') : `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`));
-                            return (
-                              <img 
-                                src={directUrl} style={{ width: '100%', height: '100%', objectFit: s.type === 'Game' ? 'cover' : 'contain', padding: s.type === 'Game' ? '0' : '2px' }} 
-                                alt={s.name} 
-                                onError={e => {
-                                  if (!e.target.dataset.triedProxy) {
-                                    e.target.dataset.triedProxy = 'true';
-                                    e.target.src = getProxiedUrl(directUrl);
-                                    return;
-                                  }
-                                  if (!e.target.dataset.triedFallback) {
-                                    e.target.dataset.triedFallback = 'true';
-                                    const fallbackImg = getGameIcon(s.name);
-                                    if (fallbackImg && fallbackImg !== directUrl) {
-                                      e.target.src = getProxiedUrl(fallbackImg);
-                                      return;
-                                    }
-                                  }
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling.style.display = 'flex';
-                                }} 
-                              />
-                            );
-                          })()}
-                         <div style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#222' }}>
-                           {s.name ? s.name.charAt(0).toUpperCase() : '?'}
-                         </div>
-                       </div>
-                       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                          <span style={{ fontWeight: '600' }}>{highlightMatch(s.name, editForm.name || '')}</span>
-                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{s.domain}</span>
-                       </div>
-                       <span style={{ fontSize: '10px', padding: '2px 6px', background: s.type === 'Game' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(99, 102, 241, 0.2)', color: s.type === 'Game' ? '#4ade80' : '#818cf8', borderRadius: '4px' }}>{s.type}</span>
-                    </div>
-                 ))}
-               </div>
-             )}
           </div>
         </div>
+
+        {/* Gallery Suggestions Selection Grid (Fully Responsive) */}
+        {suggestions.length > 0 && (
+          <div style={{ 
+            background: 'var(--color-background)', 
+            border: '1px solid var(--color-border)', 
+            borderRadius: '12px', 
+            padding: '1rem', 
+            marginTop: '0.75rem',
+            boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)'
+          }}>
+            <div style={{ 
+              fontSize: '11px', 
+              fontWeight: 700, 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.05em', 
+              color: 'var(--color-text-muted)',
+              marginBottom: '0.75rem',
+              textAlign: 'left'
+            }}>
+              Select preferred logo from gallery:
+            </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', 
+              gap: '10px',
+              maxHeight: '300px',
+              overflowY: 'auto'
+            }}>
+              {suggestions.map((s, idx) => {
+                const isLocalOverride = s.name && (
+                  s.name.toLowerCase().includes('hoichoi') ||
+                  s.name.toLowerCase().includes('discovery') ||
+                  s.name.toLowerCase().includes('lionsgate') ||
+                  s.name.toLowerCase().includes('hotstar')
+                );
+                const directUrl = isLocalOverride 
+                  ? getFavicon(s.name, s.icon) 
+                  : (s.icon || (s.type === 'Game' ? (getGameIcon(s.name) || '') : `https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`));
+                return (
+                  <div 
+                    key={idx} 
+                    onClick={() => handleSelect(s)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      padding: '8px',
+                      background: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      textAlign: 'center'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = 'var(--color-primary)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'var(--color-border)';
+                      e.currentTarget.style.transform = 'none';
+                    }}
+                  >
+                    <div style={{
+                      width: '100%',
+                      height: '45px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: '#111',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      marginBottom: '6px'
+                    }}>
+                      <img 
+                        src={directUrl} 
+                        alt={s.name}
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: s.type === 'Game' ? 'cover' : 'contain', 
+                          padding: s.type === 'Game' ? '0' : '2px' 
+                        }}
+                        onError={e => {
+                          if (!e.target.dataset.triedProxy) {
+                            e.target.dataset.triedProxy = 'true';
+                            e.target.src = getProxiedUrl(directUrl);
+                            return;
+                          }
+                          if (!e.target.dataset.triedFallback) {
+                            e.target.dataset.triedFallback = 'true';
+                            const fallbackImg = getGameIcon(s.name);
+                            if (fallbackImg && fallbackImg !== directUrl) {
+                              e.target.src = getProxiedUrl(fallbackImg);
+                              return;
+                            }
+                          }
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                      <div style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-muted)', background: '#222' }}>
+                        {s.name ? s.name.charAt(0).toUpperCase() : '?'}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%', color: 'var(--color-text)' }}>
+                      {s.name}
+                    </span>
+                    <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
+                      {s.domain || 'Game'}
+                    </span>
+                    <span style={{ 
+                      fontSize: '8px', 
+                      padding: '2px 5px', 
+                      background: s.type === 'Game' 
+                        ? 'rgba(34, 197, 94, 0.15)' 
+                        : s.source === 'Logo.dev' 
+                          ? 'rgba(6, 182, 212, 0.15)' 
+                          : 'rgba(99, 102, 241, 0.15)', 
+                      color: s.type === 'Game' 
+                        ? '#4ade80' 
+                        : s.source === 'Logo.dev' 
+                          ? '#22d3ee' 
+                          : '#818cf8', 
+                      borderRadius: '3px',
+                      marginTop: '4px',
+                      textTransform: 'uppercase',
+                      fontWeight: '700',
+                      letterSpacing: '0.02em'
+                    }}>
+                      {s.source || s.type}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
       
       <div 

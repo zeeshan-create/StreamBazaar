@@ -8,7 +8,24 @@ export const CUSTOM_ICONS = {
   'discovery': '/discoveryplus.jpg',
   'lionsgate': '/lionsgateplay.jpg',
   'lionsgate play': '/lionsgateplay.jpg',
-  'lionsgateplay': '/lionsgateplay.jpg'
+  'lionsgateplay': '/lionsgateplay.jpg',
+  'netflix': 'https://logo.clearbit.com/netflix.com',
+  'spotify': 'https://logo.clearbit.com/spotify.com',
+  'crunchyroll': 'https://logo.clearbit.com/crunchyroll.com',
+  'apple': 'https://logo.clearbit.com/apple.com',
+  'zee5': 'https://logo.clearbit.com/zee5.com',
+  'jiohotstar': '/jiohotstar.png',
+  'jio hotstar': '/jiohotstar.png',
+  'hotstar': '/jiohotstar.png',
+  'sonyliv': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/SonyLIV_2020.png',
+  'sony liv': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/SonyLIV_2020.png',
+  'amazon': 'https://logo.clearbit.com/primevideo.com',
+  'prime video': 'https://logo.clearbit.com/primevideo.com',
+  'chatgpt': 'https://logo.clearbit.com/openai.com',
+  'openai': 'https://logo.clearbit.com/openai.com',
+  'midjourney': 'https://logo.clearbit.com/midjourney.com',
+  'claude': 'https://logo.clearbit.com/anthropic.com',
+  'canva': 'https://logo.clearbit.com/canva.com'
 };
 
 // ── GAME COVER IMAGES ──────────────────────────────────────────────────────
@@ -1588,35 +1605,65 @@ const SORTED_DOMAIN_KEYS = Object.keys(DOMAINS).sort((a, b) => b.length - a.leng
  * Performs dynamic upgrade from google favicon URLs if token is available.
  */
 export const getFavicon = (name, customIcon = null) => {
-  // Check CUSTOM_ICONS first by matching name
+  // 1. If customIcon is provided and is a high-fidelity URL, use it directly!
+  if (customIcon) {
+    const lowerIcon = customIcon.toLowerCase();
+    const isHighFidelity = 
+      lowerIcon.startsWith('/') ||
+      lowerIcon.includes('logo.dev') ||
+      lowerIcon.includes('brandfetch.io') ||
+      lowerIcon.includes('wikimedia.org') ||
+      lowerIcon.includes('steamstatic') ||
+      lowerIcon.includes('igdb') ||
+      lowerIcon.includes('lutris') ||
+      lowerIcon.startsWith('data:image/');
+
+    if (isHighFidelity) {
+      if (name) {
+        const lowerName = name.toLowerCase().trim();
+        if (lowerName.includes('jiohotstar') || lowerName.includes('jio hotstar') || (lowerName.includes('hotstar') && !lowerName.includes('shotstar'))) {
+          return '/jiohotstar.png';
+        }
+      }
+      return customIcon;
+    }
+  }
+
+  // 2. If name matches local brand assets (hoichoi, discovery, lionsgate play, hotstar), return them!
+  if (name) {
+    const lowerName = name.toLowerCase().trim();
+    if (lowerName.includes('hoichoi')) return '/hoichoi.jpg';
+    if (lowerName.includes('discovery')) return '/discoveryplus.jpg';
+    if (lowerName.includes('lionsgate')) return '/lionsgateplay.jpg';
+    if (lowerName.includes('jiohotstar') || lowerName.includes('jio hotstar') || (lowerName.includes('hotstar') && !lowerName.includes('shotstar'))) {
+      return '/jiohotstar.png';
+    }
+  }
+
+  // 3. Fallback check of CUSTOM_ICONS dictionary for other fallback URLs
   if (name) {
     const lowerName = name.toLowerCase().trim();
     const sortedCustomKeys = Object.keys(CUSTOM_ICONS).sort((a, b) => b.length - a.length);
-    const matchedCustom = sortedCustomKeys.find(k => {
-      if (lowerName === k) return true;
-      if (lowerName.startsWith(k + ' ') || lowerName.endsWith(' ' + k)) {
-        return lowerName.length < k.length + 8;
-      }
-      return false;
-    });
+    const matchedCustom = sortedCustomKeys.find(k => lowerName.includes(k));
     if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
   }
 
-  // Also check if customIcon contains signature references to overrides
+  // 4. Also check if customIcon contains signature references to overrides
   if (customIcon) {
     const lowerIcon = customIcon.toLowerCase();
-    if (lowerIcon.includes('lionsgate') || lowerIcon.includes('lionsgateplay.com')) return CUSTOM_ICONS['lionsgate'];
-    if (lowerIcon.includes('discovery') || lowerIcon.includes('discovery.co.za')) return CUSTOM_ICONS['discovery'];
-    if (lowerIcon.includes('hoichoi') || lowerIcon.includes('hoichoicdn')) return CUSTOM_ICONS['hoichoi'];
+    for (const key of Object.keys(CUSTOM_ICONS)) {
+      if (lowerIcon.includes(key)) {
+        return CUSTOM_ICONS[key];
+      }
+    }
   }
 
   // If customIcon is a local base64 upload or a customized non-favicon, non-cdn URL, return it directly
   if (
     customIcon && 
     !customIcon.includes('google.com/s2/favicons') && 
-    !customIcon.includes('logo.dev') &&
     !customIcon.includes('clearbit.com') &&
-    !customIcon.includes('brandfetch.io')
+    !customIcon.includes('fallback/lettermark')
   ) {
     return customIcon;
   }
@@ -1647,13 +1694,7 @@ export const getFavicon = (name, customIcon = null) => {
 
   if (!domain) return null;
 
-  // 3. Construct the ideal high-fidelity URL cascade
-  const token = import.meta.env.VITE_LOGO_DEV_TOKEN || import.meta.env.VITE_LOGO_DEV_PUBLISHABLE_KEY;
-  if (token) {
-    return `https://img.logo.dev/${domain}?token=${token}`;
-  }
-
-  // Clearbit API as high quality open logo fallback (then google favicon via client onError handler)
+  // 3. Use high-fidelity Clearbit CDN cascade
   return `https://logo.clearbit.com/${domain}`;
 };
 
