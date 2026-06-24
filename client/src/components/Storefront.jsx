@@ -818,10 +818,12 @@ export default function App() {
                           style={isGamingCategory(product.category) ? { width: '96px', height: '36px', objectFit: 'cover', borderRadius: '4px' } : {}} 
                           alt={product.name} 
                           onError={(e) => {
-                            if (e.target.src.includes('clearbit.com')) {
-                              const domain = getDomainFromUrl(e.target.src);
-                              e.target.src = `https://www.google.com/s2/favicons?domain=${domain || 'google.com'}&sz=256`;
+                            if (!e.target.src.includes('google.com/s2/favicons') && !e.target.src.startsWith('/') && !e.target.src.includes('placeholder')) {
+                              const domain = getDomainFromUrl(getFavicon(product.name, product.customIcon)) || (product.name ? `${product.name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '')}.com` : 'google.com');
+                              e.target.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
+                              return;
                             }
+                            e.target.src = isGamingCategory(product.category) ? '/placeholder-game.png' : '/placeholder-ott.png';
                           }}
                         />
                        <div className="search-result-info">
