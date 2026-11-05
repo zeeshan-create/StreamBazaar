@@ -451,23 +451,32 @@
   border-radius: 8px;
 }
 
-/* Game Horizontal Capsule */
+/* Game Horizontal Capsule (Exact 120x45 ratio from old website) */
 .sb-game-capsule {
-  width: 95px;
-  height: 48px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: #090a10;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  width: 120px !important;
+  height: 45px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  min-height: 45px !important;
+  max-height: 45px !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  background: #090a10 !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .sb-game-capsule img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 6px !important;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .sb-card-title {

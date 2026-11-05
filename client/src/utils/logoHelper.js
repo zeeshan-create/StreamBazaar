@@ -1571,10 +1571,39 @@ export const isGamingCategory = (cat) => {
 export const getGameIcon = (gameName) => {
   if (!gameName) return null;
   const cleanName = gameName.toLowerCase().replace(/[^a-z0-9]/g, '');
+  
+  // 1. Clean substring or exact key match
   for (let key in GAME_IMGS) {
     const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (cleanName.includes(cleanKey) || cleanKey.includes(cleanName)) return GAME_IMGS[key];
+    if (cleanName === cleanKey || cleanName.includes(cleanKey) || cleanKey.includes(cleanName)) {
+      return GAME_IMGS[key];
+    }
   }
+
+  // 2. High-accuracy intelligent keyword recognition for any new game added via Admin/API
+  const lower = gameName.toLowerCase();
+  if (lower.includes('gta') || lower.includes('grand theft auto')) return GAME_IMGS['gta v'];
+  if (lower.includes('forza') && (lower.includes('5') || lower.includes('hot wheels'))) return GAME_IMGS['forza horizon 5'];
+  if (lower.includes('forza') && lower.includes('6')) return GAME_IMGS['forza horizon 6'];
+  if (lower.includes('forza') && lower.includes('4')) return GAME_IMGS['forza horizon 4'];
+  if (lower.includes('007') || lower.includes('first light')) return GAME_IMGS['007 first light'];
+  if (lower.includes('wukong') || lower.includes('black myth')) return GAME_IMGS['black myth'];
+  if (lower.includes('spider-man') || lower.includes('spiderman')) return GAME_IMGS['spider-man 2'];
+  if (lower.includes('resident evil') || lower.includes('biohazard') || lower.includes('requiem')) return GAME_IMGS['resident evil requiem'];
+  if (lower.includes('god of war')) return GAME_IMGS['god of war'];
+  if (lower.includes('last of us')) return GAME_IMGS['the last of us'];
+  if (lower.includes('wwe')) return GAME_IMGS['wwe 2k25'];
+  if (lower.includes('fifa') || lower.includes('ea sports fc') || lower.includes('fc 25') || lower.includes('fc 24')) return GAME_IMGS['fifa 23'];
+  if (lower.includes('red dead') || lower.includes('rdr')) return GAME_IMGS['red dead redemption'];
+  if (lower.includes('elden ring')) return GAME_IMGS['elden ring'];
+  if (lower.includes('cyberpunk')) return GAME_IMGS['cyberpunk 2077'];
+  if (lower.includes('hogwarts')) return GAME_IMGS['hogwarts legacy'];
+  if (lower.includes('tekken')) return GAME_IMGS['tekken 8'];
+  if (lower.includes('ghost of tsushima')) return GAME_IMGS['ghost of tsushima'];
+  if (lower.includes('assassin')) return GAME_IMGS["assassin's creed"];
+  if (lower.includes('far cry')) return GAME_IMGS['far cry'];
+  if (lower.includes('minecraft')) return GAME_IMGS['minecraft'];
+
   return null;
 };
 

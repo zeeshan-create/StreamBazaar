@@ -198,33 +198,65 @@ const getAccountBadge = (desc) => {
 // ─── LOGO COMPONENT ──────────────────────────────────────────────
 const CardLogo = ({ product }) => {
   const isGaming = isGamingCategory(product.category);
-  const resolvedUrl = getFavicon(product.name, product.customIcon);
+
+  // High-res cover image resolution: prioritize direct plan image, then GAME_IMGS match, then customIcon/favicon
+  const resolvedUrl = useMemo(() => {
+    if (isGaming) {
+      if (product.plans?.[0]?.image) return product.plans[0].image;
+      const gameIcon = getGameIcon(product.name);
+      if (gameIcon) return gameIcon;
+      if (product.customIcon && (product.customIcon.includes('steam') || product.customIcon.includes('capsule') || product.customIcon.startsWith('http') || product.customIcon.startsWith('/'))) {
+        return product.customIcon;
+      }
+    }
+    return getFavicon(product.name, product.customIcon);
+  }, [product.name, product.customIcon, product.category, product.plans, isGaming]);
+
   const [imgSrc, setImgSrc] = useState(resolvedUrl);
 
   useEffect(() => {
-    setImgSrc(getFavicon(product.name, product.customIcon));
-  }, [product.name, product.customIcon]);
+    setImgSrc(resolvedUrl);
+  }, [resolvedUrl]);
 
   const handleError = () => {
+    if (isGaming) {
+      const fallback = getGameIcon(product.name);
+      if (fallback && imgSrc !== fallback) {
+        setImgSrc(fallback);
+        return;
+      }
+      setImgSrc('/placeholder-game.png');
+      return;
+    }
     if (imgSrc && !imgSrc.includes('google.com/s2/favicons') && !imgSrc.startsWith('/')) {
       const domain = getDomainFromUrl(imgSrc) || `${product.name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '')}.com`;
       setImgSrc(`https://www.google.com/s2/favicons?domain=${domain}&sz=256`);
       return;
     }
-    setImgSrc(isGaming ? '/placeholder-game.png' : '/placeholder-ott.png');
+    setImgSrc('/placeholder-ott.png');
   };
 
   if (isGaming) {
     return (
       <div className="sb-game-capsule">
-        <img src={imgSrc} alt={product.name} onError={handleError} />
+        <img
+          src={imgSrc}
+          alt={product.name}
+          onError={handleError}
+          loading="lazy"
+        />
       </div>
     );
   }
 
   return (
     <div className="sb-ott-logo">
-      <img src={imgSrc} alt={product.name} onError={handleError} />
+      <img
+        src={imgSrc}
+        alt={product.name}
+        onError={handleError}
+        loading="lazy"
+      />
     </div>
   );
 };
@@ -745,19 +777,41 @@ export default function StreamBazaarDemo() {
   // Filtered Products
   const displayedProducts = useMemo(() => {
     return products.filter(p => {
+      // 1. Text Search Query
       if (searchQuery) {
-        const match = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-        if (!match) return false;
+        const q = searchQuery.toLowerCase().trim();
+        const name = (p.name || '').toLowerCase();
+        const cat = (p.category || '').toLowerCase();
+        const desc = (p.description || '').toLowerCase();
+        const plat = (p.platform || '').toLowerCase();
+        const matchesQuery = name.includes(q) || cat.includes(q) || desc.includes(q) || plat.includes(q);
+        if (!matchesQuery) return false;
       }
 
-      if (activeCategory !== 'All') {
+      // 2. Gaming Platform Filter (Steam, PlayStation, Xbox)
+      if (gamingPlatformFilter !== 'All') {
+        if (!isGamingCategory(p.category)) return false;
+
+        const target = gamingPlatformFilter.toLowerCase();
+        const pPlat = (p.platform || '').toLowerCase();
+        const pName = (p.name || '').toLowerCase();
+        const pDesc = (p.description || '').toLowerCase();
+        const detected = getGamingPlatform(p).toLowerCase();
+
+        let matches = false;
+        if (target === 'steam') {
+          matches = pPlat === 'steam' || detected === 'steam' || pDesc.includes('steam') || pDesc.includes('pc') || (!pPlat.includes('playstation') && !pPlat.includes('xbox'));
+        } else if (target === 'playstation') {
+          matches = pPlat === 'playstation' || detected === 'playstation' || pPlat.includes('ps') || pDesc.includes('playstation') || pDesc.includes('ps4') || pDesc.includes('ps5') || pName.includes('ps4') || pName.includes('ps5');
+        } else if (target === 'xbox') {
+          matches = pPlat === 'xbox' || detected === 'xbox' || pPlat.includes('xbox') || pDesc.includes('xbox') || pName.includes('xbox');
+        }
+
+        if (!matches) return false;
+      } else if (activeCategory !== 'All') {
+        // 3. Category Filter
         if (activeCategory === 'Gaming' && !isGamingCategory(p.category)) return false;
         if (activeCategory !== 'Gaming' && p.category !== activeCategory) return false;
-      }
-
-      if (isGamingCategory(p.category) && gamingPlatformFilter !== 'All') {
-        const plat = getGamingPlatform(p).toLowerCase();
-        if (plat !== gamingPlatformFilter.toLowerCase()) return false;
       }
 
       return true;
@@ -912,19 +966,27 @@ export default function StreamBazaarDemo() {
 
             <div className="sb-platform-pills">
               {[
-                { id: 'All', label: 'All Platforms', icon: '🌟' },
-                { id: 'steam', label: 'Steam', icon: <Icons.Steam size={12} />, color: '#d4a359' },
-                { id: 'playstation', label: 'PlayStation', icon: <Icons.PlayStation size={12} />, color: '#dfbe82' },
-                { id: 'xbox', label: 'Xbox', icon: <Icons.Xbox size={12} />, color: '#4ade80' }
+                { id: 'All', label: 'All Platforms', icon: '🌟', color: '#f59e0b' },
+                { id: 'steam', label: 'Steam', icon: <Icons.Steam size={13} />, color: '#d4a359' },
+                { id: 'playstation', label: 'PlayStation', icon: <Icons.PlayStation size={13} />, color: '#60a5fa' },
+                { id: 'xbox', label: 'Xbox', icon: <Icons.Xbox size={13} />, color: '#4ade80' }
               ].map((p) => {
-                const isActive = gamingPlatformFilter === p.id;
+                const isActive = gamingPlatformFilter.toLowerCase() === p.id.toLowerCase();
                 return (
                   <button
                     key={p.id}
                     className={`sb-platform-pill ${isActive ? 'active' : ''}`}
-                    onClick={() => setGamingPlatformFilter(p.id)}
+                    onClick={() => {
+                      setGamingPlatformFilter(p.id);
+                      if (p.id !== 'All') {
+                        setActiveCategory('Gaming');
+                      }
+                    }}
                     style={{
-                      borderColor: isActive ? (p.color || '#fff') : 'rgba(255, 255, 255, 0.08)'
+                      borderColor: isActive ? (p.color || '#fff') : 'rgba(255, 255, 255, 0.1)',
+                      background: isActive ? `${p.color}22` : 'rgba(255, 255, 255, 0.04)',
+                      color: isActive ? (p.color || '#fff') : '#bbb',
+                      boxShadow: isActive ? `0 0 14px ${p.color}44` : 'none'
                     }}
                   >
                     <span>{p.icon}</span>
