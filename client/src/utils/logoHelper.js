@@ -9,42 +9,58 @@ export const CUSTOM_ICONS = {
   'lionsgate': '/lionsgateplay.jpg',
   'lionsgate play': '/lionsgateplay.jpg',
   'lionsgateplay': '/lionsgateplay.jpg',
-  'netflix': 'https://logo.clearbit.com/netflix.com',
-  'spotify': 'https://logo.clearbit.com/spotify.com',
-  'crunchyroll': 'https://logo.clearbit.com/crunchyroll.com',
-  'apple': 'https://logo.clearbit.com/apple.com',
-  'zee5': 'https://logo.clearbit.com/zee5.com',
+  'netflix': 'https://www.google.com/s2/favicons?domain=netflix.com&sz=256',
+  'spotify': 'https://www.google.com/s2/favicons?domain=spotify.com&sz=256',
+  'crunchyroll': 'https://www.google.com/s2/favicons?domain=crunchyroll.com&sz=256',
+  'apple': 'https://www.google.com/s2/favicons?domain=apple.com&sz=256',
+  'zee5': 'https://www.google.com/s2/favicons?domain=zee5.com&sz=256',
   'jiohotstar': '/jiohotstar.png',
   'jio hotstar': '/jiohotstar.png',
   'hotstar': '/jiohotstar.png',
   'sonyliv': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/SonyLIV_2020.png',
   'sony liv': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/SonyLIV_2020.png',
-  'amazon': 'https://logo.clearbit.com/primevideo.com',
-  'prime video': 'https://logo.clearbit.com/primevideo.com',
-  'chatgpt': 'https://logo.clearbit.com/openai.com',
-  'openai': 'https://logo.clearbit.com/openai.com',
-  'midjourney': 'https://logo.clearbit.com/midjourney.com',
-  'claude': 'https://logo.clearbit.com/anthropic.com',
-  'canva': 'https://logo.clearbit.com/canva.com'
+  'amazon': 'https://www.google.com/s2/favicons?domain=primevideo.com&sz=256',
+  'prime video': 'https://www.google.com/s2/favicons?domain=primevideo.com&sz=256',
+  'prime': 'https://www.google.com/s2/favicons?domain=primevideo.com&sz=256',
+  'chatgpt': 'https://www.google.com/s2/favicons?domain=chatgpt.com&sz=256',
+  'openai': 'https://www.google.com/s2/favicons?domain=openai.com&sz=256',
+  'midjourney': 'https://www.google.com/s2/favicons?domain=midjourney.com&sz=256',
+  'claude': 'https://www.google.com/s2/favicons?domain=anthropic.com&sz=256',
+  'canva': 'https://www.google.com/s2/favicons?domain=canva.com&sz=256',
+  'nordvpn': 'https://www.google.com/s2/favicons?domain=nordvpn.com&sz=256',
+  'surfshark': 'https://www.google.com/s2/favicons?domain=surfshark.com&sz=256',
+  'expressvpn': 'https://www.google.com/s2/favicons?domain=expressvpn.com&sz=256',
+  'proton': 'https://www.google.com/s2/favicons?domain=protonvpn.com&sz=256',
+  'grok': 'https://www.google.com/s2/favicons?domain=x.ai&sz=256',
+  'perplexity': 'https://www.google.com/s2/favicons?domain=perplexity.ai&sz=256',
+  'youtube': 'https://www.google.com/s2/favicons?domain=youtube.com&sz=256',
+  'fancode': 'https://www.google.com/s2/favicons?domain=fancode.com&sz=256'
 };
 
 // ── GAME COVER IMAGES ──────────────────────────────────────────────────────
 export const GAME_IMGS = {
-  'wwe 2k25': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg',
-  'wwe bundles': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2315690/capsule_184x69.jpg',
-  'forza horizon 5': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551360/capsule_184x69.jpg',
-  'gta v': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/capsule_184x69.jpg',
+  'grand theft auto v enhanced': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/a318bd9affe8eee32984b18794b273c256e9b2d6/capsule_231x87.jpg',
+  'gta v': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/a318bd9affe8eee32984b18794b273c256e9b2d6/capsule_231x87.jpg',
   'gta trilogy': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1546930/capsule_184x69.jpg',
+  'forza horizon 5': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1613280/capsule_231x87.jpg',
+  'forza horizon 6': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2483190/3e98fe57eb90547f6b7b165a9e4b2a4c27902ac8/capsule_231x87_alt_assets_1.jpg',
+  'forza horizon 4': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1293830/capsule_231x87.jpg',
+  '007 first light': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3768760/244e00f17e6d0b5d1e88320dfbb5a12b483be700/capsule_231x87.jpg',
+  '007': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3768760/244e00f17e6d0b5d1e88320dfbb5a12b483be700/capsule_231x87.jpg',
+  'black myth': 'https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_184x69.jpg',
   'spider-man 2': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
   'spider-man series': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg',
-  'uncharted': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659420/capsule_184x69.jpg',
-  'the last of us': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/capsule_184x69.jpg',
-  'black myth wukong': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/capsule_184x69.jpg',
-  'ghost of tsushima': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/capsule_184x69.jpg',
-  'elden ring': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_184x69.jpg',
+  'resident evil requiem': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3764200/64f506b9b6210df6055136e7017f2082957e5b22/capsule_231x87.jpg',
   'resident evil': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2050650/capsule_184x69.jpg',
-  'hogwarts legacy': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/capsule_184x69.jpg',
   'god of war': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/capsule_184x69.jpg',
+  'the last of us': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/capsule_231x87.jpg',
+  'wwe 2k25': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2878960/e982af853388882a4a7c527d79a96c0f2e8b19cb/capsule_231x87.jpg',
+  'fifa 23': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1811260/capsule_231x87.jpg',
+  'red dead redemption': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg',
+  'elden ring': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_184x69.jpg',
+  'hogwarts legacy': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/capsule_184x69.jpg',
+  'uncharted': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659420/capsule_184x69.jpg',
+  'ghost of tsushima': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2215430/capsule_184x69.jpg',
   'cyberpunk 2077': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/capsule_184x69.jpg',
   'pragmata': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1240440/capsule_184x69.jpg',
   'assassin\'s creed': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2208920/capsule_184x69.jpg',
@@ -55,7 +71,6 @@ export const GAME_IMGS = {
   'tekken 7': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/389730/capsule_184x69.jpg',
   'tekken 8': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1778820/capsule_184x69.jpg',
   'expedition 33': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2690040/capsule_184x69.jpg',
-  'red dead redemption': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg',
   'hitman': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1659040/capsule_184x69.jpg',
   'far cry': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2369390/capsule_184x69.jpg',
   'poppy playtime': 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1721470/capsule_184x69.jpg',
@@ -1605,30 +1620,36 @@ const SORTED_DOMAIN_KEYS = Object.keys(DOMAINS).sort((a, b) => b.length - a.leng
  * Performs dynamic upgrade from google favicon URLs if token is available.
  */
 export const getFavicon = (name, customIcon = null) => {
-  // 1. If customIcon is provided and is a high-fidelity URL, use it directly!
-  if (customIcon) {
-    const lowerIcon = customIcon.toLowerCase();
-    const isHighFidelity = 
-      lowerIcon.startsWith('/') ||
-      lowerIcon.includes('logo.dev') ||
-      lowerIcon.includes('wikimedia.org') ||
-      lowerIcon.includes('steamstatic') ||
-      lowerIcon.includes('igdb') ||
-      lowerIcon.includes('lutris') ||
-      lowerIcon.startsWith('data:image/');
-
-    if (isHighFidelity) {
+  // 1. If customIcon is provided and is a valid URL, return it directly
+  if (customIcon && typeof customIcon === 'string' && customIcon.trim()) {
+    const trimmed = customIcon.trim();
+    if (trimmed.startsWith('/') || trimmed.startsWith('data:image/') || trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      // Hotstar local fix
       if (name) {
         const lowerName = name.toLowerCase().trim();
         if (lowerName.includes('jiohotstar') || lowerName.includes('jio hotstar') || (lowerName.includes('hotstar') && !lowerName.includes('shotstar'))) {
           return '/jiohotstar.png';
         }
       }
-      return customIcon;
+      return trimmed;
     }
   }
 
-  // 2. If name matches local brand assets (hoichoi, discovery, lionsgate play, hotstar), return them!
+  // 2. Check if name matches any game cover capsule
+  if (name) {
+    const lowerName = name.toLowerCase().trim();
+    const gameIcon = getGameIcon(name);
+    if (gameIcon) return gameIcon;
+
+    // Direct game image match
+    for (const [k, v] of Object.entries(GAME_IMGS)) {
+      if (lowerName.includes(k) || k.includes(lowerName)) {
+        return v;
+      }
+    }
+  }
+
+  // 3. If name matches local brand assets (hoichoi, discovery, lionsgate play, hotstar), return them!
   if (name) {
     const lowerName = name.toLowerCase().trim();
     if (lowerName.includes('hoichoi')) return '/hoichoi.jpg';
@@ -1639,7 +1660,7 @@ export const getFavicon = (name, customIcon = null) => {
     }
   }
 
-  // 3. Fallback check of CUSTOM_ICONS dictionary for other fallback URLs
+  // 4. Fallback check of CUSTOM_ICONS dictionary
   if (name) {
     const lowerName = name.toLowerCase().trim();
     const sortedCustomKeys = Object.keys(CUSTOM_ICONS).sort((a, b) => b.length - a.length);
@@ -1647,54 +1668,22 @@ export const getFavicon = (name, customIcon = null) => {
     if (matchedCustom) return CUSTOM_ICONS[matchedCustom];
   }
 
-  // 4. Also check if customIcon contains signature references to overrides
-  if (customIcon) {
-    const lowerIcon = customIcon.toLowerCase();
-    for (const key of Object.keys(CUSTOM_ICONS)) {
-      if (lowerIcon.includes(key)) {
-        return CUSTOM_ICONS[key];
-      }
-    }
-  }
-
-  // If customIcon is a local base64 upload or a customized non-favicon, non-cdn URL, return it directly
-  if (
-    customIcon && 
-    !customIcon.includes('google.com/s2/favicons') && 
-    !customIcon.includes('clearbit.com') &&
-    !customIcon.includes('fallback/lettermark')
-  ) {
-    return customIcon;
-  }
-
-  // 1. Try to extract the domain from the existing customIcon URL
+  // 5. Try to extract domain
   let domain = null;
-  if (customIcon) {
-    domain = getDomainFromUrl(customIcon);
-  }
-
-  // 2. Fall back to name-based mapping if no domain resolved
-  if (!domain && name) {
+  if (name) {
     const lowerName = name.toLowerCase().trim();
-    
-    // Check GAME_IMGS
-    const gameIcon = getGameIcon(name);
-    if (gameIcon) return gameIcon;
-
-    // Resolve domain from DOMAINS dictionary
     const matchedKey = SORTED_DOMAIN_KEYS.find(key => lowerName.includes(key));
     if (matchedKey) {
       domain = DOMAINS[matchedKey];
     } else {
-      // Smart domain fallback: sanitize and append .com
       domain = `${lowerName.split(' ')[0].replace(/[^a-z0-9]/g, '')}.com`;
     }
   }
 
-  if (!domain) return null;
+  if (!domain) return '/placeholder-ott.png';
 
-  // 3. Use high-fidelity Clearbit CDN cascade
-  return `https://logo.clearbit.com/${domain}`;
+  // 6. Use ultra-reliable Google S2 256px CDN
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
 };
 
 /**
