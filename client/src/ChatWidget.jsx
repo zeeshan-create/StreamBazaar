@@ -13,7 +13,7 @@ const QUICK_CHIPS = [
 
 const WELCOME = {
   role: 'bot',
-  content: "Hey! I'm **StreamBot** 🤖\n\nI can help you find the best subscription plan, check prices, or answer any questions.\n(Main Hindi aur English dono mein baat kar sakta hoon!)\n\nWhat are you looking for today? / Aaj aap kya dhoondh rahe hain?",
+  content: "Hey! I'm **Sheena** 🤖\n\nI can help you find the best subscription plan, check prices, or answer any questions.\n(Main Hindi aur English dono mein baat kar sakta hoon!)\n\nWhat are you looking for today? / Aaj aap kya dhoondh rahe hain?",
   id: 0,
 };
 
@@ -101,7 +101,7 @@ export default function ChatWidget() {
                   <span className="bot-status-dot" />
                 </div>
                 <div>
-                  <div className="chat-title">StreamBot</div>
+                  <div className="chat-title">Sheena</div>
                   <div className="chat-subtitle">AI Support · Usually replies instantly</div>
                 </div>
               </div>

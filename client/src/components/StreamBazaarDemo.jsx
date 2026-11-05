@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import { MessageCircle, ExternalLink, Search } from 'lucide-react';
+import ChatWidget from '../ChatWidget';
+import FomoToast from './FomoToast';
 import { 
   getFavicon, 
   isGamingCategory, 
@@ -875,58 +878,94 @@ export default function StreamBazaarDemo() {
         </div>
       </nav>
 
-      {/* Hero Showcase Section */}
-      <header className="sb-hero">
-        {/* Floating Animated 3D StreamBazaar Logo */}
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+      {/* Hero Showcase Section - Matches Image 2 */}
+      <section className="hero">
+        <div className="hero-glow" />
+        <div className="hero-ring" />
+        <div className="hero-ring" />
+        <div className="hero-ring" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        >
+          {/* 3D Gold & Cyan StreamBazaar Shopping Bag Logo */}
           <img
             src="/logo.png"
             alt="StreamBazaar Logo"
-            className="sb-hero-logo-img"
+            className="hero-logo"
           />
-        </div>
 
-        <div className="sb-hero-tag">
-          <span>✨</span>
-          <span>India's #1 Most Trusted OTT & Gaming Seat Marketplace</span>
-        </div>
+          {/* Badge */}
+          <div className="hero-badge">🌟 Premium Digital Seat Access Store</div>
 
-        <h1 className="sb-hero-title">
-          Watch & Play Anything for <br />
-          <span className="sb-hero-highlight">Up to 90% Less</span>
-        </h1>
+          {/* Main Title */}
+          <h1>
+            Premium Subscriptions<br />
+            <span>At Lowest Prices</span>
+          </h1>
 
-        <p className="sb-hero-sub">
-          Instant delivery, pin-protected private profiles, 100% full replacement guarantee, 
-          and 24/7 human customer support on Telegram.
-        </p>
+          {/* Subtitle */}
+          <p className="hero-sub">
+            <span>Instant Access</span> &nbsp;•&nbsp; <span>Secure Login</span> &nbsp;•&nbsp; <span>1 Device Support</span>
+          </p>
 
-        {/* Dedicated Centered Search Bar */}
-        <div className="sb-search-hero-wrap">
-          <div className="sb-search-hero-box">
-            <span style={{ fontSize: '18px', color: '#a855f7' }}>🔍</span>
-            <input
-              className="sb-search-hero-input"
-              type="text"
-              placeholder="Search Netflix, Crunchyroll, GTA V, VPN, Spotify..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button
-                className="sb-search-clear-btn"
-                onClick={() => setSearchQuery('')}
-                title="Clear Search"
-              >
-                ✕
-              </button>
-            )}
+          {/* Two CTA Buttons */}
+          <div className="hero-ctas">
+            <motion.a
+              href="#deals"
+              className="btn-primary"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById('deals');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              View Plans <ExternalLink size={16} />
+            </motion.a>
+            <motion.a
+              href="https://t.me/TrustedStreams"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-ghost"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <MessageCircle size={16} /> Contact Support
+            </motion.a>
           </div>
-        </div>
-      </header>
+
+          {/* Dedicated Centered Search Bar */}
+          <div className="sb-search-hero-wrap">
+            <div className="sb-search-hero-box">
+              <span style={{ fontSize: '18px', color: '#a855f7' }}>🔍</span>
+              <input
+                className="sb-search-hero-input"
+                type="text"
+                placeholder="Search Netflix, Crunchyroll, GTA V, VPN..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  className="sb-search-clear-btn"
+                  onClick={() => setSearchQuery('')}
+                  title="Clear Search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </section>
 
       {/* Content Container */}
-      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
+      <main id="deals" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
 
         {/* Category Navigation Pills */}
         <div className="sb-cats-scroll">
@@ -1106,6 +1145,10 @@ export default function StreamBazaarDemo() {
         <span style={{ fontSize: '18px' }}>💬</span>
         <span>Order via Telegram</span>
       </a>
+
+      {/* Sheena AI Chatbot & FOMO Live Purchases Toast */}
+      <ChatWidget />
+      <FomoToast />
     </div>
   );
 }

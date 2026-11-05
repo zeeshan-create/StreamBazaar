@@ -1009,7 +1009,7 @@ app.post('/api/chat', async (req, res) => {
     
     // Greetings & Menu
     if (/^(hi|hello|hey|help|menu|start|namaste)$/.test(msgLower)) {
-      return res.json({ reply: 'Hello there! 👋 Welcome to StreamBazaar.\n\nI can help you with:\n• Finding OTT prices (e.g., type "Netflix" or "Spotify")\n• Gaming seat prices (e.g., type "Steam")\n• How to purchase\n\nWhat are you looking for today?' });
+      return res.json({ reply: "Hello there! 👋 I'm **Sheena**, AI Support at StreamBazaar.\n\nI can help you with:\n• Finding OTT prices (e.g., type \"Netflix\" or \"Spotify\")\n• Gaming seat prices (e.g., type \"Steam\")\n• How to purchase\n\nWhat are you looking for today? / Aaj aap kya dhoondh rahe hain?" });
     }
 
     // Quick Chips - Dynamic Price Lookups
@@ -1097,7 +1097,7 @@ app.post('/api/chat', async (req, res) => {
       s.plans.map(p => `   • ${p.label} → ${p.price}`).join('\n')
     ).join('\n\n');
 
-    const SYSTEM_PROMPT = `You are StreamBot 🤖, a friendly and knowledgeable customer support AI for StreamBazaar — a premium digital subscription seat access store.
+    const SYSTEM_PROMPT = `You are Sheena 🤖, a friendly and knowledgeable customer support AI for StreamBazaar — a premium digital subscription seat access store.
 Your job is to help customers:
 - Find the right subscription plan
 - Understand pricing and what "seat access" means
