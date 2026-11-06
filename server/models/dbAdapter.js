@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const mongoUri = process.env.MONGODB_URI;
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://zk45681_db_user:nbU3QDZat24g3Yzw@streambazaar.7lg63mf.mongodb.net/streambazaar?retryWrites=true&w=majority&appName=streambazaar';
 
 let isConnected = false;
 

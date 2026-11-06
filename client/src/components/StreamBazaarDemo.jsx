@@ -95,6 +95,9 @@ const isColorTooDark = (c) => {
 };
 
 const getSafeBrandColor = (product) => {
+  const raw = product?.primaryColor || product?.color;
+  if (raw && !isColorTooDark(raw)) return raw;
+
   const name = (product?.name || '').toLowerCase();
   if (name.includes('crunchyroll')) return '#ff6600'; // Official Crunchyroll Vibrant Orange!
   if (name.includes('chatgpt') || name.includes('openai')) return '#10a37f';
@@ -112,8 +115,6 @@ const getSafeBrandColor = (product) => {
   if (name.includes('expressvpn')) return '#ef4444';
   if (name.includes('proton')) return '#8b5cf6';
 
-  const raw = product?.primaryColor || product?.color;
-  if (raw && !isColorTooDark(raw)) return raw;
   return '#a855f7';
 };
 
@@ -622,6 +623,27 @@ const ProductCard = ({ product, onOpenBuy }) => {
   const platformBadge = isGaming ? getPlatformBadge(platform) : null;
   const accountBadge = getAccountBadge(product.description);
 
+  // Status check from Admin Panel
+  const rawStatus = (product.status || 'Available').trim().toLowerCase();
+  const isOutOfStock = rawStatus.includes('out') || rawStatus === 'oos';
+  const isComingSoon = rawStatus.includes('coming');
+
+  const statusBadge = isOutOfStock ? {
+    label: 'OUT OF STOCK',
+    style: {
+      border: '1px solid rgba(239, 68, 68, 0.6)',
+      background: 'rgba(239, 68, 68, 0.16)',
+      color: '#f87171'
+    }
+  } : isComingSoon ? {
+    label: 'COMING SOON',
+    style: {
+      border: '1px solid rgba(245, 158, 11, 0.6)',
+      background: 'rgba(245, 158, 11, 0.16)',
+      color: '#fbbf24'
+    }
+  } : null;
+
   // Lowest price from plans
   const lowestPrice = useMemo(() => {
     if (!product.plans || product.plans.length === 0) return '₹199';
@@ -639,10 +661,13 @@ const ProductCard = ({ product, onOpenBuy }) => {
   return (
     <motion.div
       layout
-      className="sb-card"
+      className={`sb-card ${isOutOfStock ? 'sb-card-oos' : ''}`}
       style={{
-        border: `1.5px solid rgba(${colorRgb}, 0.35)`,
-        boxShadow: `0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(${colorRgb}, 0.08)`
+        border: `1.5px solid ${isOutOfStock ? 'rgba(239, 68, 68, 0.35)' : `rgba(${colorRgb}, 0.35)`}`,
+        boxShadow: isOutOfStock 
+          ? '0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 68, 68, 0.05)'
+          : `0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(${colorRgb}, 0.08)`,
+        opacity: isOutOfStock ? 0.78 : 1
       }}
     >
       <div>
@@ -674,6 +699,11 @@ const ProductCard = ({ product, onOpenBuy }) => {
               <span className="sb-badge" style={accountBadge.style}>
                 {accountBadge.icon} {accountBadge.label}
               </span>
+              {statusBadge && (
+                <span className="sb-badge" style={statusBadge.style}>
+                  {isOutOfStock ? '🚫' : '⏳'} {statusBadge.label}
+                </span>
+              )}
             </div>
 
             <p className="sb-card-desc">
@@ -694,11 +724,11 @@ const ProductCard = ({ product, onOpenBuy }) => {
         </div>
       </div>
 
-      {/* Bottom Action Area: Starting Price + Single Get Plan Button */}
+      {/* Bottom Action Area: Starting Price + Single Get Plan / Out of Stock Button */}
       <div className="sb-card-action">
         <div className="sb-card-price-area">
           <span className="sb-price-label">STARTING AT</span>
-          <span className="sb-card-price" style={{ color: brandColor }}>
+          <span className="sb-card-price" style={{ color: isOutOfStock ? '#888' : brandColor }}>
             {lowestPrice}
           </span>
           <span style={{ color: '#aaa', fontSize: '11px', fontWeight: 700 }}>
@@ -706,17 +736,51 @@ const ProductCard = ({ product, onOpenBuy }) => {
           </span>
         </div>
 
-        {/* Single High-Converting Get Plan Button (Opens Modal with All Plans & Devices) */}
-        <button
-          className="sb-card-buy-btn"
-          onClick={() => onOpenBuy(product, product.plans?.[0])}
-          style={{
-            background: `linear-gradient(135deg, ${brandColor}, #6366f1)`
-          }}
-        >
-          <span>Get Plan</span>
-          <span style={{ fontSize: '13px' }}>⚡</span>
-        </button>
+        {/* High-Converting Action Button: Respects Out of Stock & Coming Soon from Admin Panel */}
+        {isOutOfStock ? (
+          <button
+            className="sb-card-buy-btn"
+            disabled
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.45)',
+              color: '#f87171',
+              cursor: 'not-allowed',
+              boxShadow: 'none',
+              filter: 'none'
+            }}
+          >
+            <span>Out of Stock</span>
+            <span style={{ fontSize: '12px' }}>🚫</span>
+          </button>
+        ) : isComingSoon ? (
+          <button
+            className="sb-card-buy-btn"
+            disabled
+            style={{
+              background: 'rgba(245, 158, 11, 0.15)',
+              border: '1px solid rgba(245, 158, 11, 0.45)',
+              color: '#fbbf24',
+              cursor: 'not-allowed',
+              boxShadow: 'none',
+              filter: 'none'
+            }}
+          >
+            <span>Coming Soon</span>
+            <span style={{ fontSize: '12px' }}>⏳</span>
+          </button>
+        ) : (
+          <button
+            className="sb-card-buy-btn"
+            onClick={() => onOpenBuy(product, product.plans?.[0])}
+            style={{
+              background: `linear-gradient(135deg, ${brandColor}, #6366f1)`
+            }}
+          >
+            <span>Get Plan</span>
+            <span style={{ fontSize: '13px' }}>⚡</span>
+          </button>
+        )}
       </div>
     </motion.div>
   );
@@ -761,10 +825,29 @@ export default function StreamBazaarDemo() {
 
   useEffect(() => {
     fetchPlans();
+    
+    // 1. Ultra-fast 2-second background polling
     const interval = setInterval(() => {
       if (!document.hidden) fetchPlans();
-    }, 3500);
-    return () => clearInterval(interval);
+    }, 2000);
+
+    // 2. Instant re-fetch when user switches back to the storefront tab
+    const onFocus = () => fetchPlans();
+    window.addEventListener('focus', onFocus);
+
+    // 3. 0ms instant broadcast sync when Admin edits any product in another tab
+    const onStorage = (e) => {
+      if (e.key === 'streambazaar_plans_updated') {
+        fetchPlans();
+      }
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('storage', onStorage);
+    };
   }, [fetchPlans]);
 
   // Filtered Products

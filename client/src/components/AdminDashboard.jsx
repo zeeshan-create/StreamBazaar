@@ -990,6 +990,7 @@ export default function AdminDashboard() {
       if (res.ok) {
         setEditingId(null);
         fetchServices();
+        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to save: ${errData.error || res.statusText || 'Unknown error'}`);
@@ -1004,7 +1005,10 @@ export default function AdminDashboard() {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
     try {
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchServices();
+      if (res.ok) {
+        fetchServices();
+        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
+      }
     } catch (err) {
       console.error('Delete error:', err);
     }
@@ -1022,6 +1026,7 @@ export default function AdminDashboard() {
       if (res.ok) {
         alert('All products have been deleted successfully.');
         fetchServices();
+        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to delete: ${errData.error || res.statusText || 'Unknown error'}`);
@@ -1051,6 +1056,7 @@ export default function AdminDashboard() {
       if (res.ok) {
         setShowAddForm(false);
         fetchServices();
+        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to add service: ${errData.error || res.statusText || 'Unknown error'}`);
