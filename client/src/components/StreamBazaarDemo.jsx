@@ -699,9 +699,16 @@ const ProductCard = ({ product, onOpenBuy }) => {
               <span className="sb-badge" style={accountBadge.style}>
                 {accountBadge.icon} {accountBadge.label}
               </span>
-              {statusBadge && (
-                <span className="sb-badge" style={statusBadge.style}>
-                  {isOutOfStock ? '🚫' : '⏳'} {statusBadge.label}
+              {isOutOfStock && (
+                <span className="sb-badge-oos">
+                  <span>🚫</span>
+                  <span>OUT OF STOCK</span>
+                </span>
+              )}
+              {isComingSoon && (
+                <span className="sb-badge-coming-soon">
+                  <span>⏳</span>
+                  <span>COMING SOON</span>
                 </span>
               )}
             </div>
@@ -738,36 +745,14 @@ const ProductCard = ({ product, onOpenBuy }) => {
 
         {/* High-Converting Action Button: Respects Out of Stock & Coming Soon from Admin Panel */}
         {isOutOfStock ? (
-          <button
-            className="sb-card-buy-btn"
-            disabled
-            style={{
-              background: 'rgba(239, 68, 68, 0.15)',
-              border: '1px solid rgba(239, 68, 68, 0.45)',
-              color: '#f87171',
-              cursor: 'not-allowed',
-              boxShadow: 'none',
-              filter: 'none'
-            }}
-          >
+          <button className="sb-btn-oos" disabled>
             <span>Out of Stock</span>
-            <span style={{ fontSize: '12px' }}>🚫</span>
+            <span style={{ fontSize: '13px' }}>🚫</span>
           </button>
         ) : isComingSoon ? (
-          <button
-            className="sb-card-buy-btn"
-            disabled
-            style={{
-              background: 'rgba(245, 158, 11, 0.15)',
-              border: '1px solid rgba(245, 158, 11, 0.45)',
-              color: '#fbbf24',
-              cursor: 'not-allowed',
-              boxShadow: 'none',
-              filter: 'none'
-            }}
-          >
+          <button className="sb-btn-coming-soon" disabled>
             <span>Coming Soon</span>
-            <span style={{ fontSize: '12px' }}>⏳</span>
+            <span style={{ fontSize: '13px' }}>⏳</span>
           </button>
         ) : (
           <button

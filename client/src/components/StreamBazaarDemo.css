@@ -1082,6 +1082,107 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   CYBER-LUXE STYLISH GLOWING BADGES & BUTTONS
+   Out of Stock (Neon Crimson Pulse) & Coming Soon (Cyber-Gold Glow)
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes sb-pulse-crimson {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.45), 0 0 20px rgba(239, 68, 68, 0.2), inset 0 0 8px rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.8), 0 0 35px rgba(239, 68, 68, 0.4), inset 0 0 14px rgba(239, 68, 68, 0.3);
+    border-color: #ff4d4d;
+  }
+}
+
+@keyframes sb-pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.45), 0 0 20px rgba(245, 158, 11, 0.2), inset 0 0 8px rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.85), 0 0 35px rgba(245, 158, 11, 0.45), inset 0 0 14px rgba(245, 158, 11, 0.35);
+    border-color: #fbbf24;
+  }
+}
+
+.sb-badge-oos {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #ff6b6b;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(127, 29, 29, 0.12));
+  border: 1px solid rgba(239, 68, 68, 0.65);
+  animation: sb-pulse-crimson 2.4s ease-in-out infinite;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+  backdrop-filter: blur(6px);
+}
+
+.sb-badge-coming-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #fde047;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(161, 98, 7, 0.12));
+  border: 1px solid rgba(245, 158, 11, 0.65);
+  animation: sb-pulse-gold 2.4s ease-in-out infinite;
+  text-shadow: 0 0 8px rgba(253, 224, 71, 0.7);
+  backdrop-filter: blur(6px);
+}
+
+.sb-btn-oos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  color: #ff8585;
+  background: linear-gradient(135deg, rgba(185, 28, 28, 0.3), rgba(99, 14, 14, 0.2));
+  border: 1.5px solid rgba(239, 68, 68, 0.65);
+  animation: sb-pulse-crimson 2.6s ease-in-out infinite;
+  cursor: not-allowed;
+  user-select: none;
+  backdrop-filter: blur(8px);
+}
+
+.sb-btn-coming-soon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  color: #fde047;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.3), rgba(120, 53, 15, 0.2));
+  border: 1.5px solid rgba(245, 158, 11, 0.65);
+  animation: sb-pulse-gold 2.6s ease-in-out infinite;
+  cursor: not-allowed;
+  user-select: none;
+  backdrop-filter: blur(8px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
    ULTRA-PERFORMANCE & UNIVERSAL DEVICE RESPONSIVENESS
    (iOS, Android, Tablets, PC, Mac, Smart TV, Ultrawide)
    ═══════════════════════════════════════════════════════════════ */

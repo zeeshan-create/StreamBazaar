@@ -63,6 +63,11 @@ function createAdapter(mongoModel) {
       await mongoModel.updateMany(query, payload);
       return { success: true };
     },
+    findOneAndUpdate: async (query, updateDoc) => {
+      await connectToDatabase();
+      const payload = updateDoc.$set ? updateDoc : { $set: updateDoc };
+      return mongoModel.findOneAndUpdate(query, payload, { new: true }).lean();
+    },
     remove: async (query, options = {}) => {
       await connectToDatabase();
       if (Object.keys(query).length === 0 && options.multi) {

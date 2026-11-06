@@ -972,9 +972,8 @@ app.put('/api/admin/plans/:id', async (req, res) => {
     const updateData = { ...req.body };
     delete updateData._id;
     delete updateData.__v;
-    await Service.update({ _id: req.params.id }, { $set: updateData });
-    const updated = await Service.findOne({ _id: req.params.id });
-    res.json(updated);
+    const updated = await Service.findOneAndUpdate({ _id: req.params.id }, { $set: updateData });
+    res.json(updated || { success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

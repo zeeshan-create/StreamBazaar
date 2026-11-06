@@ -982,22 +982,25 @@ export default function AdminDashboard() {
       });
       const payload = { ...editForm, plans: sanitizedPlans };
 
+      // ⚡ INSTANT 0ms ZERO-LATENCY OPTIMISTIC UPDATE
+      setServices(prev => prev.map(s => (s._id === id ? { ...s, ...payload } : s)));
+      setEditingId(null);
+      localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
+
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (res.ok) {
-        setEditingId(null);
-        fetchServices();
-        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
-      } else {
+      if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to save: ${errData.error || res.statusText || 'Unknown error'}`);
+        fetchServices();
       }
     } catch (err) {
       console.error('Save error:', err);
       alert(`Save connection error: ${err.message}`);
+      fetchServices();
     }
   };
 
