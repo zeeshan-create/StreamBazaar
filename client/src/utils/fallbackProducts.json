@@ -1,0 +1,1406 @@
+[
+  {
+    "_id": "6a2592d5558f5b1e06968f5c",
+    "name": "Netflix",
+    "category": "Streaming",
+    "primaryColor": "#e40c14",
+    "secondaryColor": "#b4040c",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "4K UHD",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹160",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "Android",
+          "iOS"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K Ultra HD",
+        "quality": "",
+        "duration": "45 Days ",
+        "price": "₹350",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Full HD 1080p",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹299",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K Ultra HD",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹980",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K Ultra HD",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹1690",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=netflix.com&sz=256",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#e40c14",
+    "originalSecondaryColor": "#b4040c"
+  },
+  {
+    "_id": "6a25939e7103b6ff57bee9ab",
+    "name": "Amazon Prime",
+    "category": "Streaming",
+    "primaryColor": "#00a8e1",
+    "secondaryColor": "#00a8e1",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "4K UHD",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹90",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "Android",
+          "iOS"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K UHD",
+        "quality": "",
+        "duration": "45 Days ",
+        "price": "₹199",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Full HD 1080p",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹385",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹690",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Private Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹890",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹980",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Private Profile",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹1100",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#00a8e1",
+    "originalSecondaryColor": "#00a8e1"
+  },
+  {
+    "_id": "6a259777558f5b1e06968f5d",
+    "name": "ZEE5Official",
+    "category": "Streaming",
+    "primaryColor": "#6a3fbf",
+    "secondaryColor": "#140c24",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Full HD 1080p",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹90",
+        "type": "",
+        "supportedDevices": [
+          "Android",
+          "iOS"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K Ultra HD",
+        "quality": "",
+        "duration": "45 Days",
+        "price": "₹199",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹680",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Private Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹880",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹999",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹1099",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=zee5.com&sz=256",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#6a3fbf",
+    "originalSecondaryColor": "#140c24"
+  },
+  {
+    "_id": "6a2599304cea82423fb52320",
+    "name": "Sony LIV",
+    "category": "Streaming",
+    "primaryColor": "#f2a814",
+    "secondaryColor": "#1e0b78",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Full HD 1080p",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹80",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K UHD",
+        "quality": "",
+        "duration": "45 Days ",
+        "price": "₹199",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹699",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Private Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹799",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹999",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹1099",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=sonyliv.com&sz=256",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#f2a814",
+    "originalSecondaryColor": "#1e0b78"
+  },
+  {
+    "_id": "6a25a2946a349e3a8e5d5139",
+    "name": "JioHotstar",
+    "category": "Streaming",
+    "primaryColor": "#06a5fb",
+    "secondaryColor": "#970c90",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Full HD 1080p",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹90",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K UHD",
+        "quality": "",
+        "duration": "45 Days",
+        "price": "₹199",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹675",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Private Profile",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹785",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Shared Profile",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹900",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Private Profile",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹999",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#06a5fb",
+    "originalSecondaryColor": "#970c90",
+    "customIcon": "/jiohotstar.png"
+  },
+  {
+    "_id": "6a267d7854799a32872526a0",
+    "name": "YouTube",
+    "category": "Streaming",
+    "primaryColor": "#fc0434",
+    "secondaryColor": "#83011a",
+    "description": "Personal email upgrade. Secure and private access.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Individual Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹120",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Individual Plan",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹355",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "6 Months",
+        "price": "₹550",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=youtube.com&sz=256",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#fc0434",
+    "originalSecondaryColor": "#83011a"
+  },
+  {
+    "_id": "6a267f26a1d3ef0ff77d9016",
+    "name": "Crunchyroll",
+    "category": "Streaming",
+    "primaryColor": "#030b14",
+    "secondaryColor": "#030b14",
+    "description": "4K Ultra HD • 1 Device Seat Access",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "4K Ultra HD",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹70",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K Ultra HD",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹180",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "4K Ultra HD",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹550",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=crunchyroll.com&sz=256",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#030b14",
+    "originalSecondaryColor": "#030b14"
+  },
+  {
+    "_id": "6a26f7f4537a86c642246ffa",
+    "name": "ChatGPT",
+    "category": "AI+",
+    "primaryColor": "#7f7f7f",
+    "secondaryColor": "#424242",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Plus ",
+        "quality": "",
+        "duration": "55days",
+        "price": "₹899",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Plus",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹645",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=chatgpt.com&sz=256",
+    "__v": 0,
+    "originalCategory": "AI+",
+    "originalPrimaryColor": "#7f7f7f",
+    "originalSecondaryColor": "#424242"
+  },
+  {
+    "_id": "6a26f88b6710eae615e3a53f",
+    "name": "Canva",
+    "category": "AI+",
+    "primaryColor": "#04c4cc",
+    "secondaryColor": "#04bccc",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹100",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Education Pro",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹599",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Education Pro",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹170",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=canva-pro.com&sz=256",
+    "__v": 0,
+    "originalCategory": "AI+",
+    "originalPrimaryColor": "#04c4cc",
+    "originalSecondaryColor": "#04bccc"
+  },
+  {
+    "_id": "6a26faad6710eae615e3a540",
+    "name": "Grand Theft Auto V Enhanced",
+    "category": "Gaming",
+    "primaryColor": "#bc6c44",
+    "secondaryColor": "#504010",
+    "description": "Private account. Instant delivery.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "PC Game Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹399",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      },
+      {
+        "label": "PC Game Seat Access",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹890",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/a318bd9affe8eee32984b18794b273c256e9b2d6/capsule_231x87.jpg",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#bc6c44",
+    "originalSecondaryColor": "#504010"
+  },
+  {
+    "_id": "6a26fb746710eae615e3a541",
+    "name": "Forza Horizon 5: Hot Wheels",
+    "category": "Gaming",
+    "primaryColor": "#e7dd38",
+    "secondaryColor": "#8c6613",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "PC Game Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹399",
+        "type": "",
+        "supportedDevices": [
+          "Laptop",
+          "PC"
+        ],
+        "image": ""
+      },
+      {
+        "label": "PC Game Seat Access",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹470",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1613280/capsule_231x87.jpg",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#e7dd38",
+    "originalSecondaryColor": "#8c6613",
+    "platform": "steam"
+  },
+  {
+    "_id": "6a26fd40cded8b1894404463",
+    "name": "007 First Light",
+    "category": "Gaming",
+    "primaryColor": "#c4ad7c",
+    "secondaryColor": "#5c4c2c",
+    "description": "Private account. Instant delivery.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹1550",
+        "type": "",
+        "supportedDevices": [
+          "PS5"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3768760/244e00f17e6d0b5d1e88320dfbb5a12b483be700/capsule_231x87.jpg",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#c4ad7c",
+    "originalSecondaryColor": "#5c4c2c",
+    "platform": "playstation"
+  },
+  {
+    "_id": "6a2d7cfdf47e5820fb29767d",
+    "name": "Black Myth: Wukong",
+    "category": "Gaming",
+    "primaryColor": "#af8f4f",
+    "secondaryColor": "#2c2414",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹580",
+        "type": "",
+        "supportedDevices": [
+          "PS5"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://cdn.akamai.steamstatic.com/steam/apps/2358720/capsule_184x69.jpg",
+    "platform": "playstation",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#af8f4f",
+    "originalSecondaryColor": "#2c2414"
+  },
+  {
+    "_id": "6a2d8dba4d27a74b0d7cf729",
+    "name": "Marvel's Spider-Man 2",
+    "category": "Gaming",
+    "primaryColor": "#ad0c0c",
+    "secondaryColor": "#700404",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹680",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      },
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹879",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      },
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹299",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/capsule_184x69.jpg",
+    "platform": "steam",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#ad0c0c",
+    "originalSecondaryColor": "#700404"
+  },
+  {
+    "_id": "6a2d8e824d27a74b0d7cf72a",
+    "name": "Resident Evil Requiem",
+    "category": "Gaming",
+    "primaryColor": "#8c2c2c",
+    "secondaryColor": "#7c1e19",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "45days",
+        "price": "₹680",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3764200/64f506b9b6210df6055136e7017f2082957e5b22/capsule_231x87.jpg",
+    "platform": "steam",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#8c2c2c",
+    "originalSecondaryColor": "#7c1e19"
+  },
+  {
+    "_id": "6a2d8f1b24413a220a8020df",
+    "name": "God of War",
+    "category": "Gaming",
+    "primaryColor": "#9e2027",
+    "secondaryColor": "#6a282c",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹580",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/capsule_184x69.jpg",
+    "platform": "steam",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#9e2027",
+    "originalSecondaryColor": "#6a282c"
+  },
+  {
+    "_id": "6a33e1d12bb60b8e38b807bc",
+    "name": "Spotify",
+    "category": "Streaming",
+    "primaryColor": "#1cd464",
+    "secondaryColor": "#0f7537",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹270",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://www.google.com/s2/favicons?domain=spotify.com&sz=256",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#1cd464",
+    "originalSecondaryColor": "#0f7537"
+  },
+  {
+    "_id": "6a42704bcf385547548bb660",
+    "name": "Forza Horizon 6",
+    "category": "Gaming",
+    "primaryColor": "#ec1499",
+    "secondaryColor": "#970c0c",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "PC Game Seat Access",
+        "quality": "",
+        "duration": "12 Months",
+        "price": "₹990",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2483190/3e98fe57eb90547f6b7b165a9e4b2a4c27902ac8/capsule_231x87_alt_assets_1.jpg",
+    "platform": "steam",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#ec1499",
+    "originalSecondaryColor": "#970c0c"
+  },
+  {
+    "_id": "6a4270cacf385547548bb661",
+    "name": "Red Dead Redemption 2",
+    "category": "Gaming",
+    "primaryColor": "#f00518",
+    "secondaryColor": "#9e050a",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "PC Game Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹499",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_184x69.jpg",
+    "platform": "steam",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#f00518",
+    "originalSecondaryColor": "#9e050a"
+  },
+  {
+    "_id": "6a427197cf385547548bb662",
+    "name": "The Last of Us™ Part I",
+    "category": "Gaming",
+    "primaryColor": "#ef8d3d",
+    "secondaryColor": "#973d0c",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "PC Game Seat Access",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹530",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/capsule_231x87.jpg",
+    "platform": "steam",
+    "__v": 0
+  },
+  {
+    "_id": "6a4272560fe2777752732b45",
+    "name": "WWE 2K25",
+    "category": "Gaming",
+    "primaryColor": "#e21d12",
+    "secondaryColor": "#970c18",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹540",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2878960/e982af853388882a4a7c527d79a96c0f2e8b19cb/capsule_231x87.jpg",
+    "platform": "steam",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#e21d12",
+    "originalSecondaryColor": "#970c18"
+  },
+  {
+    "_id": "6a427374a5ffdb575607be92",
+    "name": "NordVPN ",
+    "category": "VPN",
+    "primaryColor": "#4059fc",
+    "secondaryColor": "#0215a1",
+    "description": "Private account. Instant delivery.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹699",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      },
+      {
+        "label": "Basic",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹185",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://cdn.brandfetch.io/id-TSTtgfe/w/400/h/400/theme/dark/icon.jpeg?c=1bxfp0f8u603j9p3320b84rz8i8S5Prti5w",
+    "__v": 0,
+    "originalCategory": "VPN",
+    "originalPrimaryColor": "#4059fc",
+    "originalSecondaryColor": "#0215a1"
+  },
+  {
+    "_id": "6a63b2b32cf0046de4ebeb98",
+    "name": "Perplexity AI",
+    "category": "AI+",
+    "primaryColor": "#ebeb13",
+    "secondaryColor": "#97970c",
+    "description": "Private account. Instant delivery.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "3 Months",
+        "price": "₹3800",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "data:image/webp;base64,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",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#f31676",
+    "originalSecondaryColor": "#b30953"
+  },
+  {
+    "_id": "6a63b3272cf0046de4ebeb99",
+    "name": "Claude",
+    "category": "AI+",
+    "primaryColor": "#f0754c",
+    "secondaryColor": "#97310c",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹1550",
+        "type": "",
+        "supportedDevices": [
+          "PC"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://img.logo.dev/claude.ai?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2",
+    "__v": 0
+  },
+  {
+    "_id": "6a63b3822cf0046de4ebeb9a",
+    "name": "Grok AI ",
+    "category": "AI+",
+    "primaryColor": "#13ebeb",
+    "secondaryColor": "#0c9797",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹550",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://img.logo.dev/grokaiapk.net?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#13ebeb",
+    "originalSecondaryColor": "#0c9797"
+  },
+  {
+    "_id": "6a63b4619b6d550dedb90bff",
+    "name": "Surfshark",
+    "category": "VPN",
+    "primaryColor": "#12e2e2",
+    "secondaryColor": "#0c9597",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹199",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://img.logo.dev/surfshark.com?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2",
+    "__v": 0
+  },
+  {
+    "_id": "6a63b4989b6d550dedb90c00",
+    "name": "ExpressVPN",
+    "category": "VPN",
+    "primaryColor": "#ee2a2a",
+    "secondaryColor": "#970c0c",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹499",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://img.logo.dev/expressvpn.com?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#ee2a2a",
+    "originalSecondaryColor": "#970c0c"
+  },
+  {
+    "_id": "6a63b4df9b6d550dedb90c01",
+    "name": "Proton VPN",
+    "category": "VPN",
+    "primaryColor": "#4b53f1",
+    "secondaryColor": "#0b1298",
+    "description": "Private account. Instant delivery.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹799",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://img.logo.dev/protonvpn.com?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#4b53f1",
+    "originalSecondaryColor": "#0b1298"
+  },
+  {
+    "_id": "6a63b6951404f1fd0c0b1110",
+    "name": "FIFA 23: Ultimate Edition",
+    "category": "Gaming",
+    "primaryColor": "#eea931",
+    "secondaryColor": "#0c3697",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹299",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://lutris.net/media/igdb/cover_big/co4zvs.jpg",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#eea931",
+    "originalSecondaryColor": "#0c3697",
+    "platform": "steam"
+  },
+  {
+    "_id": "6a63b6e01404f1fd0c0b1111",
+    "name": "Forza horizon 4 ",
+    "category": "Gaming",
+    "primaryColor": "#ee327a",
+    "secondaryColor": "#0c3f97",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "1 Device Seat Access",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹299",
+        "type": "",
+        "supportedDevices": [
+          "PC",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "data:image/webp;base64,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",
+    "__v": 0,
+    "originalCategory": "Gaming",
+    "originalPrimaryColor": "#126de2",
+    "originalSecondaryColor": "#991b0a",
+    "platform": "steam"
+  },
+  {
+    "_id": "6ad0fbe2d622d7a9ed9b7bc8",
+    "name": "FanCode",
+    "category": "Streaming",
+    "primaryColor": "#fc5304",
+    "secondaryColor": "#a23401",
+    "description": "Premium shared profiles. Instant access upon purchase.",
+    "status": "Available",
+    "plans": [
+      {
+        "label": "Premium Plan",
+        "quality": "",
+        "duration": "1 Month",
+        "price": "₹80",
+        "type": "",
+        "supportedDevices": [
+          "TV",
+          "PC",
+          "iOS",
+          "Android",
+          "Laptop"
+        ],
+        "image": ""
+      }
+    ],
+    "customIcon": "https://img.logo.dev/fancode.com?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2",
+    "__v": 0,
+    "originalCategory": "Streaming",
+    "originalPrimaryColor": "#fc5304",
+    "originalSecondaryColor": "#a23401"
+  }
+]

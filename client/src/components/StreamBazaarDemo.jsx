@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { MessageCircle, ExternalLink, Search } from 'lucide-react';
 import ChatWidget from '../ChatWidget';
 import FomoToast from './FomoToast';
+import FALLBACK_PRODUCTS from '../utils/fallbackProducts.json';
 import { 
   getFavicon, 
   isGamingCategory, 
@@ -692,41 +693,67 @@ const ProductCard = ({ product, onOpenBuy }) => {
           </div>
         </div>
 
-        {/* Feature Highlights Pills */}
-        <div className="sb-card-features" style={{ marginTop: '14px' }}>
-          <span className="sb-feat-pill">⚡ Instant Delivery</span>
-          <span style={{ color: '#444' }}>•</span>
-          <span className="sb-feat-pill">🛡️ 100% Guarantee</span>
-          <span style={{ color: '#444' }}>•</span>
-          <span className="sb-feat-pill">
-            {isGaming ? '🎮 PC & Console Access' : `📺 ${defaultQuality}`}
-          </span>
-        </div>
-      </div>
+        {/* Plans List right on Card - Exact Match to Screenshots */}
+        <div className="sb-card-plans-list">
+          {(product.plans || []).slice(0, 3).map((plan, i) => {
+            const deviceLabel = isGaming ? 'PC Game Seat Access' : '1 Device Seat Access';
+            const deviceIcon = isGaming ? '🎮' : '🖥️';
+            const priceFormatted = (plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '');
+            const durationLabel = plan.duration || plan.label || '1 Month';
 
-      {/* Bottom Action Area: Starting Price + Single Buy Button */}
-      <div className="sb-card-action">
-        <div className="sb-card-price-area">
-          <span className="sb-price-label">STARTING AT</span>
-          <span className="sb-card-price" style={{ color: '#ffffff' }}>
-            {lowestPrice}
-          </span>
-          <span style={{ color: brandColor, fontSize: '11px', fontWeight: 700 }}>
-            {defaultDuration} Access
-          </span>
-        </div>
+            return (
+              <div
+                key={i}
+                className="sb-card-plan-row"
+                onClick={() => onOpenBuy(product, plan)}
+                style={{
+                  borderColor: `rgba(${colorRgb}, 0.22)`,
+                  background: 'rgba(255, 255, 255, 0.025)'
+                }}
+              >
+                <div className="sb-plan-row-left">
+                  <span className="sb-plan-row-pill" style={{
+                    color: brandColor,
+                    borderColor: `rgba(${colorRgb}, 0.35)`,
+                    background: `rgba(${colorRgb}, 0.08)`
+                  }}>
+                    <span>{deviceIcon}</span>
+                    <span>{deviceLabel}</span>
+                  </span>
+                  <span className="sb-plan-row-dur">
+                    {durationLabel}
+                  </span>
+                </div>
 
-        {/* Single High-Converting Buy Button (Opens Modal with All Plans & Devices) */}
-        <button
-          className="sb-card-buy-btn"
-          onClick={() => onOpenBuy(product, product.plans?.[0])}
-          style={{
-            background: `linear-gradient(135deg, ${brandColor}, #6366f1)`
-          }}
-        >
-          <span>Buy</span>
-          <span style={{ fontSize: '13px' }}>⚡</span>
-        </button>
+                <div className="sb-plan-row-right">
+                  <span className="sb-plan-row-price" style={{ color: brandColor }}>
+                    {priceFormatted}
+                  </span>
+                  <button
+                    className="sb-plan-row-buy-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenBuy(product, plan);
+                    }}
+                  >
+                    Buy
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* View All Plans link if more than 3 plans */}
+          {product.plans && product.plans.length > 3 && (
+            <button
+              className="sb-view-all-plans-btn"
+              onClick={() => onOpenBuy(product, product.plans[0])}
+              style={{ color: brandColor }}
+            >
+              + View all {product.plans.length} plans
+            </button>
+          )}
+        </div>
       </div>
     </motion.div>
   );
@@ -735,7 +762,7 @@ const ProductCard = ({ product, onOpenBuy }) => {
 // ─── MAIN HOME APPLICATION COMPONENT ─────────────────────────────
 export default function StreamBazaarDemo() {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(FALLBACK_PRODUCTS);
   const [modalData, setModalData] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [gamingPlatformFilter, setGamingPlatformFilter] = useState('All');
