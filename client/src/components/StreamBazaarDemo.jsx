@@ -318,23 +318,11 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
   const handleTelegramOrder = () => {
     if (!selectedDevice) return;
     const priceText = selectedPlan.price.startsWith('₹') ? selectedPlan.price : `₹${selectedPlan.price}`;
-    const qualityText = selectedPlan.quality || (isGaming ? 'Full Game Access' : '4K Ultra HD + Dolby Vision');
     
-    const msg = [
-      `🛒 *StreamBazaar Order Ticket*`,
-      `━━━━━━━━━━━━━━━━━━━━━━`,
-      `📦 *Service:* ${product.name}`,
-      `⭐ *Plan:* ${selectedPlan.label || 'Premium Access'}`,
-      `📺 *Quality:* ${qualityText}`,
-      `⏱️ *Duration:* ${selectedPlan.duration}`,
-      `📱 *Selected Device:* ${selectedDevice}`,
-      `💰 *Total Price:* ${priceText}`,
-      `━━━━━━━━━━━━━━━━━━━━━━`,
-      `🛡️ 100% Replacement Warranty Included`,
-      `👉 Please share UPI / Payment details for instant activation!`
-    ].join('%0A');
+    // Exact format user requested: "Netflix 160 ka purchase karna hai" + device and duration
+    const msg = `Hi! Mujhe ${product.name} (${selectedPlan.duration || '1 Month'}) purchase karna hai - Price: ${priceText} - Device: ${selectedDevice}. Please share UPI / payment details for instant activation!`;
 
-    window.open(`https://t.me/TrustedStreams?text=${msg}`, '_blank');
+    window.open(`https://t.me/owner_trusted_streams?text=${encodeURIComponent(msg)}`, '_blank');
     onClose();
   };
 
@@ -858,7 +846,7 @@ export default function StreamBazaarDemo() {
           </Link>
 
           <a
-            href="https://t.me/TrustedStreams"
+            href="https://t.me/owner_trusted_streams"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -930,7 +918,7 @@ export default function StreamBazaarDemo() {
               View Plans <ExternalLink size={16} />
             </motion.a>
             <motion.a
-              href="https://t.me/TrustedStreams"
+              href="https://t.me/owner_trusted_streams"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-ghost"
