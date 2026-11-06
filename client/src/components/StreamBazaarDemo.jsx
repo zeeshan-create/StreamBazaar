@@ -9,6 +9,7 @@ import {
   getFavicon, 
   isGamingCategory, 
   getDomainFromUrl,
+  getGameIcon,
   GAME_IMGS
 } from '../utils/logoHelper';
 import './StreamBazaarDemo.css';
@@ -926,17 +927,17 @@ export default function StreamBazaarDemo() {
           />
 
           {/* Badge */}
-          <div className="hero-badge">🌟 Premium Digital Seat Access Store</div>
+          <div className="hero-badge">✨ India's #1 Most Trusted OTT &amp; Gaming Seat Marketplace</div>
 
           {/* Main Title */}
           <h1>
-            Premium Subscriptions<br />
-            <span>At Lowest Prices</span>
+            Watch &amp; Play Anything for<br />
+            <span>Up to 90% Less</span>
           </h1>
 
           {/* Subtitle */}
           <p className="hero-sub">
-            <span>Instant Access</span> &nbsp;•&nbsp; <span>Secure Login</span> &nbsp;•&nbsp; <span>1 Device Support</span>
+            Instant delivery, pin-protected private profiles, 100% full replacement guarantee, and 24/7 human customer support on Telegram.
           </p>
 
           {/* Two CTA Buttons */}

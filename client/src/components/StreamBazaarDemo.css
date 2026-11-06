@@ -273,16 +273,13 @@
 }
 
 .hero-sub {
-  color: #a1a1aa;
-  font-size: clamp(13px, 2vw, 15px);
-  max-width: 620px;
+  color: #9ca3af;
+  font-size: clamp(13px, 1.8vw, 15px);
+  max-width: 540px;
   margin: 0 auto 22px;
-  line-height: 1.5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  line-height: 1.6;
+  text-align: center;
+  font-weight: 400;
 }
 .hero-sub span {
   color: #d4d4d8;
