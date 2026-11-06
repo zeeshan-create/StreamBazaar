@@ -661,14 +661,16 @@ const ProductCard = ({ product, onOpenBuy }) => {
   return (
     <motion.div
       layout
-      className={`sb-card ${isOutOfStock ? 'sb-card-oos' : ''}`}
-      style={{
-        border: `1.5px solid ${isOutOfStock ? 'rgba(239, 68, 68, 0.35)' : `rgba(${colorRgb}, 0.35)`}`,
-        boxShadow: isOutOfStock 
-          ? '0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 68, 68, 0.05)'
-          : `0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(${colorRgb}, 0.08)`,
-        opacity: isOutOfStock ? 0.78 : 1
-      }}
+      className={`sb-card ${isOutOfStock ? 'sb-card-oos' : isComingSoon ? 'sb-card-coming-soon' : ''}`}
+      style={
+        isOutOfStock || isComingSoon
+          ? { opacity: 1 }
+          : {
+              border: `1.5px solid rgba(${colorRgb}, 0.35)`,
+              boxShadow: `0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(${colorRgb}, 0.08)`,
+              opacity: 1
+            }
+      }
     >
       <div>
         {/* Header: Logo + Full Title + Badges */}
@@ -732,10 +734,28 @@ const ProductCard = ({ product, onOpenBuy }) => {
       </div>
 
       {/* Bottom Action Area: Starting Price + Single Get Plan / Out of Stock Button */}
-      <div className="sb-card-action">
+      <div 
+        className="sb-card-action"
+        style={{
+          borderTopColor: isOutOfStock 
+            ? 'rgba(255, 45, 85, 0.22)' 
+            : isComingSoon 
+              ? 'rgba(251, 191, 36, 0.22)' 
+              : 'rgba(255, 255, 255, 0.06)'
+        }}
+      >
         <div className="sb-card-price-area">
           <span className="sb-price-label">STARTING AT</span>
-          <span className="sb-card-price" style={{ color: isOutOfStock ? '#888' : brandColor }}>
+          <span 
+            className="sb-card-price" 
+            style={{ 
+              color: isOutOfStock 
+                ? '#94a3b8' 
+                : isComingSoon 
+                  ? '#fde047' 
+                  : brandColor 
+            }}
+          >
             {lowestPrice}
           </span>
           <span style={{ color: '#aaa', fontSize: '11px', fontWeight: 700 }}>
