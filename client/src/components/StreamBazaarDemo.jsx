@@ -903,6 +903,7 @@ export default function StreamBazaarDemo() {
     <div className="sb-page">
       <div className="sb-ambient-1" />
       <div className="sb-ambient-2" />
+      <div className="sb-ambient-3" />
 
       {/* Sticky Modern Navbar */}
       <nav className="sb-navbar">
