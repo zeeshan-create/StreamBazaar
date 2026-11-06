@@ -694,67 +694,41 @@ const ProductCard = ({ product, onOpenBuy }) => {
           </div>
         </div>
 
-        {/* Plans List right on Card - Exact Match to Screenshots */}
-        <div className="sb-card-plans-list">
-          {(product.plans || []).slice(0, 3).map((plan, i) => {
-            const deviceLabel = isGaming ? 'PC Game Seat Access' : '1 Device Seat Access';
-            const deviceIcon = isGaming ? '🎮' : '🖥️';
-            const priceFormatted = (plan.price || '').startsWith('₹') ? plan.price : '₹' + (plan.price || '');
-            const durationLabel = plan.duration || plan.label || '1 Month';
-
-            return (
-              <div
-                key={i}
-                className="sb-card-plan-row"
-                onClick={() => onOpenBuy(product, plan)}
-                style={{
-                  borderColor: `rgba(${colorRgb}, 0.22)`,
-                  background: 'rgba(255, 255, 255, 0.025)'
-                }}
-              >
-                <div className="sb-plan-row-left">
-                  <span className="sb-plan-row-pill" style={{
-                    color: brandColor,
-                    borderColor: `rgba(${colorRgb}, 0.35)`,
-                    background: `rgba(${colorRgb}, 0.08)`
-                  }}>
-                    <span>{deviceIcon}</span>
-                    <span>{deviceLabel}</span>
-                  </span>
-                  <span className="sb-plan-row-dur">
-                    {durationLabel}
-                  </span>
-                </div>
-
-                <div className="sb-plan-row-right">
-                  <span className="sb-plan-row-price" style={{ color: brandColor }}>
-                    {priceFormatted}
-                  </span>
-                  <button
-                    className="sb-plan-row-buy-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenBuy(product, plan);
-                    }}
-                  >
-                    Buy
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* View All Plans link if more than 3 plans */}
-          {product.plans && product.plans.length > 3 && (
-            <button
-              className="sb-view-all-plans-btn"
-              onClick={() => onOpenBuy(product, product.plans[0])}
-              style={{ color: brandColor }}
-            >
-              + View all {product.plans.length} plans
-            </button>
-          )}
+        {/* Feature Highlights Pills */}
+        <div className="sb-card-features" style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span className="sb-feat-pill">⚡ Instant Delivery</span>
+          <span style={{ color: '#444' }}>•</span>
+          <span className="sb-feat-pill">🛡️ 100% Guarantee</span>
+          <span style={{ color: '#444' }}>•</span>
+          <span className="sb-feat-pill">
+            {isGaming ? '🎮 PC & Console Access' : `📺 ${defaultQuality}`}
+          </span>
         </div>
+      </div>
+
+      {/* Bottom Action Area: Starting Price + Single Get Plan Button */}
+      <div className="sb-card-action">
+        <div className="sb-card-price-area">
+          <span className="sb-price-label">STARTING AT</span>
+          <span className="sb-card-price" style={{ color: brandColor }}>
+            {lowestPrice}
+          </span>
+          <span style={{ color: '#aaa', fontSize: '11px', fontWeight: 700 }}>
+            {defaultDuration} Access
+          </span>
+        </div>
+
+        {/* Single High-Converting Get Plan Button (Opens Modal with All Plans & Devices) */}
+        <button
+          className="sb-card-buy-btn"
+          onClick={() => onOpenBuy(product, product.plans?.[0])}
+          style={{
+            background: `linear-gradient(135deg, ${brandColor}, #6366f1)`
+          }}
+        >
+          <span>Get Plan</span>
+          <span style={{ fontSize: '13px' }}>⚡</span>
+        </button>
       </div>
     </motion.div>
   );
@@ -1162,17 +1136,6 @@ export default function StreamBazaarDemo() {
           />
         )}
       </AnimatePresence>
-
-      {/* Floating Telegram Support Pill */}
-      <a
-        href="https://t.me/TrustedStreams"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="sb-floating-tg"
-      >
-        <span style={{ fontSize: '18px' }}>💬</span>
-        <span>Order via Telegram</span>
-      </a>
 
       {/* Sheena AI Chatbot & FOMO Live Purchases Toast */}
       <ChatWidget />
