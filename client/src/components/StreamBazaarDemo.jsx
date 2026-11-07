@@ -434,16 +434,58 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               type="button"
               className={`sb-step-tab ${step === 1 ? 'active' : ''}`}
               onClick={() => setStep(1)}
-              style={step === 1 ? { borderColor: brandColor, background: `rgba(${colorRgb}, 0.16)` } : {}}
+              style={
+                step === 1 
+                  ? { borderColor: brandColor, background: `rgba(${colorRgb}, 0.16)` } 
+                  : { borderColor: `rgba(${colorRgb}, 0.35)`, background: 'rgba(255, 255, 255, 0.04)', cursor: 'pointer' }
+              }
+              title={step === 2 ? 'Click to change duration plan' : ''}
             >
-              <span
-                className="sb-step-circle"
-                style={step >= 1 ? { background: brandColor, color: '#fff', boxShadow: `0 0 10px rgba(${colorRgb}, 0.5)` } : {}}
-              >
-                1
-              </span>
-              <span className="sb-step-title" style={{ color: step === 1 ? '#fff' : 'rgba(255, 255, 255, 0.5)' }}>
-                Choose Plan
+              {step === 2 ? (
+                <div style={{
+                  position: 'relative',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '7px',
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  border: `1px solid rgba(${colorRgb}, 0.4)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <span style={{ fontSize: '11px', fontWeight: 900, color: brandColor }}>
+                    {product.name ? product.name.charAt(0).toUpperCase() : '⚡'}
+                  </span>
+                  <span style={{
+                    position: 'absolute',
+                    bottom: '-3px',
+                    right: '-3px',
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    background: brandColor,
+                    color: '#fff',
+                    fontSize: '8px',
+                    fontWeight: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 0 5px rgba(0, 0, 0, 0.5)'
+                  }}>
+                    ⇄
+                  </span>
+                </div>
+              ) : (
+                <span
+                  className="sb-step-circle"
+                  style={{ background: brandColor, color: '#fff', boxShadow: `0 0 10px rgba(${colorRgb}, 0.5)` }}
+                >
+                  1
+                </span>
+              )}
+              <span className="sb-step-title" style={{ color: step === 1 ? '#fff' : brandColor, fontWeight: 800 }}>
+                {step === 2 ? 'Change Plan' : 'Choose Plan'}
               </span>
             </button>
 
@@ -513,7 +555,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                           </span>
                         </div>
                         <div className="sb-plan-row-sub">
-                          {rowSpecs.deviceCompatibility} • Replacement Guarantee
+                          {isGaming ? '🎮 Lifetime License • ⚡ Instant Access' : '🛡️ 100% Replacement Warranty • ⚡ Instant Delivery'}
                         </div>
                       </div>
 
@@ -576,10 +618,85 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.12, ease: 'easeOut' }}
             >
-              <button className="sb-back-link" onClick={() => setStep(1)}>
-                <span>←</span>
-                <span>Change Plan ({selectedPlan?.duration || 'Select Plan'} · {currentPriceFormatted})</span>
-              </button>
+              {/* Sleek Modern Change Plan Bar with Brand Logo & No Service Name (Plan Duration Only) */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '9px 13px',
+                borderRadius: '14px',
+                background: 'rgba(255, 255, 255, 0.035)',
+                border: `1px solid rgba(${colorRgb}, 0.28)`,
+                marginBottom: '12px',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.25)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
+                  <div style={{
+                    position: 'relative',
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    background: 'rgba(0, 0, 0, 0.65)',
+                    border: `1px solid rgba(${colorRgb}, 0.35)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <span style={{ fontSize: '13px', fontWeight: 900, color: brandColor }}>
+                      {product.name ? product.name.charAt(0).toUpperCase() : '⚡'}
+                    </span>
+                    <span style={{
+                      position: 'absolute',
+                      bottom: '-3px',
+                      right: '-3px',
+                      width: '13px',
+                      height: '13px',
+                      borderRadius: '50%',
+                      background: brandColor,
+                      color: '#fff',
+                      fontSize: '8px',
+                      fontWeight: 900,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 0 5px rgba(0, 0, 0, 0.6)'
+                    }}>
+                      ⇄
+                    </span>
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ color: '#888', fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Active Plan Duration
+                    </div>
+                    <div style={{ color: '#fff', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {selectedPlan?.duration || '1 Month'} · <span style={{ color: brandColor }}>{currentPriceFormatted}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  style={{
+                    background: `rgba(${colorRgb}, 0.16)`,
+                    border: `1px solid rgba(${colorRgb}, 0.45)`,
+                    color: brandColor,
+                    borderRadius: '9px',
+                    padding: '5px 11px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <span>🔄 Change Plan</span>
+                </button>
+              </div>
 
               <div style={{
                 display: 'flex',
@@ -636,8 +753,8 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
 
               <div className="sb-summary-grid">
                 <div>
-                  <div className="sb-sum-label">SERVICE &amp; PLAN</div>
-                  <div className="sb-sum-value">{product.name} ({selectedPlan?.duration || 'Standard'})</div>
+                  <div className="sb-sum-label">PLAN DURATION</div>
+                  <div className="sb-sum-value">{selectedPlan?.duration || '1 Month'} Access</div>
                 </div>
                 <div>
                   <div className="sb-sum-label">SELECTED DEVICE</div>
