@@ -953,13 +953,14 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(3, 4, 10, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(3, 4, 10, 0.82);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
+  will-change: opacity;
 }
 
 .sb-modal-card {
@@ -971,8 +972,11 @@
   overflow-y: auto;
   position: relative;
   border: 1.5px solid var(--c, #a855f7);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.9), 0 0 40px color-mix(in srgb, var(--c, #a855f7) 35%, transparent);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 30px color-mix(in srgb, var(--c, #a855f7) 30%, transparent);
   box-sizing: border-box;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
 }
 
 .sb-modal-card::-webkit-scrollbar {
@@ -1115,12 +1119,13 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 290px;
+  max-height: 340px;
   overflow-y: auto;
   padding-right: 4px;
   margin-bottom: 16px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sb-plans-scroll::-webkit-scrollbar {
@@ -1149,14 +1154,15 @@
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   box-sizing: border-box;
   width: 100%;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .sb-plan-row:hover {
   background: rgba(255, 255, 255, 0.05);
-  transform: translateX(2px);
 }
 
 .sb-plan-row-left {

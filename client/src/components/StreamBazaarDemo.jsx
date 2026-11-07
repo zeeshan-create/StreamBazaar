@@ -271,25 +271,35 @@ const CardLogo = ({ product }) => {
 // ─── 2-STEP SMOOTH POP-UP PURCHASE MODAL ─────────────────────────
 const PurchaseModal = ({ product, initialPlan, onClose }) => {
   const [step, setStep] = useState(1);
-  const [selectedPlan, setSelectedPlan] = useState(initialPlan || null);
+
+  const plans = useMemo(() => product?.plans || [], [product?.plans]);
+
+  // Determine initial selected plan index safely
+  const initialIndex = useMemo(() => {
+    if (!plans.length) return 0;
+    if (!initialPlan) return 0;
+    const foundIdx = plans.findIndex(p => 
+      p === initialPlan || 
+      (p._id && initialPlan._id && p._id === initialPlan._id) ||
+      (String(p.duration || '').trim() === String(initialPlan.duration || '').trim() && 
+       String(p.price || '').trim() === String(initialPlan.price || '').trim() &&
+       String(p.label || '').trim() === String(initialPlan.label || '').trim())
+    );
+    return foundIdx >= 0 ? foundIdx : 0;
+  }, [plans, initialPlan]);
+
+  const [selectedPlanIdx, setSelectedPlanIdx] = useState(initialIndex);
   const [selectedDevice, setSelectedDevice] = useState(null);
+
+  // Clamped safe index ensuring it's always valid
+  const safeIdx = Math.min(Math.max(0, selectedPlanIdx), Math.max(0, plans.length - 1));
+  const selectedPlan = plans[safeIdx] || plans[0] || null;
 
   const brandColor = getSafeBrandColor(product);
   const colorRgb = hexToRgb(brandColor);
   const isGaming = isGamingCategory(product.category);
   const accountBadge = getAccountBadge(product.description);
-  const activePlan = selectedPlan || product.plans?.[0];
-  const specs = detectServiceSpecs(product, activePlan);
-
-  // Sync selectedPlan if product plans are updated live in background
-  useEffect(() => {
-    if (selectedPlan && product?.plans) {
-      const match = product.plans.find(p => p.duration === selectedPlan.duration) || product.plans[0];
-      if (match && (match.price !== selectedPlan.price || match.label !== selectedPlan.label)) {
-        setSelectedPlan(match);
-      }
-    }
-  }, [product, selectedPlan]);
+  const specs = detectServiceSpecs(product, selectedPlan);
 
   const deviceList = useMemo(() => {
     if (isGaming) {
@@ -313,12 +323,21 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
     ];
   }, [isGaming]);
 
-  const isAvailable = (devId) => {
+  const isAvailable = useCallback((devId) => {
     if (!selectedPlan) return true;
     const supp = selectedPlan.supportedDevices || [];
-    if (supp.length === 0) return true;
-    return supp.some(d => d.toLowerCase() === devId.toLowerCase());
-  };
+    if (!Array.isArray(supp) || supp.length === 0) return true;
+    return supp.some(d => String(d).toLowerCase().trim() === String(devId).toLowerCase().trim());
+  }, [selectedPlan]);
+
+  // Reset selectedDevice if not supported on newly selected plan
+  useEffect(() => {
+    if (selectedDevice && selectedPlan) {
+      if (!isAvailable(selectedDevice)) {
+        setSelectedDevice(null);
+      }
+    }
+  }, [selectedPlan, selectedDevice, isAvailable]);
 
   const handleTelegramOrder = () => {
     if (!selectedPlan || !selectedDevice) return;
@@ -349,20 +368,20 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.12 }}
+      transition={{ duration: 0.1, ease: 'easeOut' }}
       onClick={onClose}
     >
       <motion.div
         className="sb-modal-card"
-        initial={{ scale: 0.96, opacity: 0, y: 12 }}
+        initial={{ scale: 0.97, opacity: 0, y: 8 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.96, opacity: 0, y: 12 }}
-        transition={{ duration: 0.15, ease: 'easeOut' }}
+        exit={{ scale: 0.97, opacity: 0, y: 8 }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
         onClick={(e) => e.stopPropagation()}
         style={{
           '--c': brandColor,
           borderColor: brandColor,
-          boxShadow: `0 25px 80px rgba(0, 0, 0, 0.85), 0 0 35px rgba(${colorRgb}, 0.35)`
+          boxShadow: `0 20px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(${colorRgb}, 0.35)`
         }}
       >
         <button
@@ -459,15 +478,15 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.18 }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
             >
               <div style={{ color: '#888', fontSize: '10px', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '10px' }}>
-                AVAILABLE DURATION PLANS ({product.plans?.length || 0})
+                AVAILABLE DURATION PLANS ({plans.length})
               </div>
 
               <div className="sb-plans-scroll">
-                {(product.plans || []).map((pl, idx) => {
-                  const isSelected = selectedPlan === pl;
+                {plans.map((pl, idx) => {
+                  const isSelected = idx === safeIdx;
                   const plPrice = pl.price || '₹199';
                   const rowSpecs = detectServiceSpecs(product, pl);
 
@@ -475,7 +494,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                     <div
                       key={idx}
                       className={`sb-plan-row ${isSelected ? 'selected' : ''}`}
-                      onClick={() => setSelectedPlan(pl)}
+                      onClick={() => setSelectedPlanIdx(idx)}
                       style={{
                         background: isSelected
                           ? `rgba(${colorRgb}, 0.16)`
@@ -555,7 +574,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.18 }}
+              transition={{ duration: 0.12, ease: 'easeOut' }}
             >
               <button className="sb-back-link" onClick={() => setStep(1)}>
                 <span>←</span>
