@@ -1,5 +1,6 @@
-/* StreamBazaar - running OTT names background (brand colours, tilted, alternating directions)
-   Hardware GPU Accelerated for 60Hz, 90Hz, 120Hz, 144Hz, 165Hz displays */
+/* StreamBazaar - High-Performance OTT Ticker Background
+   Ultra-optimized for 60Hz, 90Hz, 120Hz ProMotion, 144Hz, 165Hz displays */
+
 .ottbg {
   position: fixed;
   inset: 0;
@@ -9,23 +10,17 @@
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  opacity: 0.13;
-  transform: translate3d(0, 0, 0) rotate(-6deg) scale(1.3);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
+  opacity: 0.11;
+  transform: rotate(-5deg) scale(1.15);
   user-select: none;
-  contain: strict;
+  will-change: transform;
 }
 
 .ottbg-row {
   display: flex;
   width: max-content;
-  animation: ottbgL 40s linear infinite;
+  animation: ottbgL 26s linear infinite;
   will-change: transform;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .ottbg-row.r {
@@ -34,13 +29,13 @@
 
 .ottbg-row span {
   display: flex;
-  gap: 46px;
-  padding-right: 46px;
+  gap: 36px;
+  padding-right: 36px;
   white-space: nowrap;
 }
 
 .ottbg-row b {
-  font: 800 clamp(40px, 9vw, 76px) / 1 "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 800 clamp(34px, 7.5vw, 68px) / 1 "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
@@ -57,6 +52,19 @@
   }
   to {
     transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 768px) {
+  .ottbg {
+    opacity: 0.08;
+    transform: rotate(-4deg) scale(1.1);
+  }
+  .ottbg-row:nth-child(n+4) {
+    display: none; /* Only 3 rows on mobile for maximum 120fps smoothness */
+  }
+  .ottbg-row {
+    animation-duration: 22s;
   }
 }
 

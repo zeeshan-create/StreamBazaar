@@ -616,11 +616,13 @@
   justify-content: space-between;
   gap: 16px;
   position: relative;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  isolation: isolate;
 }
 
-.sb-card:hover {
-  transform: translateY(-4px);
+.sb-card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
 }
 
 /* Card Header */
@@ -892,6 +894,8 @@
 
 /* Card Bottom Buy Action Row */
 .sb-card-action {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1458,9 +1462,7 @@ html, body {
   scroll-behavior: smooth;
 }
 
-.sb-card, .sb-modal-card, .sb-cat-pill, .sb-card-buy-btn, .sb-platform-pill {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+.sb-modal-card, .sb-cat-pill, .sb-card-buy-btn, .sb-platform-pill {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }

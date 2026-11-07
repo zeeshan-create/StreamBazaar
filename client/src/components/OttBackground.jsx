@@ -21,7 +21,7 @@ const OTT = [
 export default function OttBackground() {
   return (
     <div className="ottbg" aria-hidden="true">
-      {OTT.slice(0, 8).map((_, i) => {
+      {OTT.slice(0, 5).map((_, i) => {
         const items = [...OTT.slice(i), ...OTT.slice(0, i)];
         const strip = (k) => (
           <span key={k}>
@@ -36,7 +36,7 @@ export default function OttBackground() {
           <div
             key={i}
             className={`ottbg-row${i % 2 ? ' r' : ''}`}
-            style={{ animationDuration: `${34 + i * 5}s` }}
+            style={{ animationDuration: `${26 + i * 4}s` }}
           >
             {strip(0)}
             {strip(1)}

@@ -342,10 +342,10 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
     >
       <motion.div
         className="sb-modal-card"
-        initial={{ scale: 0.92, opacity: 0, y: 20 }}
+        initial={{ scale: 0.95, opacity: 0, y: 15 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.92, opacity: 0, y: 20 }}
-        transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+        exit={{ scale: 0.95, opacity: 0, y: 15 }}
+        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
         style={{
           '--c': brandColor,
@@ -674,7 +674,7 @@ const ProductCard = ({ product, onOpenBuy }) => {
       off={isOutOfStock}
       className={`sb-card ${isOutOfStock ? 'sb-card-oos' : isComingSoon ? 'sb-card-coming-soon' : ''}`}
     >
-      <div>
+      <div className="sb-card-content">
         {/* Header: Logo + Title + Badges */}
         <div className="sb-card-header">
           <CardLogo product={product} />
@@ -814,7 +814,9 @@ export default function StreamBazaarDemo() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigate]);
 
-  // Live polling from MongoDB
+  const lastDataRef = React.useRef('');
+
+  // Live polling from MongoDB (Optimized to prevent re-render thrashing)
   const fetchPlans = useCallback(async () => {
     try {
       const apiBase = import.meta.env.PROD ? '' : 'http://localhost:5000';
@@ -822,7 +824,11 @@ export default function StreamBazaarDemo() {
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          setProducts(data);
+          const str = JSON.stringify(data);
+          if (str !== lastDataRef.current) {
+            lastDataRef.current = str;
+            setProducts(data);
+          }
         }
       }
     } catch (err) {
@@ -832,9 +838,10 @@ export default function StreamBazaarDemo() {
 
   useEffect(() => {
     fetchPlans();
+    // 30-second polling to ensure ultra-smooth 60/120fps performance on all devices
     const interval = setInterval(() => {
       if (!document.hidden) fetchPlans();
-    }, 2000);
+    }, 30000);
 
     const onFocus = () => fetchPlans();
     window.addEventListener('focus', onFocus);
