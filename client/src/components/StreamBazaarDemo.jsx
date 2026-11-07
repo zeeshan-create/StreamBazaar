@@ -271,14 +271,14 @@ const CardLogo = ({ product }) => {
 // ─── 2-STEP SMOOTH POP-UP PURCHASE MODAL ─────────────────────────
 const PurchaseModal = ({ product, initialPlan, onClose }) => {
   const [step, setStep] = useState(1);
-  const [selectedPlan, setSelectedPlan] = useState(initialPlan || product.plans?.[0]);
+  const [selectedPlan, setSelectedPlan] = useState(initialPlan || null);
   const [selectedDevice, setSelectedDevice] = useState(null);
 
   const brandColor = getSafeBrandColor(product);
   const colorRgb = hexToRgb(brandColor);
   const isGaming = isGamingCategory(product.category);
   const accountBadge = getAccountBadge(product.description);
-  const specs = detectServiceSpecs(product, selectedPlan);
+  const specs = detectServiceSpecs(product, selectedPlan || product.plans?.[0]);
 
   const deviceList = useMemo(() => {
     if (isGaming) {
@@ -310,7 +310,7 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
   };
 
   const handleTelegramOrder = () => {
-    if (!selectedDevice) return;
+    if (!selectedPlan || !selectedDevice) return;
     const price = selectedPlan.price || 'Contact Support';
     const duration = selectedPlan.duration || 'Standard';
 
@@ -330,7 +330,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
     window.open(`https://t.me/owner_trusted_streams?text=${encoded}`, '_blank');
   };
 
-  const currentPriceFormatted = selectedPlan?.price || '₹199';
+  const currentPriceFormatted = selectedPlan?.price || '';
 
   return (
     <motion.div
@@ -338,18 +338,20 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.12 }}
       onClick={onClose}
     >
       <motion.div
         className="sb-modal-card"
-        initial={{ scale: 0.95, opacity: 0, y: 15 }}
+        initial={{ scale: 0.96, opacity: 0, y: 12 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 15 }}
-        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        exit={{ scale: 0.96, opacity: 0, y: 12 }}
+        transition={{ duration: 0.15, ease: 'easeOut' }}
         onClick={(e) => e.stopPropagation()}
         style={{
           '--c': brandColor,
-          boxShadow: `0 25px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(${colorRgb}, 0.25)`
+          borderColor: brandColor,
+          boxShadow: `0 25px 80px rgba(0, 0, 0, 0.85), 0 0 35px rgba(${colorRgb}, 0.35)`
         }}
       >
         <button
@@ -419,9 +421,15 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
 
             <button
               type="button"
+              disabled={!selectedPlan}
               className={`sb-step-tab ${step === 2 ? 'active' : ''}`}
               onClick={() => { if (selectedPlan) setStep(2); }}
-              style={step === 2 ? { borderColor: brandColor, background: `rgba(${colorRgb}, 0.16)` } : {}}
+              style={{
+                borderColor: step === 2 ? brandColor : 'transparent',
+                background: step === 2 ? `rgba(${colorRgb}, 0.16)` : 'transparent',
+                cursor: selectedPlan ? 'pointer' : 'not-allowed',
+                opacity: selectedPlan ? 1 : 0.45
+              }}
             >
               <span
                 className="sb-step-circle"
@@ -429,7 +437,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               >
                 2
               </span>
-              <span className="sb-step-title" style={{ color: step === 2 ? '#fff' : 'rgba(255, 255, 255, 0.5)' }}>
+              <span className="sb-step-title" style={{ color: step === 2 ? '#fff' : selectedPlan ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.35)' }}>
                 Select Device &amp; Buy
               </span>
             </button>
@@ -498,18 +506,35 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                 })}
               </div>
 
-              <button
-                className="sb-cta-btn"
-                onClick={() => setStep(2)}
-                style={{
-                  background: `linear-gradient(135deg, ${brandColor}, #6366f1)`,
-                  color: '#fff',
-                  boxShadow: `0 8px 25px rgba(${colorRgb}, 0.45)`
-                }}
-              >
-                <span>Continue to Select Device ({currentPriceFormatted})</span>
-                <span>➜</span>
-              </button>
+              {selectedPlan ? (
+                <button
+                  className="sb-cta-btn"
+                  onClick={() => setStep(2)}
+                  style={{
+                    background: `linear-gradient(135deg, ${brandColor}, #6366f1)`,
+                    color: '#fff',
+                    boxShadow: `0 8px 25px rgba(${colorRgb}, 0.45)`,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span>Continue to Select Device ({currentPriceFormatted})</span>
+                  <span>➜</span>
+                </button>
+              ) : (
+                <button
+                  className="sb-cta-btn"
+                  disabled
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#888',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    boxShadow: 'none',
+                    cursor: 'not-allowed'
+                  }}
+                >
+                  <span>👉 Please Select a Duration Plan to Continue</span>
+                </button>
+              )}
             </motion.div>
           )}
 
@@ -522,7 +547,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
             >
               <button className="sb-back-link" onClick={() => setStep(1)}>
                 <span>←</span>
-                <span>Change Plan ({selectedPlan.duration} · {currentPriceFormatted})</span>
+                <span>Change Plan ({selectedPlan?.duration || 'Select Plan'} · {currentPriceFormatted})</span>
               </button>
 
               <div style={{
@@ -581,7 +606,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               <div className="sb-summary-grid">
                 <div>
                   <div className="sb-sum-label">SERVICE &amp; PLAN</div>
-                  <div className="sb-sum-value">{product.name} ({selectedPlan.duration})</div>
+                  <div className="sb-sum-value">{product.name} ({selectedPlan?.duration || 'Standard'})</div>
                 </div>
                 <div>
                   <div className="sb-sum-label">SELECTED DEVICE</div>
@@ -617,21 +642,23 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
 
               <button
                 className="sb-cta-btn"
+                disabled={!selectedDevice}
                 onClick={handleTelegramOrder}
                 style={{
                   background: selectedDevice
-                    ? `linear-gradient(135deg, ${brandColor}, #6366f1)`
-                    : 'rgba(255, 255, 255, 0.08)',
+                    ? `linear-gradient(135deg, ${brandColor}, #10b981)`
+                    : 'rgba(255, 255, 255, 0.06)',
                   color: selectedDevice ? '#fff' : '#777',
+                  border: selectedDevice ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
                   cursor: selectedDevice ? 'pointer' : 'not-allowed',
-                  boxShadow: selectedDevice ? `0 10px 30px rgba(${colorRgb}, 0.45)` : 'none'
+                  boxShadow: selectedDevice ? `0 10px 30px rgba(${colorRgb}, 0.5)` : 'none'
                 }}
               >
                 <span>💬</span>
                 <span>
                   {selectedDevice 
                     ? `Buy on Telegram (${currentPriceFormatted})` 
-                    : 'Please Select a Device First'}
+                    : '⚠️ Please Select a Device Above to Continue'}
                 </span>
               </button>
             </motion.div>
