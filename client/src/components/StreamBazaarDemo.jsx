@@ -437,7 +437,12 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               style={
                 step === 1 
                   ? { borderColor: brandColor, background: `rgba(${colorRgb}, 0.16)` } 
-                  : { borderColor: `rgba(${colorRgb}, 0.35)`, background: 'rgba(255, 255, 255, 0.04)', cursor: 'pointer' }
+                  : {
+                      borderColor: `rgba(${colorRgb}, 0.55)`,
+                      background: `linear-gradient(135deg, rgba(${colorRgb}, 0.15), rgba(255, 255, 255, 0.04))`,
+                      cursor: 'pointer',
+                      boxShadow: `0 0 12px rgba(${colorRgb}, 0.2)`
+                    }
               }
               title={step === 2 ? 'Click to change duration plan' : ''}
             >
@@ -447,20 +452,26 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                   width: '24px',
                   height: '24px',
                   borderRadius: '7px',
-                  background: 'rgba(0, 0, 0, 0.6)',
-                  border: `1px solid rgba(${colorRgb}, 0.4)`,
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  border: `1.5px solid ${brandColor}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  boxShadow: `0 0 8px rgba(${colorRgb}, 0.4)`
                 }}>
-                  <span style={{ fontSize: '11px', fontWeight: 900, color: brandColor }}>
-                    {product.name ? product.name.charAt(0).toUpperCase() : '⚡'}
-                  </span>
+                  <img
+                    src={getFavicon(product.name, product.customIcon)}
+                    alt=""
+                    style={{ width: '14px', height: '14px', objectFit: 'contain', borderRadius: '3px' }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
                   <span style={{
                     position: 'absolute',
-                    bottom: '-3px',
-                    right: '-3px',
+                    bottom: '-4px',
+                    right: '-4px',
                     width: '12px',
                     height: '12px',
                     borderRadius: '50%',
@@ -471,7 +482,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 0 5px rgba(0, 0, 0, 0.5)'
+                    boxShadow: '0 0 4px rgba(0, 0, 0, 0.8)'
                   }}>
                     ⇄
                   </span>
@@ -484,8 +495,17 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                   1
                 </span>
               )}
-              <span className="sb-step-title" style={{ color: step === 1 ? '#fff' : brandColor, fontWeight: 800 }}>
+              <span className="sb-step-title" style={{
+                color: '#fff',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
                 {step === 2 ? 'Change Plan' : 'Choose Plan'}
+                {step === 2 && (
+                  <span style={{ fontSize: '11px', color: brandColor, opacity: 0.9 }}>🔄</span>
+                )}
               </span>
             </button>
 
@@ -618,86 +638,6 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.12, ease: 'easeOut' }}
             >
-              {/* Sleek Modern Change Plan Bar with Brand Logo & No Service Name (Plan Duration Only) */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '9px 13px',
-                borderRadius: '14px',
-                background: 'rgba(255, 255, 255, 0.035)',
-                border: `1px solid rgba(${colorRgb}, 0.28)`,
-                marginBottom: '12px',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.25)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
-                  <div style={{
-                    position: 'relative',
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '8px',
-                    background: 'rgba(0, 0, 0, 0.65)',
-                    border: `1px solid rgba(${colorRgb}, 0.35)`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <span style={{ fontSize: '13px', fontWeight: 900, color: brandColor }}>
-                      {product.name ? product.name.charAt(0).toUpperCase() : '⚡'}
-                    </span>
-                    <span style={{
-                      position: 'absolute',
-                      bottom: '-3px',
-                      right: '-3px',
-                      width: '13px',
-                      height: '13px',
-                      borderRadius: '50%',
-                      background: brandColor,
-                      color: '#fff',
-                      fontSize: '8px',
-                      fontWeight: 900,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 0 5px rgba(0, 0, 0, 0.6)'
-                    }}>
-                      ⇄
-                    </span>
-                  </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ color: '#888', fontSize: '9.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Active Plan Duration
-                    </div>
-                    <div style={{ color: '#fff', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {selectedPlan?.duration || '1 Month'} · <span style={{ color: brandColor }}>{currentPriceFormatted}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  style={{
-                    background: `rgba(${colorRgb}, 0.16)`,
-                    border: `1px solid rgba(${colorRgb}, 0.45)`,
-                    color: brandColor,
-                    borderRadius: '9px',
-                    padding: '5px 11px',
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    flexShrink: 0,
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  <span>🔄 Change Plan</span>
-                </button>
-              </div>
-
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
