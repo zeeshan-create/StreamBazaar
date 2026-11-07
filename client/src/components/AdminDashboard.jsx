@@ -961,6 +961,17 @@ export default function AdminDashboard() {
     return () => document.removeEventListener('keydown', handleEscapeKey);
   }, [handleEscapeKey]);
 
+  const notifyPlanSync = () => {
+    localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const bc = new BroadcastChannel('streambazaar_updates');
+        bc.postMessage({ type: 'PLANS_UPDATED', timestamp: Date.now() });
+        bc.close();
+      }
+    } catch (e) {}
+  };
+
   const handleEditStart = (service) => {
     setEditingId(service._id);
     setEditForm({ 
@@ -985,14 +996,16 @@ export default function AdminDashboard() {
       // ⚡ INSTANT 0ms ZERO-LATENCY OPTIMISTIC UPDATE
       setServices(prev => prev.map(s => (s._id === id ? { ...s, ...payload } : s)));
       setEditingId(null);
-      localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
+      notifyPlanSync();
 
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) {
+      if (res.ok) {
+        notifyPlanSync();
+      } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to save: ${errData.error || res.statusText || 'Unknown error'}`);
         fetchServices();
@@ -1010,7 +1023,7 @@ export default function AdminDashboard() {
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, { method: 'DELETE' });
       if (res.ok) {
         fetchServices();
-        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
+        notifyPlanSync();
       }
     } catch (err) {
       console.error('Delete error:', err);
@@ -1029,7 +1042,7 @@ export default function AdminDashboard() {
       if (res.ok) {
         alert('All products have been deleted successfully.');
         fetchServices();
-        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
+        notifyPlanSync();
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to delete: ${errData.error || res.statusText || 'Unknown error'}`);
@@ -1059,7 +1072,7 @@ export default function AdminDashboard() {
       if (res.ok) {
         setShowAddForm(false);
         fetchServices();
-        localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
+        notifyPlanSync();
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to add service: ${errData.error || res.statusText || 'Unknown error'}`);

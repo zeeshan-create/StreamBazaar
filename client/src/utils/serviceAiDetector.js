@@ -43,19 +43,29 @@ export function detectServiceSpecs(product, selectedPlan = null) {
 
   if (isAnime) {
     let quality = '1080p FHD';
-    if (planLabel.includes('4k') || planQuality.toLowerCase().includes('4k')) {
+    const combinedPlan = `${planQuality} ${planLabel}`.toLowerCase();
+    if (combinedPlan.includes('4k') || combinedPlan.includes('uhd')) {
       quality = '4K Ultra HD';
-    } else if (planLabel.includes('mega') || desc.includes('mega')) {
+    } else if (combinedPlan.includes('mega') || desc.includes('mega')) {
       quality = '1080p Mega Fan';
-    } else if (planLabel.includes('fan')) {
+    } else if (combinedPlan.includes('fan')) {
       quality = '1080p Fan Tier';
+    } else if (combinedPlan.includes('1080p') || combinedPlan.includes('full hd') || combinedPlan.includes('fhd')) {
+      quality = '1080p FHD';
+    } else if (combinedPlan.includes('720p')) {
+      quality = '720p HD';
+    } else if (plan?.quality && plan.quality.trim()) {
+      quality = plan.quality.trim();
+    } else if (plan?.label && !['standard', 'custom', 'plan', 'default'].includes(planLabel)) {
+      quality = plan.label.trim();
     }
+    const displayQuality = quality.startsWith('🍥') ? quality : `🍥 ${quality}`;
     return {
       categoryType: 'anime',
-      featureBadge: `🍥 ${quality}`,
-      summaryQuality: `🍥 ${quality} · Ad-Free Simulcasts`,
+      featureBadge: displayQuality,
+      summaryQuality: `${displayQuality} · Ad-Free Simulcasts`,
       deviceCompatibility: '📺 Any Device (TV, Mobile, PC)',
-      planPill: `⚡ Instant Delivery • 🛡️ 100% Guarantee • 🍥 ${quality}`
+      planPill: `⚡ Instant Delivery • 🛡️ 100% Guarantee • ${displayQuality}`
     };
   }
 
@@ -171,12 +181,27 @@ export function detectServiceSpecs(product, selectedPlan = null) {
     name.includes('wwe');
 
   if (isGaming) {
+    let gameBadge = '🎮 Any Device';
+    let gameCompat = '🎮 PC, Steam Deck, PlayStation & Xbox';
+    const combinedPlan = `${planQuality} ${planLabel}`.toLowerCase();
+    if (combinedPlan.includes('playstation') || combinedPlan.includes('ps5') || combinedPlan.includes('ps4')) {
+      gameBadge = '🎮 PlayStation';
+      gameCompat = '🎮 PS4 & PS5 Console Access';
+    } else if (combinedPlan.includes('xbox')) {
+      gameBadge = '🎮 Xbox';
+      gameCompat = '🎮 Xbox One, Series S & Series X';
+    } else if (combinedPlan.includes('pc') || combinedPlan.includes('steam')) {
+      gameBadge = '🎮 PC Game';
+      gameCompat = '💻 PC & Steam Deck Access';
+    } else if (plan?.label && !['standard', 'custom', 'plan', 'default'].includes(planLabel)) {
+      gameBadge = plan.label.startsWith('🎮') ? plan.label : `🎮 ${plan.label}`;
+    }
     return {
       categoryType: 'gaming',
-      featureBadge: '🎮 Any Device',
-      summaryQuality: '🎮 Full Game License · Lifetime Access',
-      deviceCompatibility: '🎮 PC, Steam Deck, PlayStation & Xbox',
-      planPill: '⚡ Instant Delivery • 🛡️ 100% Guarantee • 🎮 Any Device'
+      featureBadge: gameBadge,
+      summaryQuality: `${gameBadge} · Full Game License · Lifetime Access`,
+      deviceCompatibility: gameCompat,
+      planPill: `⚡ Instant Delivery • 🛡️ 100% Guarantee • ${gameBadge}`
     };
   }
 
@@ -193,19 +218,37 @@ export function detectServiceSpecs(product, selectedPlan = null) {
     ottQuality = '1080p FHD';
   }
 
-  if (planQuality) {
-    ottQuality = planQuality;
-  } else if (planLabel.includes('1080p') || (planLabel.includes('hd') && !planLabel.includes('4k'))) {
-    ottQuality = '1080p FHD';
-  } else if (planLabel.includes('4k') || planLabel.includes('uhd')) {
+  const combinedPlan = `${planQuality} ${planLabel}`.toLowerCase();
+
+  if (combinedPlan.includes('4k') || combinedPlan.includes('uhd')) {
     ottQuality = '4K Ultra HD';
+  } else if (combinedPlan.includes('1080p') || combinedPlan.includes('full hd') || combinedPlan.includes('fhd')) {
+    ottQuality = '1080p FHD';
+  } else if (combinedPlan.includes('720p') || (combinedPlan.includes('hd') && !combinedPlan.includes('full') && !combinedPlan.includes('ultra'))) {
+    ottQuality = '720p HD';
+  } else if (combinedPlan.includes('private')) {
+    ottQuality = 'Private Profile';
+  } else if (combinedPlan.includes('shared')) {
+    ottQuality = 'Shared Profile';
+  } else if (plan?.quality && plan.quality.trim()) {
+    ottQuality = plan.quality.trim();
+  } else if (plan?.label && !['standard', 'custom', 'plan', 'default'].includes(planLabel)) {
+    ottQuality = plan.label.trim();
   }
+
+  let badgeIcon = '📺';
+  if (ottQuality.includes('Private')) badgeIcon = '🔒';
+  else if (ottQuality.includes('Shared')) badgeIcon = '⚡';
+
+  const featureBadge = ottQuality.startsWith('📺') || ottQuality.startsWith('🔒') || ottQuality.startsWith('⚡')
+    ? ottQuality
+    : `${badgeIcon} ${ottQuality}`;
 
   return {
     categoryType: 'ott',
-    featureBadge: `📺 ${ottQuality}`,
-    summaryQuality: `📺 ${ottQuality} + HDR · 1 Device Access`,
+    featureBadge,
+    summaryQuality: `${featureBadge} + HDR · 1 Device Access`,
     deviceCompatibility: '📺 TV, Phone, Tablet & Laptop',
-    planPill: `⚡ Instant Delivery • 🛡️ 100% Guarantee • 📺 ${ottQuality}`
+    planPill: `⚡ Instant Delivery • 🛡️ 100% Guarantee • ${featureBadge}`
   };
 }

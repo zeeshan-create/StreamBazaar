@@ -278,7 +278,18 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
   const colorRgb = hexToRgb(brandColor);
   const isGaming = isGamingCategory(product.category);
   const accountBadge = getAccountBadge(product.description);
-  const specs = detectServiceSpecs(product, selectedPlan || product.plans?.[0]);
+  const activePlan = selectedPlan || product.plans?.[0];
+  const specs = detectServiceSpecs(product, activePlan);
+
+  // Sync selectedPlan if product plans are updated live in background
+  useEffect(() => {
+    if (selectedPlan && product?.plans) {
+      const match = product.plans.find(p => p.duration === selectedPlan.duration) || product.plans[0];
+      if (match && (match.price !== selectedPlan.price || match.label !== selectedPlan.label)) {
+        setSelectedPlan(match);
+      }
+    }
+  }, [product, selectedPlan]);
 
   const deviceList = useMemo(() => {
     if (isGaming) {
@@ -458,6 +469,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                 {(product.plans || []).map((pl, idx) => {
                   const isSelected = selectedPlan === pl;
                   const plPrice = pl.price || '₹199';
+                  const rowSpecs = detectServiceSpecs(product, pl);
 
                   return (
                     <div
@@ -478,11 +490,11 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                             {pl.duration || '1 Month'}
                           </span>
                           <span className="sb-plan-quality-tag" style={{ color: brandColor, borderColor: `rgba(${colorRgb}, 0.4)` }}>
-                            {pl.quality || specs.featureBadge}
+                            {rowSpecs.featureBadge}
                           </span>
                         </div>
                         <div className="sb-plan-row-sub">
-                          {specs.deviceCompatibility} • Replacement Guarantee
+                          {rowSpecs.deviceCompatibility} • Replacement Guarantee
                         </div>
                       </div>
 
@@ -843,11 +855,11 @@ export default function StreamBazaarDemo() {
 
   const lastDataRef = React.useRef('');
 
-  // Live polling from MongoDB (Optimized to prevent re-render thrashing)
+  // Live polling from MongoDB (Optimized with zero re-render thrashing)
   const fetchPlans = useCallback(async () => {
     try {
       const apiBase = import.meta.env.PROD ? '' : 'http://localhost:5000';
-      const res = await fetch(`${apiBase}/api/plans?v=` + Date.now());
+      const res = await fetch(`${apiBase}/api/plans?v=` + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -855,6 +867,11 @@ export default function StreamBazaarDemo() {
           if (str !== lastDataRef.current) {
             lastDataRef.current = str;
             setProducts(data);
+            setModalData(prev => {
+              if (!prev) return null;
+              const updated = data.find(p => p._id === prev.product?._id || p.name === prev.product?.name);
+              return updated ? { ...prev, product: updated } : prev;
+            });
           }
         }
       }
@@ -865,13 +882,31 @@ export default function StreamBazaarDemo() {
 
   useEffect(() => {
     fetchPlans();
-    // 30-second polling to ensure ultra-smooth 60/120fps performance on all devices
+
+    // Fast 3-second live sync interval for zero-delay admin updates across any device
     const interval = setInterval(() => {
       if (!document.hidden) fetchPlans();
-    }, 30000);
+    }, 3000);
 
-    const onFocus = () => fetchPlans();
-    window.addEventListener('focus', onFocus);
+    const onVisible = () => {
+      if (!document.hidden) fetchPlans();
+    };
+
+    window.addEventListener('focus', onVisible);
+    document.addEventListener('visibilitychange', onVisible);
+
+    // Multi-tab instant sync via BroadcastChannel
+    let bc;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bc = new BroadcastChannel('streambazaar_updates');
+        bc.onmessage = (e) => {
+          if (e.data?.type === 'PLANS_UPDATED') {
+            fetchPlans();
+          }
+        };
+      }
+    } catch (e) {}
 
     const onStorage = (e) => {
       if (e.key === 'streambazaar_plans_updated') {
@@ -882,8 +917,10 @@ export default function StreamBazaarDemo() {
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('focus', onVisible);
+      document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('storage', onStorage);
+      if (bc) bc.close();
     };
   }, [fetchPlans]);
 
