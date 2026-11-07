@@ -7,19 +7,27 @@ import HomeLive1 from './components/HomeLive1';
 import SearchDemo from './components/SearchDemo';
 import ColorGuide from './components/ColorGuide';
 import StreamBazaarDemo from './components/StreamBazaarDemo';
+import OttBackground from './components/OttBackground';
+import PolicyPage from './components/PolicyPage';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<StreamBazaarDemo />} />
-      <Route path="/demo" element={<StreamBazaarDemo />} />
-      <Route path="/legacy" element={<Storefront />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/trial-home" element={<HomeLive />} />
-      <Route path="/trial-home-1" element={<HomeLive1 />} />
-      <Route path="/trial-search" element={<SearchDemo />} />
-      <Route path="/trial-color" element={<ColorGuide />} />
-    </Routes>
+    <>
+      <OttBackground />
+      <Routes>
+        <Route path="/" element={<StreamBazaarDemo />} />
+        <Route path="/demo" element={<StreamBazaarDemo />} />
+        <Route path="/policy" element={<PolicyPage />} />
+        <Route path="/terms" element={<PolicyPage />} />
+        <Route path="/warranty" element={<PolicyPage />} />
+        <Route path="/legacy" element={<Storefront />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/trial-home" element={<HomeLive />} />
+        <Route path="/trial-home-1" element={<HomeLive1 />} />
+        <Route path="/trial-search" element={<SearchDemo />} />
+        <Route path="/trial-color" element={<ColorGuide />} />
+      </Routes>
+    </>
   );
 }
 

@@ -1,0 +1,90 @@
+/* StreamBazaar - always-on glowing border in each service's own colour.
+   Border ghoomta rehta hai + bahar ki glow khulti/band hoti hai. Center plain rehta hai. */
+@property --ga {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.glowcard {
+  --r: 22px;
+  position: relative;
+  border-radius: var(--r);
+  background: #0c0b16;
+  border: 1px solid transparent;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c, #a855f7) 26%, transparent);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.glowcard:hover {
+  transform: translateY(-4px);
+}
+
+.glowcard::before,
+.glowcard::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  background: conic-gradient(
+    from var(--ga, 0deg),
+    transparent 0 40%,
+    var(--c, #a855f7) 75%,
+    color-mix(in srgb, var(--c, #a855f7) 45%, #fff) 90%,
+    transparent
+  );
+  animation: gcrot 5s linear infinite;
+  z-index: 1;
+}
+
+/* crisp rotating border */
+.glowcard::before {
+  inset: 0;
+  border-radius: var(--r);
+  padding: 2px;
+}
+
+/* soft outer glow: border ke BAHAR, saans lene jaisa */
+.glowcard::after {
+  inset: -6px;
+  border-radius: calc(var(--r) + 6px);
+  padding: 6px;
+  filter: blur(9px);
+  animation: gcrot 5s linear infinite, gcgl 3.6s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes gcrot {
+  to {
+    --ga: 360deg;
+  }
+}
+
+@keyframes gcgl {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.95;
+  }
+}
+
+/* out-of-stock: koi glow nahi */
+.glowcard.off {
+  opacity: 0.65;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.glowcard.off::before,
+.glowcard.off::after {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glowcard::before,
+  .glowcard::after {
+    animation: none;
+  }
+}

@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle, ExternalLink, Search } from 'lucide-react';
 import ChatWidget from '../ChatWidget';
 import FomoToast from './FomoToast';
+import GlowCard from './GlowCard';
+import PolicyModal from './PolicyModal';
 import FALLBACK_PRODUCTS from '../utils/fallbackProducts.json';
 import { 
   getFavicon, 
   isGamingCategory, 
   getDomainFromUrl,
-  getGameIcon,
-  GAME_IMGS
+  getGameIcon
 } from '../utils/logoHelper';
+import { detectServiceSpecs } from '../utils/serviceAiDetector';
 import './StreamBazaarDemo.css';
 
 // ─── HIGH-DPI SVG VECTOR ICONS ───────────────────────────────────
@@ -75,7 +76,6 @@ const Icons = {
 };
 
 // ─── HIGH-CONTRAST SAFE BRAND COLOR HELPER ───────────────────────
-// Solves dark/blank text bug for Crunchyroll (#030b14), ChatGPT, etc.
 const isColorTooDark = (c) => {
   if (!c) return true;
   c = c.trim().toLowerCase();
@@ -99,7 +99,7 @@ const getSafeBrandColor = (product) => {
   if (raw && !isColorTooDark(raw)) return raw;
 
   const name = (product?.name || '').toLowerCase();
-  if (name.includes('crunchyroll')) return '#ff6600'; // Official Crunchyroll Vibrant Orange!
+  if (name.includes('crunchyroll')) return '#ff6600';
   if (name.includes('chatgpt') || name.includes('openai')) return '#10a37f';
   if (name.includes('netflix')) return '#e50914';
   if (name.includes('prime') || name.includes('amazon')) return '#00a8e1';
@@ -114,6 +114,8 @@ const getSafeBrandColor = (product) => {
   if (name.includes('surfshark')) return '#06b6d4';
   if (name.includes('expressvpn')) return '#ef4444';
   if (name.includes('proton')) return '#8b5cf6';
+  if (name.includes('fancode')) return '#ff5722';
+  if (name.includes('steam') || name.includes('gta') || name.includes('forza')) return '#d4a359';
 
   return '#a855f7';
 };
@@ -205,7 +207,6 @@ const getAccountBadge = (desc) => {
 const CardLogo = ({ product }) => {
   const isGaming = isGamingCategory(product.category);
 
-  // High-res cover image resolution: prioritize direct plan image, then GAME_IMGS match, then customIcon/favicon
   const resolvedUrl = useMemo(() => {
     if (isGaming) {
       if (product.plans?.[0]?.image) return product.plans[0].image;
@@ -268,8 +269,6 @@ const CardLogo = ({ product }) => {
 };
 
 // ─── 2-STEP SMOOTH POP-UP PURCHASE MODAL ─────────────────────────
-// Step 1: All Plans pop up with animation -> User selects plan -> clicks "Continue to Device"
-// Step 2: Device selection -> User selects device -> Direct Telegram Purchase!
 const PurchaseModal = ({ product, initialPlan, onClose }) => {
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState(initialPlan || product.plans?.[0]);
@@ -279,8 +278,8 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
   const colorRgb = hexToRgb(brandColor);
   const isGaming = isGamingCategory(product.category);
   const accountBadge = getAccountBadge(product.description);
+  const specs = detectServiceSpecs(product, selectedPlan);
 
-  // Device list: 3x3 for Gaming, 4-grid for OTT
   const deviceList = useMemo(() => {
     if (isGaming) {
       return [
@@ -298,36 +297,40 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
     return [
       { id: 'TV', label: 'TV', icon: Icons.TV },
       { id: 'PC', label: 'PC', icon: Icons.PC },
-      { id: 'iOS', label: 'iOS', icon: Icons.Apple },
-      { id: 'Android', label: 'Android', icon: Icons.Android }
+      { id: 'Android', label: 'Android', icon: Icons.Android },
+      { id: 'iOS', label: 'iPhone/iPad', icon: Icons.Apple }
     ];
   }, [isGaming]);
 
-  // Live stock availability
   const isAvailable = (devId) => {
-    const raw = selectedPlan?.supportedDevices;
-    if (!raw) {
-      if (isGaming) return devId === 'PC' || devId === 'Laptop';
-      return true;
-    }
-    const devArray = Array.isArray(raw) ? raw : String(raw).split(' ');
-    const lowerArr = devArray.map(x => x.toLowerCase());
-    return lowerArr.some(x => devId.toLowerCase().includes(x) || x.includes(devId.toLowerCase()));
+    if (!selectedPlan) return true;
+    const supp = selectedPlan.supportedDevices || [];
+    if (supp.length === 0) return true;
+    return supp.some(d => d.toLowerCase() === devId.toLowerCase());
   };
 
-  // Direct Telegram purchase message generator
   const handleTelegramOrder = () => {
     if (!selectedDevice) return;
-    const priceText = selectedPlan.price.startsWith('₹') ? selectedPlan.price : `₹${selectedPlan.price}`;
-    
-    // Exact format user requested: "Netflix 160 ka purchase karna hai" + device and duration
-    const msg = `Hi! Mujhe ${product.name} (${selectedPlan.duration || '1 Month'}) purchase karna hai - Price: ${priceText} - Device: ${selectedDevice}. Please share UPI / payment details for instant activation!`;
+    const price = selectedPlan.price || 'Contact Support';
+    const duration = selectedPlan.duration || 'Standard';
 
-    window.open(`https://t.me/owner_trusted_streams?text=${encodeURIComponent(msg)}`, '_blank');
-    onClose();
+    const msg = 
+`👋 Hello StreamBazaar Support, I want to purchase an account!
+
+🛍️ **Service:** ${product.name}
+⏱️ **Plan:** ${duration}
+💰 **Price:** ${price}
+📱 **Selected Device:** ${selectedDevice}
+🛡️ **Guarantee:** 100% Full Replacement
+✨ **Specs:** ${specs.summaryQuality}
+
+Please share the payment QR / UPI ID and setup credentials. Thank you!`;
+
+    const encoded = encodeURIComponent(msg);
+    window.open(`https://t.me/owner_trusted_streams?text=${encoded}`, '_blank');
   };
 
-  const currentPriceFormatted = selectedPlan.price.startsWith('₹') ? selectedPlan.price : `₹${selectedPlan.price}`;
+  const currentPriceFormatted = selectedPlan?.price || '₹199';
 
   return (
     <motion.div
@@ -339,60 +342,86 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
     >
       <motion.div
         className="sb-modal-card"
-        style={{
-          border: `1.5px solid rgba(${colorRgb}, 0.5)`,
-          boxShadow: `0 30px 90px rgba(0, 0, 0, 0.95), 0 0 50px rgba(${colorRgb}, 0.25)`
-        }}
-        initial={{ scale: 0.94, y: 24, opacity: 0 }}
-        animate={{ scale: 1, y: 0, opacity: 1 }}
-        exit={{ scale: 0.94, y: 24, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+        initial={{ scale: 0.92, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.92, opacity: 0, y: 20 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 350 }}
         onClick={(e) => e.stopPropagation()}
+        style={{
+          '--c': brandColor,
+          boxShadow: `0 25px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(${colorRgb}, 0.25)`
+        }}
       >
-        {/* Top Accent Strip */}
-        <div style={{ height: '3px', background: `linear-gradient(90deg, transparent, ${brandColor}, transparent)` }} />
+        <button
+          className="sb-modal-close-btn"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          ✕
+        </button>
 
-        {/* Close Button */}
-        <button className="sb-modal-close" onClick={onClose}>✕</button>
+        <div className="sb-modal-header">
+          <CardLogo product={product} />
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 className="sb-modal-title">{product.name}</h3>
+              <span style={{ color: '#3b82f6', fontSize: '14px' }}>✓</span>
+            </div>
+
+            <div className="sb-badges-row" style={{ marginTop: '4px' }}>
+              <span className="sb-badge" style={accountBadge.style}>
+                {accountBadge.icon} {accountBadge.label}
+              </span>
+              <span className="sb-badge" style={{
+                border: `1px solid rgba(${colorRgb}, 0.5)`,
+                background: `rgba(${colorRgb}, 0.15)`,
+                color: brandColor
+              }}>
+                {(product.category || 'STREAMING').toUpperCase()}
+              </span>
+              <span className="sb-badge" style={{
+                border: '1px solid rgba(52, 211, 153, 0.4)',
+                background: 'rgba(52, 211, 153, 0.12)',
+                color: '#34d399'
+              }}>
+                {specs.featureBadge}
+              </span>
+            </div>
+
+            <p style={{ color: '#888', fontSize: '11.5px', margin: '4px 0 0', lineHeight: 1.3 }}>
+              {product.description || (isGaming ? 'Private account. Instant delivery.' : 'Premium shared profiles. Instant access upon purchase.')}
+            </p>
+          </div>
+        </div>
+
+        <div className="sb-stepper-wrap">
+          <div className="sb-stepper-line" />
+          <div
+            className={`sb-step-bubble ${step >= 1 ? 'active' : ''}`}
+            onClick={() => setStep(1)}
+            style={step >= 1 ? { background: brandColor, color: '#fff', borderColor: brandColor } : {}}
+          >
+            1
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: step === 1 ? '#fff' : '#666' }}>
+            Choose Plan
+          </span>
+
+          <div style={{ flex: 1 }} />
+
+          <div
+            className={`sb-step-bubble ${step >= 2 ? 'active' : ''}`}
+            style={step >= 2 ? { background: brandColor, color: '#fff', borderColor: brandColor } : {}}
+          >
+            2
+          </div>
+          <span style={{ fontSize: '11.5px', fontWeight: 700, color: step === 2 ? '#fff' : '#666' }}>
+            Select Device &amp; Buy
+          </span>
+        </div>
 
         <div className="sb-modal-body">
-          {/* Header Row: Logo + Title + Badges */}
-          <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: '16px' }}>
-            <CardLogo product={product} />
-
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h3 className="sb-card-title" style={{ fontSize: '18px', margin: 0 }}>
-                  {product.name}
-                </h3>
-                <span style={{ color: '#3b82f6', fontSize: '14px' }}>✓</span>
-              </div>
-
-              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: '4px 0' }}>
-                <span className="sb-badge" style={accountBadge.style}>
-                  {accountBadge.icon} {accountBadge.label}
-                </span>
-                <span style={{ color: '#888', fontSize: '11px' }}>· 1 Device Access</span>
-              </div>
-
-              <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '11px', margin: 0, lineHeight: 1.3 }}>
-                {product.description || 'Instant delivery within 2 minutes via Telegram.'}
-              </p>
-            </div>
-          </div>
-
-          {/* STEP INDICATOR */}
-          <div className="sb-step-indicator">
-            <span className={`sb-step-bubble ${step === 1 ? 'active' : 'inactive'}`}>
-              1. CHOOSE PLAN
-            </span>
-            <span style={{ color: '#555', fontSize: '12px' }}>➜</span>
-            <span className={`sb-step-bubble ${step === 2 ? 'active' : 'inactive'}`}>
-              2. SELECT DEVICE
-            </span>
-          </div>
-
-          {/* ════════════ STEP 1: CHOOSE PLAN & DURATION ════════════ */}
           {step === 1 && (
             <motion.div
               initial={{ opacity: 0, x: -10 }}
@@ -400,54 +429,47 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.18 }}
             >
-              <div style={{ marginBottom: '16px' }}>
-                {product.plans.map((pl, idx) => {
-                  const isSelected = selectedPlan.duration === pl.duration && selectedPlan.price === pl.price;
-                  const planPrice = pl.price.startsWith('₹') ? pl.price : `₹${pl.price}`;
+              <div style={{ color: '#888', fontSize: '10px', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '10px' }}>
+                AVAILABLE DURATION PLANS ({product.plans?.length || 0})
+              </div>
+
+              <div className="sb-plans-scroll">
+                {(product.plans || []).map((pl, idx) => {
+                  const isSelected = selectedPlan === pl;
+                  const plPrice = pl.price || '₹199';
+
                   return (
                     <div
                       key={idx}
-                      className={`sb-modal-plan-item ${isSelected ? 'selected' : ''}`}
+                      className="sb-plan-row"
                       onClick={() => setSelectedPlan(pl)}
                       style={{
-                        border: `1.5px solid ${isSelected ? brandColor : 'rgba(255, 255, 255, 0.08)'}`,
-                        boxShadow: isSelected ? `0 0 16px rgba(${colorRgb}, 0.25)` : 'none'
+                        background: isSelected
+                          ? `rgba(${colorRgb}, 0.16)`
+                          : 'rgba(255, 255, 255, 0.025)',
+                        borderColor: isSelected ? brandColor : 'rgba(255, 255, 255, 0.08)',
+                        boxShadow: isSelected ? `0 0 16px rgba(${colorRgb}, 0.35)` : 'none'
                       }}
                     >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <div style={{ color: '#fff', fontSize: '13.5px', fontWeight: 800 }}>
-                          {pl.label || (isGaming ? 'PC Game Seat Access' : 'Premium Access')}
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ color: '#fff', fontSize: '14.5px', fontWeight: 800 }}>
+                            {pl.duration || '1 Month'}
+                          </span>
+                          <span className="sb-plan-quality-tag" style={{ color: brandColor, borderColor: `rgba(${colorRgb}, 0.4)` }}>
+                            {pl.quality || specs.featureBadge}
+                          </span>
                         </div>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          <span style={{
-                            fontSize: '10.5px',
-                            fontWeight: 800,
-                            color: brandColor,
-                            background: `rgba(${colorRgb}, 0.16)`,
-                            padding: '1.5px 7px',
-                            borderRadius: '4px'
-                          }}>
-                            {pl.duration}
-                          </span>
-                          <span style={{ fontSize: '10px', color: '#999' }}>
-                            {pl.quality || (isGaming ? 'Full Game Access' : '4K UHD + HDR')}
-                          </span>
+                        <div style={{ color: '#777', fontSize: '11px', marginTop: '3px' }}>
+                          {specs.deviceCompatibility} • Replacement Guarantee
                         </div>
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {/* 100% High-Contrast, Bright Bold Price */}
-                        <span style={{
-                          color: '#ffffff',
-                          fontSize: '19px',
-                          fontWeight: 900,
-                          letterSpacing: '0.3px',
-                          textShadow: isSelected ? `0 0 12px rgba(${colorRgb}, 0.6)` : 'none'
-                        }}>
-                          {planPrice}
+                        <span className="sb-plan-price-num" style={{ color: isSelected ? brandColor : '#fff' }}>
+                          {plPrice}
                         </span>
 
-                        {/* Radio Check Button */}
                         <div
                           className="sb-radio-outer"
                           style={{
@@ -463,7 +485,6 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
                 })}
               </div>
 
-              {/* Continue to Step 2 Button */}
               <button
                 className="sb-cta-btn"
                 onClick={() => setStep(2)}
@@ -479,7 +500,6 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
             </motion.div>
           )}
 
-          {/* ════════════ STEP 2: SELECT DEVICE & ORDER VIA TELEGRAM ════════════ */}
           {step === 2 && (
             <motion.div
               initial={{ opacity: 0, x: 10 }}
@@ -506,7 +526,6 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
                 </span>
               </div>
 
-              {/* Device Buttons Grid */}
               <div className={`sb-device-grid ${isGaming ? 'gaming-grid' : 'ott-grid'}`}>
                 {deviceList.map((dev) => {
                   const available = isAvailable(dev.id);
@@ -531,7 +550,6 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
                         boxShadow: isSelected ? `0 0 18px rgba(${colorRgb}, 0.45)` : 'none'
                       }}
                     >
-                      {/* Hanging Stock Badge */}
                       <span className={`sb-stock-badge ${available ? 'avail' : 'oos'}`}>
                         {available ? 'AVAILABLE' : 'OUT OF STOCK'}
                       </span>
@@ -547,10 +565,9 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
                 })}
               </div>
 
-              {/* Order Ticket Summary */}
               <div className="sb-summary-grid">
                 <div>
-                  <div className="sb-sum-label">SERVICE & PLAN</div>
+                  <div className="sb-sum-label">SERVICE &amp; PLAN</div>
                   <div className="sb-sum-value">{product.name} ({selectedPlan.duration})</div>
                 </div>
                 <div>
@@ -560,15 +577,15 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
                   </div>
                 </div>
                 <div>
-                  <div className="sb-sum-label">QUALITY</div>
-                  <div className="sb-sum-value">
-                    {selectedPlan.quality || (isGaming ? 'Full Game Access' : '4K Ultra HD')}
+                  <div className="sb-sum-label">SPECS &amp; QUALITY</div>
+                  <div className="sb-sum-value" style={{ color: '#fff' }}>
+                    {specs.summaryQuality}
                   </div>
                 </div>
                 <div>
                   <div className="sb-sum-label">WARRANTY</div>
                   <div className="sb-sum-value" style={{ color: '#34d399' }}>
-                    🛡️ 100% Replacement
+                    🛡️ 100% Full Replacement
                   </div>
                 </div>
                 <div style={{ gridColumn: '1 / -1', borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -579,13 +596,12 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
                     </div>
                   </div>
                   <div style={{ fontSize: '11px', color: '#888', textAlign: 'right' }}>
-                    Instant Access <br />
+                    Instant Automated Access <br />
                     Delivery in &lt; 2 mins
                   </div>
                 </div>
               </div>
 
-              {/* Direct Telegram Order Button */}
               <button
                 className="sb-cta-btn"
                 onClick={handleTelegramOrder}
@@ -613,38 +629,20 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
   );
 };
 
-// ─── HIGH-CONVERTING PRODUCT CARD ────────────────────────────────
+// ─── HIGH-CONVERTING GLOWING PRODUCT CARD ────────────────────────
 const ProductCard = ({ product, onOpenBuy }) => {
   const isGaming = isGamingCategory(product.category);
   const brandColor = getSafeBrandColor(product);
-  const colorRgb = hexToRgb(brandColor);
 
   const platform = isGaming ? getGamingPlatform(product) : null;
   const platformBadge = isGaming ? getPlatformBadge(platform) : null;
   const accountBadge = getAccountBadge(product.description);
+  const specs = detectServiceSpecs(product, product.plans?.[0]);
 
-  // Status check from Admin Panel
   const rawStatus = (product.status || 'Available').trim().toLowerCase();
   const isOutOfStock = rawStatus.includes('out') || rawStatus === 'oos';
   const isComingSoon = rawStatus.includes('coming');
 
-  const statusBadge = isOutOfStock ? {
-    label: 'OUT OF STOCK',
-    style: {
-      border: '1px solid rgba(239, 68, 68, 0.6)',
-      background: 'rgba(239, 68, 68, 0.16)',
-      color: '#f87171'
-    }
-  } : isComingSoon ? {
-    label: 'COMING SOON',
-    style: {
-      border: '1px solid rgba(245, 158, 11, 0.6)',
-      background: 'rgba(245, 158, 11, 0.16)',
-      color: '#fbbf24'
-    }
-  } : null;
-
-  // Lowest price from plans
   const lowestPrice = useMemo(() => {
     if (!product.plans || product.plans.length === 0) return '₹199';
     let min = Infinity;
@@ -656,24 +654,15 @@ const ProductCard = ({ product, onOpenBuy }) => {
   }, [product.plans]);
 
   const defaultDuration = product.plans?.[0]?.duration || '1 Month';
-  const defaultQuality = product.plans?.[0]?.quality || (isGaming ? 'Full Game' : '4K Ultra HD');
 
   return (
-    <motion.div
-      layout
+    <GlowCard
+      color={brandColor}
+      off={isOutOfStock}
       className={`sb-card ${isOutOfStock ? 'sb-card-oos' : isComingSoon ? 'sb-card-coming-soon' : ''}`}
-      style={
-        isOutOfStock || isComingSoon
-          ? { opacity: 1 }
-          : {
-              border: `1.5px solid rgba(${colorRgb}, 0.35)`,
-              boxShadow: `0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(${colorRgb}, 0.08)`,
-              opacity: 1
-            }
-      }
     >
       <div>
-        {/* Header: Logo + Full Title + Badges */}
+        {/* Header: Logo + Title + Badges */}
         <div className="sb-card-header">
           <CardLogo product={product} />
 
@@ -691,8 +680,8 @@ const ProductCard = ({ product, onOpenBuy }) => {
               )}
               {!isGaming && (
                 <span className="sb-badge" style={{
-                  border: `1px solid rgba(${colorRgb}, 0.5)`,
-                  background: `rgba(${colorRgb}, 0.15)`,
+                  border: `1px solid ${brandColor}88`,
+                  background: `${brandColor}22`,
                   color: brandColor
                 }}>
                   {(product.category || 'STREAMING').toUpperCase()}
@@ -721,19 +710,19 @@ const ProductCard = ({ product, onOpenBuy }) => {
           </div>
         </div>
 
-        {/* Feature Highlights Pills */}
-        <div className="sb-card-features" style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        {/* Feature Highlights: Full-length auto-adjusted layout */}
+        <div className="sb-card-features">
           <span className="sb-feat-pill">⚡ Instant Delivery</span>
-          <span style={{ color: '#444' }}>•</span>
+          <span className="sb-feat-sep">•</span>
           <span className="sb-feat-pill">🛡️ 100% Guarantee</span>
-          <span style={{ color: '#444' }}>•</span>
-          <span className="sb-feat-pill">
-            {isGaming ? '🎮 PC & Console Access' : `📺 ${defaultQuality}`}
+          <span className="sb-feat-sep">•</span>
+          <span className="sb-feat-pill sb-feat-dynamic">
+            {specs.featureBadge}
           </span>
         </div>
       </div>
 
-      {/* Bottom Action Area: Starting Price + Single Get Plan / Out of Stock Button */}
+      {/* Bottom Action Area */}
       <div 
         className="sb-card-action"
         style={{
@@ -763,7 +752,6 @@ const ProductCard = ({ product, onOpenBuy }) => {
           </span>
         </div>
 
-        {/* High-Converting Action Button: Respects Out of Stock & Coming Soon from Admin Panel */}
         {isOutOfStock ? (
           <button className="sb-btn-oos" disabled>
             <span>Out of Stock</span>
@@ -787,7 +775,7 @@ const ProductCard = ({ product, onOpenBuy }) => {
           </button>
         )}
       </div>
-    </motion.div>
+    </GlowCard>
   );
 };
 
@@ -796,6 +784,7 @@ export default function StreamBazaarDemo() {
   const navigate = useNavigate();
   const [products, setProducts] = useState(FALLBACK_PRODUCTS);
   const [modalData, setModalData] = useState(null);
+  const [policyTab, setPolicyTab] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [gamingPlatformFilter, setGamingPlatformFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -812,7 +801,7 @@ export default function StreamBazaarDemo() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigate]);
 
-  // Live polling from MongoDB (Works locally and in production deployment)
+  // Live polling from MongoDB
   const fetchPlans = useCallback(async () => {
     try {
       const apiBase = import.meta.env.PROD ? '' : 'http://localhost:5000';
@@ -830,17 +819,13 @@ export default function StreamBazaarDemo() {
 
   useEffect(() => {
     fetchPlans();
-    
-    // 1. Ultra-fast 2-second background polling
     const interval = setInterval(() => {
       if (!document.hidden) fetchPlans();
     }, 2000);
 
-    // 2. Instant re-fetch when user switches back to the storefront tab
     const onFocus = () => fetchPlans();
     window.addEventListener('focus', onFocus);
 
-    // 3. 0ms instant broadcast sync when Admin edits any product in another tab
     const onStorage = (e) => {
       if (e.key === 'streambazaar_plans_updated') {
         fetchPlans();
@@ -858,7 +843,6 @@ export default function StreamBazaarDemo() {
   // Filtered Products
   const displayedProducts = useMemo(() => {
     return products.filter(p => {
-      // 1. Text Search Query
       if (searchQuery) {
         const q = searchQuery.toLowerCase().trim();
         const name = (p.name || '').toLowerCase();
@@ -869,29 +853,31 @@ export default function StreamBazaarDemo() {
         if (!matchesQuery) return false;
       }
 
-      // 2. Gaming Platform Filter (Steam, PlayStation, Xbox)
-      if (gamingPlatformFilter !== 'All') {
+      // Gaming Platform Sub-filter (Steam, PlayStation, Xbox)
+      if (activeCategory === 'Gaming') {
         if (!isGamingCategory(p.category)) return false;
 
-        const target = gamingPlatformFilter.toLowerCase();
-        const pPlat = (p.platform || '').toLowerCase();
-        const pName = (p.name || '').toLowerCase();
-        const pDesc = (p.description || '').toLowerCase();
-        const detected = getGamingPlatform(p).toLowerCase();
+        if (gamingPlatformFilter !== 'All') {
+          const target = gamingPlatformFilter.toLowerCase();
+          const pPlat = (p.platform || '').toLowerCase();
+          const pName = (p.name || '').toLowerCase();
+          const pDesc = (p.description || '').toLowerCase();
+          const detected = getGamingPlatform(p).toLowerCase();
 
-        let matches = false;
-        if (target === 'steam') {
-          matches = pPlat === 'steam' || detected === 'steam' || pDesc.includes('steam') || pDesc.includes('pc') || (!pPlat.includes('playstation') && !pPlat.includes('xbox'));
-        } else if (target === 'playstation') {
-          matches = pPlat === 'playstation' || detected === 'playstation' || pPlat.includes('ps') || pDesc.includes('playstation') || pDesc.includes('ps4') || pDesc.includes('ps5') || pName.includes('ps4') || pName.includes('ps5');
-        } else if (target === 'xbox') {
-          matches = pPlat === 'xbox' || detected === 'xbox' || pPlat.includes('xbox') || pDesc.includes('xbox') || pName.includes('xbox');
+          let matches = false;
+          if (target === 'steam') {
+            matches = pPlat === 'steam' || detected === 'steam' || pDesc.includes('steam') || pDesc.includes('pc') || (!pPlat.includes('playstation') && !pPlat.includes('xbox'));
+          } else if (target === 'playstation') {
+            matches = pPlat === 'playstation' || detected === 'playstation' || pPlat.includes('ps') || pDesc.includes('playstation') || pDesc.includes('ps4') || pDesc.includes('ps5') || pName.includes('ps4') || pName.includes('ps5');
+          } else if (target === 'xbox') {
+            matches = pPlat === 'xbox' || detected === 'xbox' || pPlat.includes('xbox') || pDesc.includes('xbox') || pName.includes('xbox');
+          }
+          if (!matches) return false;
         }
+        return true;
+      }
 
-        if (!matches) return false;
-      } else if (activeCategory !== 'All') {
-        // 3. Category Filter
-        if (activeCategory === 'Gaming' && !isGamingCategory(p.category)) return false;
+      if (activeCategory !== 'All') {
         if (activeCategory !== 'Gaming' && p.category !== activeCategory) return false;
       }
 
@@ -957,7 +943,7 @@ export default function StreamBazaarDemo() {
         </div>
       </nav>
 
-      {/* Hero Showcase Section - Matches Image 2 */}
+      {/* Hero Showcase Section */}
       <section className="hero">
         <div className="hero-glow" />
         <div className="hero-ring" />
@@ -970,52 +956,66 @@ export default function StreamBazaarDemo() {
           transition={{ duration: 0.6, ease: 'easeOut' }}
           style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         >
-          {/* 3D Gold & Cyan StreamBazaar Shopping Bag Logo */}
           <img
             src="/logo.png"
             alt="StreamBazaar Logo"
             className="hero-logo"
           />
 
-          {/* Badge */}
           <div className="hero-badge">✨ India's #1 Most Trusted OTT &amp; Gaming Seat Marketplace</div>
 
-          {/* Main Title */}
           <h1>
             Watch &amp; Play Anything for<br />
             <span>Up to 90% Less</span>
           </h1>
 
-          {/* Subtitle */}
           <p className="hero-sub">
             Instant delivery, pin-protected private profiles, 100% full replacement guarantee, and 24/7 human customer support on Telegram.
           </p>
 
-          {/* Two CTA Buttons */}
-          <div className="hero-ctas">
-            <motion.a
-              href="#deals"
-              className="btn-primary"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => {
-                e.preventDefault();
-                const el = document.getElementById('deals');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              View Plans <ExternalLink size={16} />
-            </motion.a>
-            <motion.a
+          {/* Replaced generic CTA buttons with interactive Cyber-Luxe Trust & Live Status Island */}
+          <div className="sb-hero-trust-island">
+            <div className="sb-trust-item">
+              <span className="sb-trust-icon">⚡</span>
+              <div>
+                <div className="sb-trust-title">Instant Delivery</div>
+                <div className="sb-trust-sub">&lt; 60s automated access</div>
+              </div>
+            </div>
+
+            <div className="sb-trust-divider" />
+
+            <div className="sb-trust-item" onClick={() => setPolicyTab('warranty')} style={{ cursor: 'pointer' }}>
+              <span className="sb-trust-icon">🛡️</span>
+              <div>
+                <div className="sb-trust-title">100% Guarantee</div>
+                <div className="sb-trust-sub">Full duration replacement</div>
+              </div>
+            </div>
+
+            <div className="sb-trust-divider" />
+
+            <div className="sb-trust-item">
+              <span className="sb-trust-icon">⭐</span>
+              <div>
+                <div className="sb-trust-title">4.9/5 Rating</div>
+                <div className="sb-trust-sub">12,400+ satisfied buyers</div>
+              </div>
+            </div>
+
+            <div className="sb-trust-divider" />
+
+            <a
               href="https://t.me/owner_trusted_streams"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-ghost"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="sb-trust-telegram-btn"
+              title="Open Official Telegram Channel"
             >
-              <MessageCircle size={16} /> Contact Support
-            </motion.a>
+              <span className="sb-pulse-dot" />
+              <span>24/7 Live Support</span>
+              <span style={{ fontSize: '12px' }}>↗</span>
+            </a>
           </div>
 
           {/* Dedicated Centered Search Bar */}
@@ -1025,7 +1025,7 @@ export default function StreamBazaarDemo() {
               <input
                 className="sb-search-hero-input"
                 type="text"
-                placeholder="Search Netflix, Crunchyroll, GTA V, VPN..."
+                placeholder="Search Netflix, Spotify, Crunchyroll, GTA V, Canva, VPN..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -1062,7 +1062,7 @@ export default function StreamBazaarDemo() {
                 className={`sb-cat-pill ${isActive ? 'active' : ''}`}
                 onClick={() => {
                   setActiveCategory(cat.id);
-                  if (cat.id !== 'Gaming') setGamingPlatformFilter('All');
+                  setGamingPlatformFilter('All');
                 }}
               >
                 <span>{cat.icon}</span>
@@ -1072,9 +1072,15 @@ export default function StreamBazaarDemo() {
           })}
         </div>
 
-        {/* Gaming Platform Sub-Filter Bar */}
-        {(activeCategory === 'Gaming' || activeCategory === 'All') && (
-          <div className="sb-platform-bar">
+        {/* Gaming Platform Sub-Filter Bar - ONLY SHOWS WHEN 'Gaming' CATEGORY IS ACTIVE */}
+        {activeCategory === 'Gaming' && (
+          <motion.div
+            className="sb-platform-bar"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '18px' }}>🎮</span>
               <span style={{ fontSize: '13px', fontWeight: 800, color: '#ccc' }}>
@@ -1094,12 +1100,7 @@ export default function StreamBazaarDemo() {
                   <button
                     key={p.id}
                     className={`sb-platform-pill ${isActive ? 'active' : ''}`}
-                    onClick={() => {
-                      setGamingPlatformFilter(p.id);
-                      if (p.id !== 'All') {
-                        setActiveCategory('Gaming');
-                      }
-                    }}
+                    onClick={() => setGamingPlatformFilter(p.id)}
                     style={{
                       borderColor: isActive ? (p.color || '#fff') : 'rgba(255, 255, 255, 0.1)',
                       background: isActive ? `${p.color}22` : 'rgba(255, 255, 255, 0.04)',
@@ -1113,10 +1114,10 @@ export default function StreamBazaarDemo() {
                 );
               })}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Product Cards Grid with Silky Category Slide-In Animation */}
+        {/* Product Cards Grid with Glowing Border */}
         <AnimatePresence mode="wait">
           <motion.div
             key={`${activeCategory}-${gamingPlatformFilter}-${searchQuery}`}
@@ -1147,19 +1148,79 @@ export default function StreamBazaarDemo() {
           </div>
         )}
 
-        {/* How It Works Section */}
-        <section style={{
-          marginTop: '70px',
-          background: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          borderRadius: '24px',
-          padding: '36px 28px'
-        }}>
+        {/* StreamBazaar Official Protection & Trust Hub */}
+        <section className="sb-trust-hub-section">
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: 900, margin: '0 0 8px' }}>
+            <div className="sb-policy-pill-badge">🛡️ STREAMBAZAAR BUYER PROTECTION</div>
+            <h3 style={{ fontSize: '26px', fontWeight: 900, margin: '10px 0 6px', color: '#fff', letterSpacing: '-0.5px' }}>
+              Official Trust, Warranty &amp; Guarantees
+            </h3>
+            <p style={{ color: '#94a3b8', fontSize: '13.5px', margin: 0, maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>
+              Every active subscription includes 100% replacement warranty, instant Telegram ticket dispatch, and private PIN protection.
+            </p>
+          </div>
+
+          <div className="sb-trust-hub-grid">
+            {[
+              {
+                id: 'warranty',
+                icon: '🛡️',
+                title: '100% Replacement Warranty',
+                desc: 'Full subscription duration covered. If credentials ever stop or reset, verified replacement is dispatched within 5-15 mins on Telegram.',
+                action: 'View Warranty Policy →',
+                color: '#10b981'
+              },
+              {
+                id: 'delivery',
+                icon: '⚡',
+                title: 'Instant Delivery (< 2 Mins)',
+                desc: 'Automated order ticket generation with dedicated login ID, private PIN, and step-by-step setup guide dispatched upon payment.',
+                action: 'View Delivery Policy →',
+                color: '#a855f7'
+              },
+              {
+                id: 'privacy',
+                icon: '🔒',
+                title: '100% Privacy & Security',
+                desc: 'No credit/debit card numbers stored. Individual 4-digit PIN lock keeps your personal watch history private from all other users.',
+                action: 'View Privacy Terms →',
+                color: '#3b82f6'
+              },
+              {
+                id: 'faq',
+                icon: '❓',
+                title: 'FAQ & Platform Setup Guide',
+                desc: 'Simple guidelines for 1-device active streaming on TV, PC, Android, iPhone, and official Steam/PlayStation game consoles.',
+                action: 'View FAQ & Help →',
+                color: '#f59e0b'
+              }
+            ].map((card) => (
+              <div
+                key={card.id}
+                className="sb-trust-hub-card"
+                onClick={() => setPolicyTab(card.id)}
+                style={{ '--accent': card.color }}
+              >
+                <div className="sb-trust-hub-icon-wrap" style={{ background: `${card.color}18`, borderColor: `${card.color}35` }}>
+                  <span style={{ fontSize: '22px' }}>{card.icon}</span>
+                </div>
+                <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#fff', margin: '0 0 6px' }}>{card.title}</h4>
+                <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 14px', lineHeight: 1.5, flex: 1 }}>{card.desc}</p>
+                <span className="sb-trust-hub-action" style={{ color: card.color }}>
+                  {card.action}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* How It Works Section - Frosted Glass Protection against background */}
+        <section className="sb-steps-section">
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 900, margin: '0 0 8px', color: '#fff' }}>
               Instant Activation in 3 Steps
             </h3>
-            <p style={{ color: '#888', fontSize: '13.5px', margin: 0 }}>
+            <p style={{ color: '#94a3b8', fontSize: '13.5px', margin: 0 }}>
               Fatafat bina kisi jhanjhat ke purchase karein:
             </p>
           </div>
@@ -1174,34 +1235,81 @@ export default function StreamBazaarDemo() {
               { step: '2', title: 'Select Device', desc: 'TV, PC, Mobile ya Console select karein with instant live stock availability.' },
               { step: '3', title: 'Buy on Telegram', desc: 'Direct Telegram ticket ban kar khulta hai, instant 2 minute mein login mil jata hai.' }
             ].map((st, i) => (
-              <div key={i} style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '16px',
-                padding: '18px'
-              }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #a855f7, #6366f1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 900,
-                  fontSize: '14px',
-                  color: '#fff',
-                  marginBottom: '12px'
-                }}>
+              <div key={i} className="sb-step-card">
+                <div className="sb-step-num">
                   {st.step}
                 </div>
-                <h4 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 6px', color: '#fff' }}>{st.title}</h4>
-                <p style={{ fontSize: '12px', color: '#888', margin: 0, lineHeight: 1.4 }}>{st.desc}</p>
+                <h4 style={{ fontSize: '15.5px', fontWeight: 800, margin: '0 0 6px', color: '#fff' }}>{st.title}</h4>
+                <p style={{ fontSize: '12.5px', color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>{st.desc}</p>
               </div>
             ))}
           </div>
         </section>
       </main>
+
+      {/* Official StreamBazaar Trust Footer */}
+      <footer className="sb-footer">
+        <div className="sb-footer-inner">
+          <div className="sb-footer-col sb-footer-brand">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <img src="/logo.png" alt="StreamBazaar" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
+              <div style={{ fontSize: '18px', fontWeight: 900 }}>
+                Stream<span style={{ color: '#a855f7' }}>Bazaar</span>
+              </div>
+            </div>
+            <p style={{ color: '#888', fontSize: '12.5px', lineHeight: '1.5', maxWidth: '340px' }}>
+              India's premier digital seat and OTT subscription marketplace. 100% genuine accounts, instant automated delivery, and round-the-clock human customer support.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+              <span className="sb-live-dot" />
+              <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700 }}>Automated Dispatch Active</span>
+            </div>
+          </div>
+
+          <div className="sb-footer-col">
+            <h4 className="sb-footer-heading">Trust &amp; Guarantees</h4>
+            <div className="sb-footer-links">
+              <button onClick={() => setPolicyTab('warranty')} className="sb-footer-link">
+                🛡️ 100% Replacement Warranty
+              </button>
+              <button onClick={() => setPolicyTab('delivery')} className="sb-footer-link">
+                ⚡ Instant Delivery Policy
+              </button>
+              <button onClick={() => setPolicyTab('privacy')} className="sb-footer-link">
+                🔒 Privacy &amp; Data Security
+              </button>
+              <button onClick={() => setPolicyTab('faq')} className="sb-footer-link">
+                ❓ FAQ &amp; Account Setup
+              </button>
+            </div>
+          </div>
+
+          <div className="sb-footer-col">
+            <h4 className="sb-footer-heading">Help &amp; Official Community</h4>
+            <div className="sb-footer-links">
+              <a href="https://t.me/owner_trusted_streams" target="_blank" rel="noopener noreferrer" className="sb-footer-link">
+                💬 Telegram Store Support
+              </a>
+              <span className="sb-footer-link" style={{ cursor: 'default' }}>
+                ⏱️ Avg Reply Time: &lt; 5 mins
+              </span>
+              <span className="sb-footer-link" style={{ cursor: 'default' }}>
+                💳 UPI, QR Code, Cards &amp; USDT
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="sb-footer-bottom">
+          <div>© {new Date().getFullYear()} StreamBazaar. All rights reserved. 100% Verified Authentic Seats.</div>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <button onClick={() => setPolicyTab('warranty')} className="sb-footer-sublink">Warranty</button>
+            <button onClick={() => setPolicyTab('privacy')} className="sb-footer-sublink">Privacy</button>
+            <button onClick={() => setPolicyTab('delivery')} className="sb-footer-sublink">Delivery</button>
+            <button onClick={() => setPolicyTab('faq')} className="sb-footer-sublink">FAQ</button>
+          </div>
+        </div>
+      </footer>
 
       {/* 2-Step Interactive Pop-Up Modal */}
       <AnimatePresence>
@@ -1210,6 +1318,16 @@ export default function StreamBazaarDemo() {
             product={modalData.product}
             initialPlan={modalData.plan}
             onClose={() => setModalData(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Policy Modal */}
+      <AnimatePresence>
+        {policyTab && (
+          <PolicyModal
+            initialTab={policyTab}
+            onClose={() => setPolicyTab(null)}
           />
         )}
       </AnimatePresence>
