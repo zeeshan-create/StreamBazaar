@@ -1,5 +1,5 @@
 /* StreamBazaar - always-on glowing border in each service's own colour.
-   Border ghoomta rehta hai + bahar ki glow khulti/band hoti hai. Center plain rehta hai. */
+   Optimized for high refresh rate displays (60Hz, 90Hz, 120Hz ProMotion, 144Hz, 165Hz) */
 @property --ga {
   syntax: "<angle>";
   inherits: false;
@@ -14,10 +14,14 @@
   border: 1px solid transparent;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--c, #a855f7) 26%, transparent);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  transform: translateZ(0);
+  will-change: transform;
+  content-visibility: auto;
+  contain-intrinsic-size: 280px;
 }
 
 .glowcard:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) translateZ(0);
 }
 
 .glowcard::before,
@@ -37,6 +41,8 @@
   );
   animation: gcrot 5s linear infinite;
   z-index: 1;
+  transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 /* crisp rotating border */
@@ -48,10 +54,10 @@
 
 /* soft outer glow: border ke BAHAR, saans lene jaisa */
 .glowcard::after {
-  inset: -6px;
-  border-radius: calc(var(--r) + 6px);
-  padding: 6px;
-  filter: blur(9px);
+  inset: -5px;
+  border-radius: calc(var(--r) + 5px);
+  padding: 5px;
+  filter: blur(7px);
   animation: gcrot 5s linear infinite, gcgl 3.6s ease-in-out infinite alternate;
   z-index: 0;
 }

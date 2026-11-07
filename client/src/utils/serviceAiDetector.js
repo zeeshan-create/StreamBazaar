@@ -42,7 +42,7 @@ export function detectServiceSpecs(product, selectedPlan = null) {
     name.includes('anime');
 
   if (isAnime) {
-    let quality = '1080p FHD Mega Fan';
+    let quality = '1080p FHD';
     if (planLabel.includes('4k') || planQuality.toLowerCase().includes('4k')) {
       quality = '4K Ultra HD';
     } else if (planLabel.includes('mega') || desc.includes('mega')) {
@@ -74,10 +74,10 @@ export function detectServiceSpecs(product, selectedPlan = null) {
   if (isSports) {
     return {
       categoryType: 'sports',
-      featureBadge: '🏆 1080p 50FPS Sports',
+      featureBadge: '🏆 1080p Sports',
       summaryQuality: '🏆 1080p 50FPS Live HD Match Pass',
       deviceCompatibility: '📺 Mobile, TV & Web Stream',
-      planPill: '⚡ Instant Delivery • 🛡️ 100% Guarantee • 🏆 1080p 50FPS'
+      planPill: '⚡ Instant Delivery • 🛡️ 100% Guarantee • 🏆 1080p Sports'
     };
   }
 
@@ -173,7 +173,7 @@ export function detectServiceSpecs(product, selectedPlan = null) {
   if (isGaming) {
     return {
       categoryType: 'gaming',
-      featureBadge: '🎮 Any Device Access',
+      featureBadge: '🎮 Any Device',
       summaryQuality: '🎮 Full Game License · Lifetime Access',
       deviceCompatibility: '🎮 PC, Steam Deck, PlayStation & Xbox',
       planPill: '⚡ Instant Delivery • 🛡️ 100% Guarantee • 🎮 Any Device'
@@ -190,13 +190,13 @@ export function detectServiceSpecs(product, selectedPlan = null) {
     name.includes('discovery') ||
     name.includes('lionsgate')
   ) {
-    ottQuality = '1080p Full HD';
+    ottQuality = '1080p FHD';
   }
 
   if (planQuality) {
     ottQuality = planQuality;
   } else if (planLabel.includes('1080p') || (planLabel.includes('hd') && !planLabel.includes('4k'))) {
-    ottQuality = '1080p Full HD';
+    ottQuality = '1080p FHD';
   } else if (planLabel.includes('4k') || planLabel.includes('uhd')) {
     ottQuality = '4K Ultra HD';
   }

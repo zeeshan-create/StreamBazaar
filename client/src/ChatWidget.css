@@ -1,21 +1,31 @@
 /* ── FAB BUTTON ─────────────────────────────────────────────────── */
 .chat-fab {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 24px;
+  right: 24px;
   z-index: 1000;
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: linear-gradient(135deg, #7c3aed, #a855f7);
   color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 32px rgba(124,58,237,0.5), 0 2px 8px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
   border: none;
   cursor: pointer;
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .chat-fab {
+    bottom: 16px;
+    right: 14px;
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+  }
 }
 .chat-badge {
   position: absolute;

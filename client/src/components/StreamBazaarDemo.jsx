@@ -395,33 +395,46 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
           </div>
         </div>
 
-        <div className="sb-stepper-wrap">
-          <div className="sb-stepper-line" />
-          <div
-            className={`sb-step-bubble ${step >= 1 ? 'active' : ''}`}
-            onClick={() => setStep(1)}
-            style={step >= 1 ? { background: brandColor, color: '#fff', borderColor: brandColor } : {}}
-          >
-            1
-          </div>
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: step === 1 ? '#fff' : '#666' }}>
-            Choose Plan
-          </span>
-
-          <div style={{ flex: 1 }} />
-
-          <div
-            className={`sb-step-bubble ${step >= 2 ? 'active' : ''}`}
-            style={step >= 2 ? { background: brandColor, color: '#fff', borderColor: brandColor } : {}}
-          >
-            2
-          </div>
-          <span style={{ fontSize: '11.5px', fontWeight: 700, color: step === 2 ? '#fff' : '#666' }}>
-            Select Device &amp; Buy
-          </span>
-        </div>
-
         <div className="sb-modal-body">
+          {/* Enhanced Modern Stepper Indicator */}
+          <div className="sb-stepper-container">
+            <button
+              type="button"
+              className={`sb-step-tab ${step === 1 ? 'active' : ''}`}
+              onClick={() => setStep(1)}
+              style={step === 1 ? { borderColor: brandColor, background: `rgba(${colorRgb}, 0.16)` } : {}}
+            >
+              <span
+                className="sb-step-circle"
+                style={step >= 1 ? { background: brandColor, color: '#fff', boxShadow: `0 0 10px rgba(${colorRgb}, 0.5)` } : {}}
+              >
+                1
+              </span>
+              <span className="sb-step-title" style={{ color: step === 1 ? '#fff' : 'rgba(255, 255, 255, 0.5)' }}>
+                Choose Plan
+              </span>
+            </button>
+
+            <span className="sb-step-arrow">➜</span>
+
+            <button
+              type="button"
+              className={`sb-step-tab ${step === 2 ? 'active' : ''}`}
+              onClick={() => { if (selectedPlan) setStep(2); }}
+              style={step === 2 ? { borderColor: brandColor, background: `rgba(${colorRgb}, 0.16)` } : {}}
+            >
+              <span
+                className="sb-step-circle"
+                style={step >= 2 ? { background: brandColor, color: '#fff', boxShadow: `0 0 10px rgba(${colorRgb}, 0.5)` } : {}}
+              >
+                2
+              </span>
+              <span className="sb-step-title" style={{ color: step === 2 ? '#fff' : 'rgba(255, 255, 255, 0.5)' }}>
+                Select Device &amp; Buy
+              </span>
+            </button>
+          </div>
+
           {step === 1 && (
             <motion.div
               initial={{ opacity: 0, x: -10 }}
@@ -441,7 +454,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                   return (
                     <div
                       key={idx}
-                      className="sb-plan-row"
+                      className={`sb-plan-row ${isSelected ? 'selected' : ''}`}
                       onClick={() => setSelectedPlan(pl)}
                       style={{
                         background: isSelected
@@ -451,21 +464,21 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                         boxShadow: isSelected ? `0 0 16px rgba(${colorRgb}, 0.35)` : 'none'
                       }}
                     >
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ color: '#fff', fontSize: '14.5px', fontWeight: 800 }}>
+                      <div className="sb-plan-row-left">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span className="sb-plan-row-dur">
                             {pl.duration || '1 Month'}
                           </span>
                           <span className="sb-plan-quality-tag" style={{ color: brandColor, borderColor: `rgba(${colorRgb}, 0.4)` }}>
                             {pl.quality || specs.featureBadge}
                           </span>
                         </div>
-                        <div style={{ color: '#777', fontSize: '11px', marginTop: '3px' }}>
+                        <div className="sb-plan-row-sub">
                           {specs.deviceCompatibility} • Replacement Guarantee
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div className="sb-plan-row-right">
                         <span className="sb-plan-price-num" style={{ color: isSelected ? brandColor : '#fff' }}>
                           {plPrice}
                         </span>
