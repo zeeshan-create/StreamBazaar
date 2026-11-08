@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Storefront from './components/Storefront';
 import AdminDashboard from './components/AdminDashboard';
 import HomeLive from './components/HomeLive';
@@ -21,11 +21,24 @@ function App() {
         <Route path="/terms" element={<PolicyPage />} />
         <Route path="/warranty" element={<PolicyPage />} />
         <Route path="/legacy" element={<Storefront />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        
+        {/* 🚫 HONEYPOT / BOUNCE: Anyone guessing /admin is instantly thrown back to home */}
+        <Route path="/admin" element={<Navigate to="/" replace />} />
+        <Route path="/admin/*" element={<Navigate to="/" replace />} />
+        <Route path="/ADMIN" element={<Navigate to="/" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
+
+        {/* 🔒 SECRET PRIVATE OWNER VAULT: Only you know this link */}
+        <Route path="/sb-master-vault-974" element={<AdminDashboard />} />
+
         <Route path="/trial-home" element={<HomeLive />} />
         <Route path="/trial-home-1" element={<HomeLive1 />} />
         <Route path="/trial-search" element={<SearchDemo />} />
         <Route path="/trial-color" element={<ColorGuide />} />
+        
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );

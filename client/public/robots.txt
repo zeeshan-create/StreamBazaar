@@ -1,4 +1,10 @@
 User-agent: *
+Disallow: /admin
+Disallow: /ADMIN
+Disallow: /dashboard
+Disallow: /login
+Disallow: /sb-master-vault-974
+Disallow: /api/admin
 Allow: /
 
 Sitemap: https://streambazaar.vercel.app/sitemap.xml
