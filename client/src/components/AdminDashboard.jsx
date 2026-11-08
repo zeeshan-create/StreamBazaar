@@ -22,6 +22,15 @@ import { unifiedSearch } from '../utils/mediaFallback';
 
 const API_BASE = (import.meta.env.PROD ? '' : 'http://localhost:5000') + '/api';
 
+const getAdminHeaders = (extra = {}) => {
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('adminToken') : null;
+  const headers = { ...extra };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 const getProxiedUrl = (url) => {
   if (!url) return '';
   if (url.startsWith('data:')) return url;
@@ -791,11 +800,13 @@ export default function AdminDashboard() {
     return () => {
       // Automatic logout when user navigates away from the Admin component
       sessionStorage.removeItem('adminAuthenticated');
+      sessionStorage.removeItem('adminToken');
     };
   }, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem('adminAuthenticated');
+    sessionStorage.removeItem('adminToken');
     setIsAuthenticated(false);
   };
 
@@ -811,6 +822,9 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (res.ok && data.success) {
         sessionStorage.setItem('adminAuthenticated', 'true');
+        if (data.token) {
+          sessionStorage.setItem('adminToken', data.token);
+        }
         setIsAuthenticated(true);
       } else {
         setError(data.error || 'Invalid username or password. Please try again!');
@@ -891,7 +905,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`${API_BASE}/admin/update-credentials`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ currentUsername, currentPassword, newUsername, newPassword })
       });
       const data = await res.json();
@@ -931,7 +945,7 @@ export default function AdminDashboard() {
       setLoading(false);
 
       // Fetch dynamic buyer orders
-      const resUsers = await fetch(`${API_BASE}/admin/orders`, { cache: 'no-store' });
+      const resUsers = await fetch(`${API_BASE}/admin/orders`, { cache: 'no-store', headers: getAdminHeaders() });
       const dataUsers = await resUsers.json();
       const mapped = dataUsers.map(u => ({
         ...u,
@@ -1000,7 +1014,7 @@ export default function AdminDashboard() {
 
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       });
       if (res.ok) {
@@ -1020,7 +1034,10 @@ export default function AdminDashboard() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
     try {
-      const res = await fetch(`${API_BASE}/admin/plans/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/admin/plans/${id}`, { 
+        method: 'DELETE',
+        headers: getAdminHeaders()
+      });
       if (res.ok) {
         fetchServices();
         notifyPlanSync();
@@ -1038,7 +1055,10 @@ export default function AdminDashboard() {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/admin/plans-all`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/admin/plans-all`, { 
+        method: 'DELETE',
+        headers: getAdminHeaders()
+      });
       if (res.ok) {
         alert('All products have been deleted successfully.');
         fetchServices();
@@ -1066,7 +1086,7 @@ export default function AdminDashboard() {
 
       const res = await fetch(`${API_BASE}/admin/plans`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       });
       if (res.ok) {

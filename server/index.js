@@ -745,28 +745,126 @@ const CACHE_TTL = 300000; // 5 minutes cache
   });
 
 
+// ── RESILIENT IN-MEMORY CACHE FOR HIGH CONCURRENCY & ZERO 500 ERRORS ──
+let cachedPlans = null;
+let lastPlansFetch = 0;
+
 app.get('/api/plans', async (req, res) => {
   try {
+    const now = Date.now();
+    // Return cache if fetched within 2 seconds for ultra-low latency & zero database thrashing
+    if (cachedPlans && (now - lastPlansFetch < 2000)) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      return res.json(cachedPlans);
+    }
+
     let allServices = await Service.find({});
+    if (Array.isArray(allServices) && allServices.length > 0) {
+      cachedPlans = allServices;
+      lastPlansFetch = now;
+    }
     // Tell mobile browsers NEVER to cache, and disable Vercel CDN caching to ensure real-time price updates
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.json(allServices);
+    res.json(allServices && allServices.length > 0 ? allServices : (cachedPlans || []));
   } catch (err) {
+    console.error('Database query error, serving fallback cache:', err.message);
+    if (cachedPlans) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      return res.json(cachedPlans);
+    }
     res.status(500).json({ error: 'Database error' });
   }
 });
 
+// ── CRYPTOGRAPHIC SECURITY & FIREWALL MIDDLEWARE ─────────────────
+const crypto = require('crypto');
+const AUTH_SECRET = process.env.ADMIN_TOKEN_SECRET || 'sb_super_secret_master_vault_key_7861974000';
+
+function generateAdminToken(username) {
+  const payload = JSON.stringify({ u: username, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 });
+  const b64 = Buffer.from(payload).toString('base64url');
+  const sig = crypto.createHmac('sha256', AUTH_SECRET).update(b64).digest('base64url');
+  return `${b64}.${sig}`;
+}
+
+function verifyAdminToken(token) {
+  if (!token || typeof token !== 'string' || !token.includes('.')) return false;
+  const [b64, sig] = token.split('.');
+  const expectedSig = crypto.createHmac('sha256', AUTH_SECRET).update(b64).digest('base64url');
+  if (sig !== expectedSig) return false;
+  try {
+    const payload = JSON.parse(Buffer.from(b64, 'base64url').toString('utf8'));
+    if (Date.now() > payload.exp) return false;
+    return payload;
+  } catch (_) {
+    return false;
+  }
+}
+
+// IP Brute-Force Rate Limiting (5 failed attempts locks IP for 15 minutes)
+const loginRateLimitMap = new Map();
+function checkLoginRateLimit(ip) {
+  const now = Date.now();
+  const entry = loginRateLimitMap.get(ip);
+  if (!entry) return { allowed: true };
+  if (now > entry.resetAt) {
+    loginRateLimitMap.delete(ip);
+    return { allowed: true };
+  }
+  if (entry.count >= 5) {
+    const waitMins = Math.ceil((entry.resetAt - now) / 60000);
+    return { allowed: false, waitMins };
+  }
+  return { allowed: true };
+}
+
+function recordFailedLogin(ip) {
+  const now = Date.now();
+  const entry = loginRateLimitMap.get(ip) || { count: 0, resetAt: now + 15 * 60 * 1000 };
+  entry.count += 1;
+  loginRateLimitMap.set(ip, entry);
+}
+
+function clearLoginRateLimit(ip) {
+  loginRateLimitMap.delete(ip);
+}
+
+// Security Guard Middleware
+function requireAdminAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = (authHeader && authHeader.startsWith('Bearer ')) ? authHeader.slice(7) : req.headers['x-admin-token'];
+  if (!token || !verifyAdminToken(token)) {
+    return res.status(401).json({ error: 'Unauthorized: Valid Admin Session Required' });
+  }
+  next();
+}
+
 // ── ADMIN AUTHENTICATION ROUTES ──────────────────────────────────
 app.post('/api/admin/login', async (req, res) => {
   try {
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const rateCheck = checkLoginRateLimit(clientIp);
+    if (!rateCheck.allowed) {
+      return res.status(429).json({ 
+        error: `Security Firewall: Too many failed attempts. Access locked for ${rateCheck.waitMins} minutes.` 
+      });
+    }
+
     const { username, password } = req.body;
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
     }
     const admin = await Admin.findOne({ username, password });
     if (admin) {
-      res.json({ success: true, user: { username: admin.username, email: admin.email } });
+      clearLoginRateLimit(clientIp);
+      const token = generateAdminToken(admin.username);
+      res.json({ 
+        success: true, 
+        token,
+        user: { username: admin.username, email: admin.email } 
+      });
     } else {
+      recordFailedLogin(clientIp);
       res.status(401).json({ error: 'Invalid username or password' });
     }
   } catch (err) {
@@ -916,7 +1014,7 @@ app.post('/api/admin/update-credentials', async (req, res) => {
 });
 
 // ── ORDER/BUYER ROUTES ──────────────────────────────────────────
-app.get('/api/admin/orders', async (req, res) => {
+app.get('/api/admin/orders', requireAdminAuth, async (req, res) => {
   try {
     let orders = await Order.find({});
     res.json(orders);
@@ -948,7 +1046,7 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-app.delete('/api/admin/orders/:id', async (req, res) => {
+app.delete('/api/admin/orders/:id', requireAdminAuth, async (req, res) => {
   try {
     await Order.remove({ _id: req.params.id });
     res.json({ success: true });
@@ -958,39 +1056,43 @@ app.delete('/api/admin/orders/:id', async (req, res) => {
 });
 
 // ── ADMIN ROUTES ────────────────────────────────────────────────
-app.post('/api/admin/plans', async (req, res) => {
+app.post('/api/admin/plans', requireAdminAuth, async (req, res) => {
   try {
     const newService = await Service.insert(req.body);
+    cachedPlans = null; // Invalidate cache for instant hand-to-hand live sync!
     res.json(newService);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.put('/api/admin/plans/:id', async (req, res) => {
+app.put('/api/admin/plans/:id', requireAdminAuth, async (req, res) => {
   try {
     const updateData = { ...req.body };
     delete updateData._id;
     delete updateData.__v;
     const updated = await Service.findOneAndUpdate({ _id: req.params.id }, { $set: updateData });
+    cachedPlans = null; // Invalidate cache for instant hand-to-hand live sync!
     res.json(updated || { success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.delete('/api/admin/plans/:id', async (req, res) => {
+app.delete('/api/admin/plans/:id', requireAdminAuth, async (req, res) => {
   try {
     await Service.remove({ _id: req.params.id });
+    cachedPlans = null; // Invalidate cache for instant hand-to-hand live sync!
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.delete('/api/admin/plans-all', async (req, res) => {
+app.delete('/api/admin/plans-all', requireAdminAuth, async (req, res) => {
   try {
     await Service.remove({}, { multi: true });
+    cachedPlans = null;
     res.json({ success: true, message: 'All products deleted successfully.' });
   } catch (err) {
     res.status(500).json({ error: err.message });

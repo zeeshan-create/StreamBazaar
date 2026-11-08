@@ -688,24 +688,6 @@ export default function App() {
           <img src="/logo.png" alt="StreamBazaar" className="nav-logo" />
         </motion.div>
         <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Link
-            to="/admin"
-            className="admin-nav-link"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              padding: '0.5rem 0.75rem',
-              borderRadius: '8px',
-              transition: 'all 0.2s'
-            }}
-          >
-            <LayoutDashboard size={15} /> Admin
-          </Link>
-          
           <button
             onClick={toggleTheme}
             className="header-badge-btn"
