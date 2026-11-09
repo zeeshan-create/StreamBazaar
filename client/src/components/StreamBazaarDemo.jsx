@@ -820,13 +820,19 @@ const ProductCard = ({ product, onOpenBuy }) => {
               </span>
               {isOutOfStock && (
                 <span className="sb-badge-oos">
-                  <span className="sb-dot-oos"></span>
+                  <span className="sb-beacon-wrap">
+                    <span className="sb-dot-ping-oos"></span>
+                    <span className="sb-dot-core-oos"></span>
+                  </span>
                   <span>RESTOCK IN PROGRESS ⚡</span>
                 </span>
               )}
               {isComingSoon && (
                 <span className="sb-badge-coming-soon">
-                  <span className="sb-dot-cs"></span>
+                  <span className="sb-beacon-wrap">
+                    <span className="sb-dot-ping-cs"></span>
+                    <span className="sb-dot-core-cs"></span>
+                  </span>
                   <span>DROPPING SOON ⏳</span>
                 </span>
               )}
@@ -883,12 +889,16 @@ const ProductCard = ({ product, onOpenBuy }) => {
         {isOutOfStock ? (
           <button className="sb-btn-oos" disabled>
             <span>Out of Stock</span>
-            <span style={{ fontSize: '13px' }}>🚫</span>
+            <span className="sb-bell-ring" style={{ fontSize: '15px', lineHeight: 1 }}>
+              🔕
+            </span>
           </button>
         ) : isComingSoon ? (
           <button className="sb-btn-coming-soon" disabled>
             <span>Coming Soon</span>
-            <span style={{ fontSize: '13px' }}>⏳</span>
+            <span className="sb-hourglass-tick" style={{ fontSize: '14px', lineHeight: 1 }}>
+              ⏳
+            </span>
           </button>
         ) : (
           <button
