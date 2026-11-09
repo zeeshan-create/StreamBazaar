@@ -486,7 +486,7 @@ export default function PolicyModal({ initialTab = 'accounts', onClose }) {
         {/* Mobile Pull Bar Indicator (Android / iOS feel) */}
         <div className="sb-mobile-pull-handle" />
 
-        {/* Modal Sticky Header */}
+        {/* Modal Sticky Header with Clean ✕ Close Button */}
         <div className="sb-policy-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '24px' }}>{current.icon}</span>
@@ -530,21 +530,7 @@ export default function PolicyModal({ initialTab = 'accounts', onClose }) {
           </button>
         </div>
 
-        {/* Quick Category Switcher Pill Bar (5 Categories) */}
-        <div className="sb-policy-pill-nav">
-          {POLICIES.map(p => (
-            <button
-              key={p.id}
-              className={`sb-policy-pill-item ${activeTab === p.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(p.id)}
-            >
-              <span>{p.icon}</span>
-              <span>{p.tabLabel}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Scrollable Policy Body */}
+        {/* Scrollable Policy Body - Dedicated Single-Category (No Tab Switcher) */}
         <div className="sb-policy-modal-scroll">
           <AnimatePresence mode="wait">
             <motion.div

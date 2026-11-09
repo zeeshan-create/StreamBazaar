@@ -1299,17 +1299,17 @@ export default function StreamBazaarDemo() {
           <div className="sb-trust-hub-grid">
             {[
               {
-                id: 'terms',
-                icon: '⚖️',
-                title: 'Terms & Replacement Warranty',
-                desc: 'Honest reseller terms. If credentials ever stop working, verified replacement is dispatched for the rest of your plan.',
-                action: 'View Terms & Warranty →',
-                color: '#10b981'
+                id: 'accounts',
+                icon: '👤',
+                title: 'Accounts & Profile Guidelines',
+                desc: 'Separate private profile inside a shared account with personal 4-digit PIN lock. Master login rules and full duration.',
+                action: 'View Accounts Policy →',
+                color: '#a855f7'
               },
               {
                 id: 'devices',
                 icon: '📱',
-                title: 'Device & Screen Limits',
+                title: 'Devices & Screen Limits',
                 desc: 'Install on Mobile, Smart TV, or PC/Laptop. Clear 1-screen active streaming rule prevents account locks.',
                 action: 'View Device Rules →',
                 color: '#3b82f6'
@@ -1320,15 +1320,23 @@ export default function StreamBazaarDemo() {
                 title: '100% Privacy & Security',
                 desc: 'Only UPI and Telegram collected. Never card numbers, bank details, or contacts. 7-day deletion upon request.',
                 action: 'View Privacy Policy →',
-                color: '#a855f7'
+                color: '#10b981'
+              },
+              {
+                id: 'terms',
+                icon: '⚖️',
+                title: 'Terms & Replacement Policy',
+                desc: 'Honest reseller terms. If credentials ever stop working, verified replacement is dispatched for the rest of your plan.',
+                action: 'View Terms & Warranty →',
+                color: '#f59e0b'
               },
               {
                 id: 'support',
                 icon: '💬',
                 title: 'Support & Ordering Guide',
-                desc: 'Everything happens step-by-step on Telegram. Fast access delivery and dedicated order resolution.',
+                desc: 'Everything happens step-by-step on Telegram. Fast 5-15 minute access delivery and dedicated order resolution.',
                 action: 'View Support Guide →',
-                color: '#f59e0b'
+                color: '#818cf8'
               }
             ].map((card) => (
               <div
@@ -1386,24 +1394,6 @@ export default function StreamBazaarDemo() {
             </div>
           </div>
 
-          {/* Centered Policy Modal Buttons */}
-          <div className="sb-footer-policy-pills">
-            <button onClick={() => setPolicyTab('accounts')} className="sb-footer-policy-btn">
-              <span>👤</span> Accounts
-            </button>
-            <button onClick={() => setPolicyTab('devices')} className="sb-footer-policy-btn">
-              <span>📱</span> Devices
-            </button>
-            <button onClick={() => setPolicyTab('privacy')} className="sb-footer-policy-btn">
-              <span>🔒</span> Privacy
-            </button>
-            <button onClick={() => setPolicyTab('terms')} className="sb-footer-policy-btn">
-              <span>⚖️</span> Terms
-            </button>
-            <button onClick={() => setPolicyTab('support')} className="sb-footer-policy-btn">
-              <span>💬</span> Support
-            </button>
-          </div>
 
           {/* Categorized Community & Official Support */}
           <div className="sb-footer-support-row">
