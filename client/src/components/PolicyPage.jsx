@@ -5,7 +5,7 @@ import OttBackground from './OttBackground';
 import './StreamBazaarDemo.css';
 
 export default function PolicyPage() {
-  const [activeTab, setActiveTab] = useState('warranty');
+  const [activeTab, setActiveTab] = useState('accounts');
 
   return (
     <div className="sb-page" style={{ minHeight: '100vh', background: '#07060f' }}>

@@ -1,214 +1,464 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const POLICIES = [
   {
-    id: 'warranty',
-    title: '100% Replacement Warranty Policy',
-    icon: '🛡️',
-    badge: 'ZERO-RISK GUARANTEE',
-    badgeBg: 'rgba(16, 185, 129, 0.15)',
-    badgeColor: '#34d399',
-    badgeBorder: 'rgba(16, 185, 129, 0.35)',
-    subtitle: 'Comprehensive full-term protection and replacement terms',
+    id: 'accounts',
+    tabLabel: 'Accounts',
+    title: 'Accounts',
+    icon: '👤',
+    badge: 'SHARED PROFILE MODEL',
+    badgeBg: 'rgba(168, 85, 247, 0.15)',
+    badgeColor: '#c084fc',
+    badgeBorder: 'rgba(168, 85, 247, 0.35)',
+    subtitle: 'What you get with your subscription',
     content: (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        {/* Commitment Box */}
-        <div style={{ 
-          background: 'rgba(16, 185, 129, 0.08)', 
-          border: '1px solid rgba(16, 185, 129, 0.28)', 
-          borderRadius: '16px', 
-          padding: '16px' 
+        {/* Intro */}
+        <div style={{
+          background: 'rgba(168, 85, 247, 0.08)',
+          border: '1px solid rgba(168, 85, 247, 0.28)',
+          borderRadius: '16px',
+          padding: '16px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-            <span style={{ fontSize: '20px' }}>🛡️</span>
-            <div style={{ color: '#34d399', fontWeight: 800, fontSize: '14.5px' }}>
-              Full-Term Warranty Commitment
+            <span style={{ fontSize: '20px' }}>🔑</span>
+            <div style={{ color: '#c084fc', fontWeight: 800, fontSize: '14.5px' }}>
+              Account Architecture
             </div>
           </div>
-          <p style={{ color: '#d1fae5', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
-            Every subscription purchased on StreamBazaar comes with a <strong>100% replacement warranty</strong> throughout its full duration. If your credentials ever encounter any login issue, password reset, or interruption, our dedicated support delivers a verified replacement within <strong>5 to 15 minutes</strong> on Telegram.
+          <p style={{ color: '#f3e8ff', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
+            You get your own profile on a shared account. It is not a private account.
           </p>
         </div>
 
-        {/* 100% Covered Grid */}
-        <div>
-          <h4 style={{ color: '#fff', fontSize: '13.5px', fontWeight: 800, margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>✅</span> What is 100% Covered Under Warranty:
-          </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
-            {[
-              { icon: '🔑', title: 'Provider Password Resets', desc: 'Instant fresh credentials if official streaming service resets password.' },
-              { icon: '🔒', title: 'PIN / Profile Lockouts', desc: 'Rapid PIN unlock and private profile restoration.' },
-              { icon: '⏳', title: 'Full Duration Access', desc: 'Active access guaranteed for the entire 1, 3, 6, or 12 months duration.' },
-              { icon: '🚀', title: 'Speedy SLA (5-15 Mins)', desc: 'Fast priority replacement dispatched via Telegram support.' }
-            ].map((item, i) => (
-              <div key={i} style={{ 
-                background: 'rgba(255, 255, 255, 0.03)', 
-                border: '1px solid rgba(255, 255, 255, 0.08)', 
-                borderRadius: '12px', 
-                padding: '12px' 
-              }}>
-                <div style={{ fontSize: '18px', marginBottom: '4px' }}>{item.icon}</div>
-                <div style={{ color: '#fff', fontSize: '12.5px', fontWeight: 700, marginBottom: '2px' }}>{item.title}</div>
-                <div style={{ color: '#94a3b8', fontSize: '11.5px', lineHeight: '1.45' }}>{item.desc}</div>
-              </div>
-            ))}
+        {/* Group "What you receive" */}
+        <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#c084fc', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> What you receive:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Your own profile:</strong> A separate profile inside a shared account.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Login details:</strong> Email/ID and password, sent to you on Telegram.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Profile PIN:</strong> Your profile has its own 4-digit PIN.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Plan quality:</strong> Shown on each product card: [HD/4K].</div>
+            </div>
           </div>
         </div>
 
-        {/* Warranty Terms & Conditions Box */}
-        <div style={{ 
-          background: 'rgba(245, 158, 11, 0.07)', 
-          border: '1px solid rgba(245, 158, 11, 0.22)', 
-          borderRadius: '14px', 
-          padding: '14px 16px' 
-        }}>
-          <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-            <span>⚠️</span> Warranty Terms &amp; Conditions (Fair Use):
+        {/* Group "Please do not" */}
+        <div style={{ background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#f87171', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>⚠️</span> Please do not:
           </div>
-          <ul style={{ color: '#fef3c7', fontSize: '12px', lineHeight: '1.65', paddingLeft: '18px', margin: 0 }}>
-            <li>Do not change the master account email or recovery settings on shared profiles.</li>
-            <li>Stream strictly on your designated 1-device active screen at a time to prevent provider flag.</li>
-            <li>For games, follow the specified online/offline guidance provided in your setup guide.</li>
-            <li>Following these fair-use terms guarantees immediate replacement support.</li>
-          </ul>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#fecaca', lineHeight: '1.55' }}>
+              <span style={{ color: '#ef4444', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Change the master login:</strong> Do not change the account email, password or recovery settings.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#fecaca', lineHeight: '1.55' }}>
+              <span style={{ color: '#ef4444', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Touch other profiles:</strong> Other profiles belong to other customers.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#fecaca', lineHeight: '1.55' }}>
+              <span style={{ color: '#ef4444', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Share your login:</strong> Sharing can get the account blocked for everyone.</div>
+            </div>
+          </div>
         </div>
 
-        {/* How to Claim Replacement */}
-        <div>
-          <h4 style={{ color: '#fff', fontSize: '13px', fontWeight: 800, margin: '0 0 8px' }}>
-            ⚡ How to Claim a Free Replacement:
-          </h4>
-          <div style={{ 
-            background: 'rgba(255, 255, 255, 0.02)', 
-            border: '1px solid rgba(255, 255, 255, 0.06)', 
-            borderRadius: '12px', 
-            padding: '12px 14px' 
-          }}>
-            <ol style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', paddingLeft: '18px', margin: 0 }}>
-              <li>Open official Telegram support: <strong style={{ color: '#c084fc' }}>@owner_trusted_streams</strong>.</li>
-              <li>Share your Order ID or registered purchase details.</li>
-              <li>Our verification agent tests the credentials and delivers fresh access within minutes.</li>
-            </ol>
+        {/* Group "Good to know" */}
+        <div style={{ background: 'rgba(56, 189, 248, 0.06)', border: '1px solid rgba(56, 189, 248, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#38bdf8', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>💡</span> Good to know:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#e0f2fe', lineHeight: '1.55' }}>
+              <span style={{ color: '#38bdf8', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Access can end early:</strong> The streaming provider can block an account at any time. If that happens, we replace it.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#e0f2fe', lineHeight: '1.55' }}>
+              <span style={{ color: '#38bdf8', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Duration:</strong> As long as the plan you bought: [1/3/6/12] months.</div>
+            </div>
           </div>
         </div>
       </div>
     )
   },
   {
-    id: 'delivery',
-    title: 'Instant Delivery & Activation Policy',
-    icon: '⚡',
-    badge: 'FAST DISPATCH (< 2 MINS)',
-    badgeBg: 'rgba(168, 85, 247, 0.15)',
-    badgeColor: '#c084fc',
-    badgeBorder: 'rgba(168, 85, 247, 0.35)',
-    subtitle: 'Step-by-step walkthrough of how your credentials are delivered',
+    id: 'devices',
+    tabLabel: 'Devices',
+    title: 'Devices',
+    icon: '📱',
+    badge: '1 SCREEN AT A TIME',
+    badgeBg: 'rgba(59, 130, 246, 0.15)',
+    badgeColor: '#60a5fa',
+    badgeBorder: 'rgba(59, 130, 246, 0.35)',
+    subtitle: 'Where and how you can watch',
     content: (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.28)', borderRadius: '16px', padding: '16px' }}>
+        {/* Intro */}
+        <div style={{
+          background: 'rgba(59, 130, 246, 0.08)',
+          border: '1px solid rgba(59, 130, 246, 0.28)',
+          borderRadius: '16px',
+          padding: '16px'
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-            <span style={{ fontSize: '20px' }}>⚡</span>
-            <div style={{ color: '#c084fc', fontWeight: 800, fontSize: '14.5px' }}>Instant Automated Ticket Generation</div>
+            <span style={{ fontSize: '20px' }}>📺</span>
+            <div style={{ color: '#60a5fa', fontWeight: 800, fontSize: '14.5px' }}>
+              Screen Guidelines
+            </div>
           </div>
-          <p style={{ color: '#f3e8ff', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
-            When you tap <strong>"Buy on Telegram"</strong> on any product card, an automated order ticket is constructed containing the service title, duration, price, and selected active device.
+          <p style={{ color: '#dbeafe', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
+            Install on as many devices as you like. Watch on one screen at a time.
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {[
-            { step: 'Step 1', title: 'Payment Verification', desc: 'Pay safely using Google Pay, PhonePe, Paytm UPI, QR Code, Card, or Crypto USDT.' },
-            { step: 'Step 2', title: 'Receive Credentials', desc: 'Your designated Email/ID and Password arrive immediately in the Telegram chat.' },
-            { step: 'Step 3', title: 'Profile & PIN Login', desc: 'Select your assigned private profile, enter the 4-digit PIN, and start enjoying 4K streaming or gaming.' }
-          ].map((st, i) => (
-            <div key={i} style={{ display: 'flex', gap: '12px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.07)', borderRadius: '12px', padding: '12px 14px', alignItems: 'center' }}>
-              <div style={{ background: 'linear-gradient(135deg, #a855f7, #6366f1)', color: '#fff', fontSize: '11px', fontWeight: 800, padding: '5px 10px', borderRadius: '7px', whiteSpace: 'nowrap' }}>
-                {st.step}
-              </div>
-              <div>
-                <div style={{ color: '#fff', fontSize: '13px', fontWeight: 700 }}>{st.title}</div>
-                <div style={{ color: '#94a3b8', fontSize: '12px' }}>{st.desc}</div>
-              </div>
+        {/* Group "Supported devices" */}
+        <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#60a5fa', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> Supported devices:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Mobile:</strong> Install the app and sign in.</div>
             </div>
-          ))}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Smart TV:</strong> Sign in on the TV app. It may ask for a code or PIN.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Laptop or PC:</strong> Use the app or a web browser.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group "Screen limit" */}
+        <div style={{ background: 'rgba(245, 158, 11, 0.06)', border: '1px solid rgba(245, 158, 11, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>⚠️</span> Screen limit:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#fef3c7', lineHeight: '1.55' }}>
+              <span style={{ color: '#f59e0b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>One screen at a time:</strong> Using two screens together can cause a block.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#fef3c7', lineHeight: '1.55' }}>
+              <span style={{ color: '#f59e0b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Many installs are fine:</strong> Installing on several devices is okay if you do not stream on them together.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group "If something goes wrong" */}
+        <div style={{ background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#34d399', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>🛠️</span> If something goes wrong:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
+              <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Signed out suddenly:</strong> Sign in again. If it fails, message us on Telegram.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
+              <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Switching devices:</strong> Tell us before you log in on a new device.</div>
+            </div>
+          </div>
         </div>
       </div>
     )
   },
   {
     id: 'privacy',
-    title: '100% Privacy, Security & Data Protection',
+    tabLabel: 'Privacy',
+    title: 'Privacy',
     icon: '🔒',
-    badge: '100% PRIVATE',
-    badgeBg: 'rgba(59, 130, 246, 0.15)',
-    badgeColor: '#60a5fa',
-    badgeBorder: 'rgba(59, 130, 246, 0.35)',
-    subtitle: 'Zero data harvesting, encrypted chats, and strict profile isolation',
+    badge: 'NO CARD NUMBERS STORED',
+    badgeBg: 'rgba(16, 185, 129, 0.15)',
+    badgeColor: '#34d399',
+    badgeBorder: 'rgba(16, 185, 129, 0.35)',
+    subtitle: 'How we handle your information',
     content: (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.28)', borderRadius: '16px', padding: '16px' }}>
+        {/* Intro */}
+        <div style={{
+          background: 'rgba(16, 185, 129, 0.08)',
+          border: '1px solid rgba(16, 185, 129, 0.28)',
+          borderRadius: '16px',
+          padding: '16px'
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-            <span style={{ fontSize: '20px' }}>🔒</span>
-            <div style={{ color: '#60a5fa', fontWeight: 800, fontSize: '14.5px' }}>Your Personal Privacy is Paramount</div>
+            <span style={{ fontSize: '20px' }}>🛡️</span>
+            <div style={{ color: '#34d399', fontWeight: 800, fontSize: '14.5px' }}>
+              Privacy Commitment
+            </div>
           </div>
-          <p style={{ color: '#dbeafe', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
-            StreamBazaar operates on privacy-first architecture. We never collect, store, or sell banking details, debit/credit cards, or phone contacts.
+          <p style={{ color: '#d1fae5', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
+            We only collect what we need to complete your order.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '14px' }}>
-            <div style={{ color: '#38bdf8', fontWeight: 700, fontSize: '13px', marginBottom: '4px' }}>🛡️ Profile PIN Lock</div>
-            <div style={{ color: '#94a3b8', fontSize: '12px', lineHeight: '1.5' }}>Each shared profile is protected with a personal 4-digit PIN so no one else can view your personal watchlist or browsing history.</div>
+        {/* Group "What we collect" */}
+        <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#34d399', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> What we collect:
           </div>
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '14px' }}>
-            <div style={{ color: '#38bdf8', fontWeight: 700, fontSize: '13px', marginBottom: '4px' }}>🚫 Zero Auto-Debit Traps</div>
-            <div style={{ color: '#94a3b8', fontSize: '12px', lineHeight: '1.5' }}>No sneaky recurring subscriptions. You only pay for the exact plan duration you choose.</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>We collect:</strong> Your Telegram username/ID, your UPI ID or transaction reference, and your order details.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>We never collect:</strong> Card numbers, bank account details, PINs or your phone contacts.</div>
+            </div>
           </div>
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '14px' }}>
-            <div style={{ color: '#38bdf8', fontWeight: 700, fontSize: '13px', marginBottom: '4px' }}>🔐 End-to-End Encryption</div>
-            <div style={{ color: '#94a3b8', fontSize: '12px', lineHeight: '1.5' }}>All purchase discussions take place via secure Telegram protocols with zero third-party telemetry.</div>
+        </div>
+
+        {/* Group "How we use it" */}
+        <div style={{ background: 'rgba(59, 130, 246, 0.06)', border: '1px solid rgba(59, 130, 246, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#60a5fa', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> How we use it:
           </div>
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '14px' }}>
-            <div style={{ color: '#38bdf8', fontWeight: 700, fontSize: '13px', marginBottom: '4px' }}>💳 Zero Banking Storage</div>
-            <div style={{ color: '#94a3b8', fontSize: '12px', lineHeight: '1.5' }}>We never store debit or credit card details. All transactions happen through verified payment gateways.</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#dbeafe', lineHeight: '1.55' }}>
+              <span style={{ color: '#3b82f6', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Only for your order:</strong> To deliver access, verify payment and give support.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#dbeafe', lineHeight: '1.55' }}>
+              <span style={{ color: '#3b82f6', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Never sold:</strong> We do not sell your data or use it for marketing.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group "Your control" */}
+        <div style={{ background: 'rgba(168, 85, 247, 0.06)', border: '1px solid rgba(168, 85, 247, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#c084fc', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> Your control:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#f3e8ff', lineHeight: '1.55' }}>
+              <span style={{ color: '#a855f7', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Delete on request:</strong> Message us on Telegram and we will delete it within 7 days.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#f3e8ff', lineHeight: '1.55' }}>
+              <span style={{ color: '#a855f7', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>How long we keep it:</strong> Order and payment records for 12 months, then deleted.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#f3e8ff', lineHeight: '1.55' }}>
+              <span style={{ color: '#a855f7', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>About Telegram:</strong> Chats are stored on Telegram servers. We do not claim they are end-to-end encrypted.</div>
+            </div>
           </div>
         </div>
       </div>
     )
   },
   {
-    id: 'faq',
-    title: 'FAQ & Platform Setup Guidelines',
-    icon: '❓',
-    badge: 'QUICK HELP',
+    id: 'terms',
+    tabLabel: 'Terms',
+    title: 'Terms',
+    icon: '⚖️',
+    badge: 'HONEST & TRANSPARENT',
     badgeBg: 'rgba(245, 158, 11, 0.15)',
     badgeColor: '#fbbf24',
     badgeBorder: 'rgba(245, 158, 11, 0.35)',
-    subtitle: 'Clear answers regarding multiple devices, platforms, and renewals',
+    subtitle: 'Clear terms before you pay',
     content: (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {[
-          { q: 'Can I use the account on multiple devices?', a: 'All StreamBazaar seats are 1-Active Screen profiles. You can install the application on your Smart TV, Mobile, and Laptop, but stream on 1 screen at a time to prevent provider suspension.' },
-          { q: 'Why do Spotify and Crunchyroll not show 4K UHD?', a: 'StreamBazaar uses AI detection to match real-world specs. Spotify delivers 320kbps Hi-Res Audio, Crunchyroll streams 1080p Full HD Mega Fan anime, and OTT movies stream in 4K Ultra HD. We never give misleading specifications!' },
-          { q: 'How do Steam and PlayStation games work?', a: 'You receive an authentic account with the full game in its library. You can download and play on PC, Steam Deck, PS4, PS5, or Xbox with official cloud saves and trophies.' },
-          { q: 'What happens if my subscription expires?', a: 'Simply reach out to @owner_trusted_streams to renew. Your profile and watch history can be seamlessly extended.' }
-        ].map((item, i) => (
-          <div key={i} style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.07)', borderRadius: '12px', padding: '12px 14px' }}>
-            <div style={{ color: '#fff', fontWeight: 800, fontSize: '13.5px', marginBottom: '4px' }}>{item.q}</div>
-            <div style={{ color: '#cbd5e1', fontSize: '12.5px', lineHeight: '1.5' }}>{item.a}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* Intro */}
+        <div style={{
+          background: 'rgba(245, 158, 11, 0.08)',
+          border: '1px solid rgba(245, 158, 11, 0.28)',
+          borderRadius: '16px',
+          padding: '16px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <span style={{ fontSize: '20px' }}>📜</span>
+            <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '14.5px' }}>
+              Honest Terms &amp; Transparency
+            </div>
           </div>
-        ))}
+          <p style={{ color: '#fef3c7', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
+            Please read this before you pay. Honest terms are how we earn your trust.
+          </p>
+        </div>
+
+        {/* Group "Who we are" */}
+        <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> Who we are:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Not official:</strong> We are an independent reseller. We are not affiliated with Netflix, Spotify, Sony or any other brand.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Payment:</strong> UPI only.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group "Refund policy" */}
+        <div style={{ background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#f87171', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> Refund policy:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#fecaca', lineHeight: '1.55' }}>
+              <span style={{ color: '#ef4444', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>No refunds:</strong> We do not give refunds once access is delivered. Please check the product and plan before you pay.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#fecaca', lineHeight: '1.55' }}>
+              <span style={{ color: '#ef4444', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Replacement instead:</strong> If your access stops working, we replace it for the rest of your plan.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group "When you get a replacement" */}
+        <div style={{ background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#34d399', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> When you get a replacement:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
+              <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Covered:</strong> Login not working, password reset by the provider, profile or PIN lockout, access blocked by the provider.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
+              <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Not covered:</strong> Changing the master email or password, sharing your login, streaming on more than one screen, or a plan that has already ended.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
+              <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>How to claim:</strong> Send your Order ID on Telegram. We reply within [X] hours.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group "Changes" */}
+        <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#94a3b8', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> Changes:
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+            <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+            <div><strong style={{ color: '#fff' }}>Updates:</strong> If these terms change, this page is updated.</div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 'support',
+    tabLabel: 'Support',
+    title: 'Support',
+    icon: '💬',
+    badge: 'TELEGRAM DISPATCH',
+    badgeBg: 'rgba(99, 102, 241, 0.15)',
+    badgeColor: '#818cf8',
+    badgeBorder: 'rgba(99, 102, 241, 0.35)',
+    subtitle: 'How to order and get help',
+    content: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* Intro */}
+        <div style={{
+          background: 'rgba(99, 102, 241, 0.08)',
+          border: '1px solid rgba(99, 102, 241, 0.28)',
+          borderRadius: '16px',
+          padding: '16px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <span style={{ fontSize: '20px' }}>⚡</span>
+            <div style={{ color: '#818cf8', fontWeight: 800, fontSize: '14.5px' }}>
+              Step-by-Step Telegram Flow
+            </div>
+          </div>
+          <p style={{ color: '#e0e7ff', fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
+            Everything happens on Telegram, step by step.
+          </p>
+        </div>
+
+        {/* Group "How to order" */}
+        <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#818cf8', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>●</span> How to order:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>1. Message us:</strong> Tell us the product and plan you want.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>2. Pay by UPI:</strong> Send the payment screenshot.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
+              <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>3. Get access:</strong> Login details arrive on Telegram, usually in [X] minutes.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Group "Need help?" */}
+        <div style={{ background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.22)', borderRadius: '14px', padding: '14px 16px' }}>
+          <div style={{ color: '#34d399', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>🛠️</span> Need help?:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
+              <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Send your Order ID:</strong> We will check and fix it or replace it.</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
+              <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
+              <div><strong style={{ color: '#fff' }}>Support hours:</strong> [HH:MM - HH:MM] IST.</div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 ];
 
-export default function PolicyModal({ initialTab = 'warranty', onClose }) {
-  const [activeTab, setActiveTab] = useState(initialTab);
+const mapLegacyTab = (tab) => {
+  if (!tab) return 'accounts';
+  if (tab === 'warranty') return 'terms';
+  if (tab === 'delivery') return 'support';
+  if (tab === 'faq') return 'devices';
+  return tab;
+};
+
+export default function PolicyModal({ initialTab = 'accounts', onClose }) {
+  const [activeTab, setActiveTab] = useState(() => mapLegacyTab(initialTab));
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(mapLegacyTab(initialTab));
+    }
+  }, [initialTab]);
+
   const current = POLICIES.find(p => p.id === activeTab) || POLICIES[0];
 
   const handleCopySupport = () => {
@@ -280,7 +530,7 @@ export default function PolicyModal({ initialTab = 'warranty', onClose }) {
           </button>
         </div>
 
-        {/* Quick Category Switcher Pill Bar */}
+        {/* Quick Category Switcher Pill Bar (5 Categories) */}
         <div className="sb-policy-pill-nav">
           {POLICIES.map(p => (
             <button
@@ -289,7 +539,7 @@ export default function PolicyModal({ initialTab = 'warranty', onClose }) {
               onClick={() => setActiveTab(p.id)}
             >
               <span>{p.icon}</span>
-              <span>{p.id === 'warranty' ? 'Warranty' : p.id === 'delivery' ? 'Delivery' : p.id === 'privacy' ? 'Privacy' : 'FAQ'}</span>
+              <span>{p.tabLabel}</span>
             </button>
           ))}
         </div>

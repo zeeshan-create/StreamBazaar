@@ -1299,35 +1299,35 @@ export default function StreamBazaarDemo() {
           <div className="sb-trust-hub-grid">
             {[
               {
-                id: 'warranty',
-                icon: '🛡️',
-                title: '100% Replacement Warranty',
-                desc: 'Full subscription duration covered. If credentials ever stop or reset, verified replacement is dispatched within 5-15 mins on Telegram.',
-                action: 'View Warranty Policy →',
+                id: 'terms',
+                icon: '⚖️',
+                title: 'Terms & Replacement Warranty',
+                desc: 'Honest reseller terms. If credentials ever stop working, verified replacement is dispatched for the rest of your plan.',
+                action: 'View Terms & Warranty →',
                 color: '#10b981'
               },
               {
-                id: 'delivery',
-                icon: '⚡',
-                title: 'Instant Delivery (< 2 Mins)',
-                desc: 'Automated order ticket generation with dedicated login ID, private PIN, and step-by-step setup guide dispatched upon payment.',
-                action: 'View Delivery Policy →',
-                color: '#a855f7'
+                id: 'devices',
+                icon: '📱',
+                title: 'Device & Screen Limits',
+                desc: 'Install on Mobile, Smart TV, or PC/Laptop. Clear 1-screen active streaming rule prevents account locks.',
+                action: 'View Device Rules →',
+                color: '#3b82f6'
               },
               {
                 id: 'privacy',
                 icon: '🔒',
                 title: '100% Privacy & Security',
-                desc: 'No credit/debit card numbers stored. Individual 4-digit PIN lock keeps your personal watch history private from all other users.',
-                action: 'View Privacy Terms →',
-                color: '#3b82f6'
+                desc: 'Only UPI and Telegram collected. Never card numbers, bank details, or contacts. 7-day deletion upon request.',
+                action: 'View Privacy Policy →',
+                color: '#a855f7'
               },
               {
-                id: 'faq',
-                icon: '❓',
-                title: 'FAQ & Platform Setup Guide',
-                desc: 'Simple guidelines for 1-device active streaming on TV, PC, Android, iPhone, and official Steam/PlayStation game consoles.',
-                action: 'View FAQ & Help →',
+                id: 'support',
+                icon: '💬',
+                title: 'Support & Ordering Guide',
+                desc: 'Everything happens step-by-step on Telegram. Fast access delivery and dedicated order resolution.',
+                action: 'View Support Guide →',
                 color: '#f59e0b'
               }
             ].map((card) => (
@@ -1388,17 +1388,20 @@ export default function StreamBazaarDemo() {
 
           {/* Centered Policy Modal Buttons */}
           <div className="sb-footer-policy-pills">
-            <button onClick={() => setPolicyTab('warranty')} className="sb-footer-policy-btn">
-              <span>🛡️</span> Warranty Policy
+            <button onClick={() => setPolicyTab('accounts')} className="sb-footer-policy-btn">
+              <span>👤</span> Accounts
+            </button>
+            <button onClick={() => setPolicyTab('devices')} className="sb-footer-policy-btn">
+              <span>📱</span> Devices
             </button>
             <button onClick={() => setPolicyTab('privacy')} className="sb-footer-policy-btn">
-              <span>🔒</span> Privacy &amp; Security
+              <span>🔒</span> Privacy
             </button>
-            <button onClick={() => setPolicyTab('delivery')} className="sb-footer-policy-btn">
-              <span>⚡</span> Delivery SLA
+            <button onClick={() => setPolicyTab('terms')} className="sb-footer-policy-btn">
+              <span>⚖️</span> Terms
             </button>
-            <button onClick={() => setPolicyTab('faq')} className="sb-footer-policy-btn">
-              <span>❓</span> FAQ &amp; Setup
+            <button onClick={() => setPolicyTab('support')} className="sb-footer-policy-btn">
+              <span>💬</span> Support
             </button>
           </div>
 
