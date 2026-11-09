@@ -1049,7 +1049,7 @@ export default function StreamBazaarDemo() {
             </div>
             <div className="sb-live-pill" style={{ marginTop: '2px' }}>
               <span className="sb-live-dot" />
-              <span>Instant Delivery Live</span>
+              <span>Official Digital Store</span>
             </div>
           </div>
         </Link>
@@ -1352,54 +1352,79 @@ export default function StreamBazaarDemo() {
 
       </main>
 
-      {/* Official StreamBazaar Trust Footer - Clean & Minimal */}
-      <footer className="sb-footer" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', padding: '28px 0 24px', background: 'rgba(8, 9, 17, 0.96)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <img src="/logo.png" alt="StreamBazaar" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
-              <div>
-                <div style={{ fontSize: '17px', fontWeight: 900, color: '#fff' }}>
-                  Stream<span style={{ color: '#a855f7' }}>Bazaar</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                  <span className="sb-live-dot" />
-                  <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700 }}>Automated Dispatch Active</span>
-                </div>
-              </div>
-            </div>
+      {/* Official StreamBazaar Unique Centered Trust & Policy Footer */}
+      <footer className="sb-footer" style={{ borderTop: 'none', padding: '44px 16px 30px', background: 'rgba(8, 9, 17, 0.98)' }}>
+        <div className="sb-footer-centered-wrap">
 
+          {/* Centered Brand Seal */}
+          <div className="sb-footer-brand-box">
+            <img src="/logo.png" alt="StreamBazaar" style={{ width: '42px', height: '42px', objectFit: 'contain', filter: 'drop-shadow(0 0 12px rgba(168, 85, 247, 0.4))' }} />
+            <div style={{ fontSize: '20px', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>
+              Stream<span style={{ color: '#a855f7' }}>Bazaar</span>
+            </div>
+            <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0, maxWidth: '440px', lineHeight: '1.5' }}>
+              India's premier verified digital seat & OTT subscription marketplace. 100% genuine accounts, private PIN protection & instant dispatch.
+            </p>
+          </div>
+
+          {/* Policy Establishment Box (Main Center - Kab Bani Thi) */}
+          <div className="sb-footer-established-card">
+            <div className="sb-footer-protocol-badge">
+              <span className="sb-live-dot" style={{ background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
+              <span>Official Consumer Protection Protocol</span>
+            </div>
+            <div className="sb-footer-est-title">
+              Policy Established: <span style={{ color: '#10b981', fontWeight: 800 }}>January 2024</span> • Active &amp; Fully Verified
+            </div>
+            <p className="sb-footer-est-desc">
+              StreamBazaar buyer warranty, profile privacy standards, and zero-risk replacement SLAs are formally registered and enforced across every active subscription.
+            </p>
+            <div className="sb-footer-trust-chips">
+              <span style={{ color: '#10b981' }}>✓ 100% Duration Guaranteed</span>
+              <span style={{ color: '#475569' }}>•</span>
+              <span style={{ color: '#60a5fa' }}>🔒 4-Digit PIN Isolated</span>
+            </div>
+          </div>
+
+          {/* Centered Policy Modal Buttons */}
+          <div className="sb-footer-policy-pills">
+            <button onClick={() => setPolicyTab('warranty')} className="sb-footer-policy-btn">
+              <span>🛡️</span> Warranty Policy
+            </button>
+            <button onClick={() => setPolicyTab('privacy')} className="sb-footer-policy-btn">
+              <span>🔒</span> Privacy &amp; Security
+            </button>
+            <button onClick={() => setPolicyTab('delivery')} className="sb-footer-policy-btn">
+              <span>⚡</span> Delivery SLA
+            </button>
+            <button onClick={() => setPolicyTab('faq')} className="sb-footer-policy-btn">
+              <span>❓</span> FAQ &amp; Setup
+            </button>
+          </div>
+
+          {/* Categorized Community & Official Support */}
+          <div className="sb-footer-support-row">
+            <span>Official Support Hub:</span>
             <a
               href="https://t.me/owner_trusted_streams"
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                background: 'linear-gradient(135deg, #a855f7, #6366f1)',
-                color: '#fff',
-                fontSize: '12px',
-                fontWeight: 800,
-                padding: '9px 20px',
-                borderRadius: '12px',
-                textDecoration: 'none',
-                boxShadow: '0 4px 16px rgba(168, 85, 247, 0.35)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
+              className="sb-footer-support-chip"
             >
-              <span>✈️</span> Telegram Support (@owner_trusted_streams)
+              @owner_trusted_streams
             </a>
+            <span style={{ color: '#475569' }}>•</span>
+            <span>Avg Response: <strong style={{ color: '#10b981' }}>&lt; 5 mins</strong></span>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', fontSize: '11.5px', color: '#64748b' }}>
-            <div>© {new Date().getFullYear()} StreamBazaar. All rights reserved. 100% Verified Authentic Seats.</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <button onClick={() => setPolicyTab('warranty')} className="sb-footer-sublink">Warranty</button>
-              <button onClick={() => setPolicyTab('privacy')} className="sb-footer-sublink">Privacy</button>
-              <button onClick={() => setPolicyTab('delivery')} className="sb-footer-sublink">Delivery</button>
-              <button onClick={() => setPolicyTab('faq')} className="sb-footer-sublink">FAQ</button>
+          {/* Centered Copyright */}
+          <div className="sb-footer-bottom-centered">
+            <div>© 2024 - {new Date().getFullYear()} StreamBazaar Marketplace. All rights reserved.</div>
+            <div style={{ color: '#475569', fontSize: '10.5px' }}>
+              Authentic 1-Device Private Profile Accounts • Full Duration Replacement Protection
             </div>
           </div>
+
         </div>
       </footer>
 

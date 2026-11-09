@@ -100,7 +100,7 @@ const POLICIES = [
     id: 'delivery',
     title: 'Instant Delivery & Activation Policy',
     icon: '⚡',
-    badge: 'AUTOMATED DISPATCH',
+    badge: 'FAST DISPATCH (< 2 MINS)',
     badgeBg: 'rgba(168, 85, 247, 0.15)',
     badgeColor: '#c084fc',
     badgeBorder: 'rgba(168, 85, 247, 0.35)',
