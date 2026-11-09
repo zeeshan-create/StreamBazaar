@@ -752,8 +752,8 @@ let lastPlansFetch = 0;
 app.get('/api/plans', async (req, res) => {
   try {
     const now = Date.now();
-    // Return cache if fetched within 2 seconds for ultra-low latency & zero database thrashing
-    if (cachedPlans && (now - lastPlansFetch < 2000)) {
+    // Return cache only if fetched within 300ms for rapid burst debounce, unless an explicit version/timestamp is requested
+    if (cachedPlans && (now - lastPlansFetch < 300) && !req.query.v && !req.query.t) {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       return res.json(cachedPlans);
     }

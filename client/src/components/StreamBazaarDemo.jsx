@@ -820,14 +820,14 @@ const ProductCard = ({ product, onOpenBuy }) => {
               </span>
               {isOutOfStock && (
                 <span className="sb-badge-oos">
-                  <span>🚫</span>
-                  <span>OUT OF STOCK</span>
+                  <span className="sb-dot-oos"></span>
+                  <span>RESTOCK IN PROGRESS ⚡</span>
                 </span>
               )}
               {isComingSoon && (
                 <span className="sb-badge-coming-soon">
-                  <span>⏳</span>
-                  <span>COMING SOON</span>
+                  <span className="sb-dot-cs"></span>
+                  <span>DROPPING SOON ⏳</span>
                 </span>
               )}
             </div>
@@ -947,10 +947,10 @@ export default function StreamBazaarDemo() {
   useEffect(() => {
     fetchPlans();
 
-    // Fast 3-second live sync interval for zero-delay admin updates across any device
+    // Fast 1.5-second live sync interval for zero-delay updates across any device
     const interval = setInterval(() => {
       if (!document.hidden) fetchPlans();
-    }, 3000);
+    }, 1500);
 
     const onVisible = () => {
       if (!document.hidden) fetchPlans();
@@ -959,13 +959,17 @@ export default function StreamBazaarDemo() {
     window.addEventListener('focus', onVisible);
     document.addEventListener('visibilitychange', onVisible);
 
-    // Multi-tab instant sync via BroadcastChannel
+    // Multi-tab 0ms zero-latency instant sync via BroadcastChannel
     let bc;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         bc = new BroadcastChannel('streambazaar_updates');
         bc.onmessage = (e) => {
-          if (e.data?.type === 'PLANS_UPDATED') {
+          if (e.data?.products && Array.isArray(e.data.products) && e.data.products.length > 0) {
+            // ⚡ DIRECT 0.00ms ZERO-LATENCY PAYLOAD SYNC
+            lastDataRef.current = JSON.stringify(e.data.products);
+            setProducts(e.data.products);
+          } else if (e.data?.type === 'PLANS_UPDATED') {
             fetchPlans();
           }
         };
@@ -973,7 +977,15 @@ export default function StreamBazaarDemo() {
     } catch (e) {}
 
     const onStorage = (e) => {
-      if (e.key === 'streambazaar_plans_updated') {
+      if (e.key === 'streambazaar_live_products' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            lastDataRef.current = e.newValue;
+            setProducts(parsed);
+          }
+        } catch (err) {}
+      } else if (e.key === 'streambazaar_plans_updated') {
         fetchPlans();
       }
     };

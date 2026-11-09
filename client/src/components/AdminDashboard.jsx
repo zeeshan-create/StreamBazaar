@@ -975,12 +975,21 @@ export default function AdminDashboard() {
     return () => document.removeEventListener('keydown', handleEscapeKey);
   }, [handleEscapeKey]);
 
-  const notifyPlanSync = () => {
+  const notifyPlanSync = (updatedProductsList) => {
+    try {
+      if (updatedProductsList && Array.isArray(updatedProductsList)) {
+        localStorage.setItem('streambazaar_live_products', JSON.stringify(updatedProductsList));
+      }
+    } catch (e) {}
     localStorage.setItem('streambazaar_plans_updated', Date.now().toString());
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const bc = new BroadcastChannel('streambazaar_updates');
-        bc.postMessage({ type: 'PLANS_UPDATED', timestamp: Date.now() });
+        bc.postMessage({ 
+          type: 'PLANS_UPDATED', 
+          timestamp: Date.now(),
+          products: updatedProductsList || null
+        });
         bc.close();
       }
     } catch (e) {}
@@ -1006,11 +1015,12 @@ export default function AdminDashboard() {
         return { ...p, price };
       });
       const payload = { ...editForm, plans: sanitizedPlans };
+      const updatedList = services.map(s => (s._id === id ? { ...s, ...payload } : s));
 
-      // ⚡ INSTANT 0ms ZERO-LATENCY OPTIMISTIC UPDATE
-      setServices(prev => prev.map(s => (s._id === id ? { ...s, ...payload } : s)));
+      // ⚡ INSTANT 0ms ZERO-LATENCY DIRECT BROADCAST
+      setServices(updatedList);
       setEditingId(null);
-      notifyPlanSync();
+      notifyPlanSync(updatedList);
 
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, {
         method: 'PUT',
@@ -1018,7 +1028,14 @@ export default function AdminDashboard() {
         body: JSON.stringify(payload),
       });
       if (res.ok) {
-        notifyPlanSync();
+        const savedData = await res.json().catch(() => null);
+        if (savedData && savedData._id) {
+          const freshList = services.map(s => (s._id === id ? savedData : s));
+          setServices(freshList);
+          notifyPlanSync(freshList);
+        } else {
+          notifyPlanSync(updatedList);
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to save: ${errData.error || res.statusText || 'Unknown error'}`);
@@ -1034,16 +1051,22 @@ export default function AdminDashboard() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
     try {
+      const updatedList = services.filter(s => s._id !== id);
+      setServices(updatedList);
+      notifyPlanSync(updatedList);
+
       const res = await fetch(`${API_BASE}/admin/plans/${id}`, { 
         method: 'DELETE',
         headers: getAdminHeaders()
       });
       if (res.ok) {
+        notifyPlanSync(updatedList);
+      } else {
         fetchServices();
-        notifyPlanSync();
       }
     } catch (err) {
       console.error('Delete error:', err);
+      fetchServices();
     }
   };
 
@@ -1055,21 +1078,24 @@ export default function AdminDashboard() {
       return;
     }
     try {
+      setServices([]);
+      notifyPlanSync([]);
       const res = await fetch(`${API_BASE}/admin/plans-all`, { 
         method: 'DELETE',
         headers: getAdminHeaders()
       });
       if (res.ok) {
         alert('All products have been deleted successfully.');
-        fetchServices();
-        notifyPlanSync();
+        notifyPlanSync([]);
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to delete: ${errData.error || res.statusText || 'Unknown error'}`);
+        fetchServices();
       }
     } catch (err) {
       console.error('Delete all error:', err);
       alert(`Connection error: ${err.message}`);
+      fetchServices();
     }
   };
 
@@ -1090,9 +1116,16 @@ export default function AdminDashboard() {
         body: JSON.stringify(payload),
       });
       if (res.ok) {
+        const newService = await res.json().catch(() => null);
         setShowAddForm(false);
-        fetchServices();
-        notifyPlanSync();
+        if (newService && newService._id) {
+          const updatedList = [newService, ...services];
+          setServices(updatedList);
+          notifyPlanSync(updatedList);
+        } else {
+          fetchServices();
+          notifyPlanSync();
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(`Failed to add service: ${errData.error || res.statusText || 'Unknown error'}`);
