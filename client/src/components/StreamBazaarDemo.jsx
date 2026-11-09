@@ -1350,99 +1350,55 @@ export default function StreamBazaarDemo() {
           </div>
         </section>
 
-        {/* How It Works Section - Frosted Glass Protection against background */}
-        <section className="sb-steps-section">
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: 900, margin: '0 0 8px', color: '#fff' }}>
-              Instant Activation in 3 Steps
-            </h3>
-            <p style={{ color: '#94a3b8', fontSize: '13.5px', margin: 0 }}>
-              Fatafat bina kisi jhanjhat ke purchase karein:
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '20px'
-          }}>
-            {[
-              { step: '1', title: 'Tap Get Plan', desc: 'Sare plans animation ke sath khulenge. Apna duration aur quality select karein.' },
-              { step: '2', title: 'Select Device', desc: 'TV, PC, Mobile ya Console select karein with instant live stock availability.' },
-              { step: '3', title: 'Buy on Telegram', desc: 'Direct Telegram ticket ban kar khulta hai, instant 2 minute mein login mil jata hai.' }
-            ].map((st, i) => (
-              <div key={i} className="sb-step-card">
-                <div className="sb-step-num">
-                  {st.step}
-                </div>
-                <h4 style={{ fontSize: '15.5px', fontWeight: 800, margin: '0 0 6px', color: '#fff' }}>{st.title}</h4>
-                <p style={{ fontSize: '12.5px', color: '#cbd5e1', margin: 0, lineHeight: 1.5 }}>{st.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
       </main>
 
-      {/* Official StreamBazaar Trust Footer */}
-      <footer className="sb-footer">
-        <div className="sb-footer-inner">
-          <div className="sb-footer-col sb-footer-brand">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-              <img src="/logo.png" alt="StreamBazaar" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
-              <div style={{ fontSize: '18px', fontWeight: 900 }}>
-                Stream<span style={{ color: '#a855f7' }}>Bazaar</span>
+      {/* Official StreamBazaar Trust Footer - Clean & Minimal */}
+      <footer className="sb-footer" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', padding: '28px 0 24px', background: 'rgba(8, 9, 17, 0.96)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src="/logo.png" alt="StreamBazaar" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
+              <div>
+                <div style={{ fontSize: '17px', fontWeight: 900, color: '#fff' }}>
+                  Stream<span style={{ color: '#a855f7' }}>Bazaar</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                  <span className="sb-live-dot" />
+                  <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700 }}>Automated Dispatch Active</span>
+                </div>
               </div>
             </div>
-            <p style={{ color: '#888', fontSize: '12.5px', lineHeight: '1.5', maxWidth: '340px' }}>
-              India's premier digital seat and OTT subscription marketplace. 100% genuine accounts, instant automated delivery, and round-the-clock human customer support.
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
-              <span className="sb-live-dot" />
-              <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700 }}>Automated Dispatch Active</span>
-            </div>
+
+            <a
+              href="https://t.me/owner_trusted_streams"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'linear-gradient(135deg, #a855f7, #6366f1)',
+                color: '#fff',
+                fontSize: '12px',
+                fontWeight: 800,
+                padding: '9px 20px',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 16px rgba(168, 85, 247, 0.35)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <span>✈️</span> Telegram Support (@owner_trusted_streams)
+            </a>
           </div>
 
-          <div className="sb-footer-col">
-            <h4 className="sb-footer-heading">Trust &amp; Guarantees</h4>
-            <div className="sb-footer-links">
-              <button onClick={() => setPolicyTab('warranty')} className="sb-footer-link">
-                🛡️ 100% Replacement Warranty
-              </button>
-              <button onClick={() => setPolicyTab('delivery')} className="sb-footer-link">
-                ⚡ Instant Delivery Policy
-              </button>
-              <button onClick={() => setPolicyTab('privacy')} className="sb-footer-link">
-                🔒 Privacy &amp; Data Security
-              </button>
-              <button onClick={() => setPolicyTab('faq')} className="sb-footer-link">
-                ❓ FAQ &amp; Account Setup
-              </button>
+          <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', fontSize: '11.5px', color: '#64748b' }}>
+            <div>© {new Date().getFullYear()} StreamBazaar. All rights reserved. 100% Verified Authentic Seats.</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <button onClick={() => setPolicyTab('warranty')} className="sb-footer-sublink">Warranty</button>
+              <button onClick={() => setPolicyTab('privacy')} className="sb-footer-sublink">Privacy</button>
+              <button onClick={() => setPolicyTab('delivery')} className="sb-footer-sublink">Delivery</button>
+              <button onClick={() => setPolicyTab('faq')} className="sb-footer-sublink">FAQ</button>
             </div>
-          </div>
-
-          <div className="sb-footer-col">
-            <h4 className="sb-footer-heading">Help &amp; Official Community</h4>
-            <div className="sb-footer-links">
-              <a href="https://t.me/owner_trusted_streams" target="_blank" rel="noopener noreferrer" className="sb-footer-link">
-                💬 Telegram Store Support
-              </a>
-              <span className="sb-footer-link" style={{ cursor: 'default' }}>
-                ⏱️ Avg Reply Time: &lt; 5 mins
-              </span>
-              <span className="sb-footer-link" style={{ cursor: 'default' }}>
-                💳 UPI, QR Code, Cards &amp; USDT
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="sb-footer-bottom">
-          <div>© {new Date().getFullYear()} StreamBazaar. All rights reserved. 100% Verified Authentic Seats.</div>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <button onClick={() => setPolicyTab('warranty')} className="sb-footer-sublink">Warranty</button>
-            <button onClick={() => setPolicyTab('privacy')} className="sb-footer-sublink">Privacy</button>
-            <button onClick={() => setPolicyTab('delivery')} className="sb-footer-sublink">Delivery</button>
-            <button onClick={() => setPolicyTab('faq')} className="sb-footer-sublink">FAQ</button>
           </div>
         </div>
       </footer>
