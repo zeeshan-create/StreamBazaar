@@ -786,7 +786,7 @@ const ProductCard = ({ product, onOpenBuy }) => {
   return (
     <GlowCard
       color={brandColor}
-      off={isOutOfStock}
+      off={false}
       className={`sb-card ${isOutOfStock ? 'sb-card-oos' : isComingSoon ? 'sb-card-coming-soon' : ''}`}
     >
       <div className="sb-card-content">
@@ -872,11 +872,9 @@ const ProductCard = ({ product, onOpenBuy }) => {
           <span 
             className="sb-card-price" 
             style={{ 
-              color: isOutOfStock 
-                ? '#94a3b8' 
-                : isComingSoon 
-                  ? '#fde047' 
-                  : brandColor 
+              color: isComingSoon 
+                ? '#fde047' 
+                : brandColor 
             }}
           >
             {lowestPrice}

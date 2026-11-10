@@ -1369,14 +1369,16 @@
 
 /* Distinctive Dark Card Ambient Glows */
 .sb-card-oos {
+  opacity: 1 !important;
   border: 1.5px solid rgba(255, 45, 85, 0.45) !important;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 30, 70, 0.12) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 30, 70, 0.18) !important;
   background: radial-gradient(130% 120% at 85% 15%, rgba(255, 30, 70, 0.1) 0%, rgba(12, 14, 22, 0.98) 65%) !important;
 }
 
 .sb-card-coming-soon {
+  opacity: 1 !important;
   border: 1.5px solid rgba(251, 191, 36, 0.45) !important;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(245, 158, 11, 0.12) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(245, 158, 11, 0.18) !important;
   background: radial-gradient(130% 120% at 85% 15%, rgba(251, 191, 36, 0.1) 0%, rgba(12, 14, 22, 0.98) 65%) !important;
 }
 
