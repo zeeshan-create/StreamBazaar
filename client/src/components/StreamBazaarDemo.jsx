@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import ChatWidget from '../ChatWidget';
@@ -757,6 +757,27 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
   );
 };
 
+// ─── STOCK STATUS & PRICING HELPERS ─────────────────────────────
+const isProductOutOfStock = (product) => {
+  const raw = (product?.status || 'Available').trim().toLowerCase();
+  return raw.includes('out') || raw === 'oos';
+};
+
+const isProductComingSoon = (product) => {
+  const raw = (product?.status || 'Available').trim().toLowerCase();
+  return raw.includes('coming');
+};
+
+const getProductStartingPrice = (product) => {
+  if (!product?.plans || product.plans.length === 0) return '₹199';
+  let min = Infinity;
+  for (const pl of product.plans) {
+    const num = parseInt(String(pl.price).replace(/[^0-9]/g, ''), 10);
+    if (!isNaN(num) && num < min) min = num;
+  }
+  return min === Infinity ? (product.plans[0].price || '₹199') : `₹${min}`;
+};
+
 // ─── HIGH-CONVERTING GLOWING PRODUCT CARD ────────────────────────
 const ProductCard = ({ product, onOpenBuy }) => {
   const isGaming = isGamingCategory(product.category);
@@ -924,6 +945,54 @@ export default function StreamBazaarDemo() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [gamingPlatformFilter, setGamingPlatformFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchInputRef = useRef(null);
+
+  // Dynamic Typewriter Animated Placeholder
+  const SEARCH_PHRASES = useMemo(() => [
+    "Search Netflix, Prime Video, Hotstar...",
+    "Search GTA V Enhanced, Black Myth: Wukong...",
+    "Search ChatGPT Plus, Claude Pro, Canva...",
+    "Search NordVPN, ExpressVPN, Surfshark...",
+    "Search Crunchyroll Mega Fan, SonyLIV...",
+    "Search Steam Keys, PlayStation, Xbox..."
+  ], []);
+
+  const [placeholderText, setPlaceholderText] = useState(SEARCH_PHRASES[0]);
+
+  useEffect(() => {
+    let pIdx = 0;
+    let cIdx = 0;
+    let isDeleting = false;
+    let timeoutId;
+
+    const tick = () => {
+      const currentPhrase = SEARCH_PHRASES[pIdx];
+      if (isDeleting) {
+        cIdx--;
+        setPlaceholderText(currentPhrase.substring(0, cIdx));
+        if (cIdx <= 0) {
+          isDeleting = false;
+          pIdx = (pIdx + 1) % SEARCH_PHRASES.length;
+          timeoutId = setTimeout(tick, 450);
+          return;
+        }
+        timeoutId = setTimeout(tick, 30);
+      } else {
+        cIdx++;
+        setPlaceholderText(currentPhrase.substring(0, cIdx));
+        if (cIdx >= currentPhrase.length) {
+          isDeleting = true;
+          timeoutId = setTimeout(tick, 2200);
+          return;
+        }
+        timeoutId = setTimeout(tick, 60);
+      }
+    };
+
+    timeoutId = setTimeout(tick, 600);
+    return () => clearTimeout(timeoutId);
+  }, [SEARCH_PHRASES]);
 
   const lastDataRef = React.useRef('');
 
@@ -1008,20 +1077,47 @@ export default function StreamBazaarDemo() {
     };
   }, [fetchPlans]);
 
-  // Filtered Products
+  // Universal Smart Filtered Products with Synonym & Plan Intelligence
   const displayedProducts = useMemo(() => {
     return products.filter(p => {
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase().trim();
-        const name = (p.name || '').toLowerCase();
-        const cat = (p.category || '').toLowerCase();
-        const desc = (p.description || '').toLowerCase();
-        const plat = (p.platform || '').toLowerCase();
-        const matchesQuery = name.includes(q) || cat.includes(q) || desc.includes(q) || plat.includes(q);
-        if (!matchesQuery) return false;
+      if (searchQuery && searchQuery.trim()) {
+        const rawQ = searchQuery.toLowerCase().trim();
+        const pName = (p.name || '').toLowerCase();
+        const pCat = (p.category || '').toLowerCase();
+        const pDesc = (p.description || '').toLowerCase();
+        const pPlat = (p.platform || '').toLowerCase();
+
+        // Plan features & quality text
+        const planText = (p.plans || [])
+          .map(pl => `${pl.label || ''} ${pl.quality || ''} ${pl.duration || ''}`)
+          .join(' ')
+          .toLowerCase();
+
+        // High-intent category synonyms:
+        const isOttQuery = rawQ === 'ott' || rawQ === 'ott apps' || rawQ === 'stream' || rawQ === 'movie' || rawQ === 'movies' || rawQ === 'series' || rawQ === 'cinema';
+        const isGameQuery = rawQ === 'game' || rawQ === 'games' || rawQ === 'gaming' || rawQ === 'game name';
+        const isAiQuery = rawQ === 'ai' || rawQ === 'ai tools' || rawQ === 'ai name' || rawQ === 'artificial intelligence' || rawQ === 'bot';
+        const isVpnQuery = rawQ === 'vpn' || rawQ === 'vpns' || rawQ === 'vpn name' || rawQ === 'proxy' || rawQ === 'shield';
+
+        const matchesSynonym = 
+          (isOttQuery && (pCat.includes('stream') || pName.includes('netflix') || pName.includes('crunchyroll') || pName.includes('prime') || pName.includes('hotstar') || pName.includes('youtube') || pName.includes('spotify') || pName.includes('zee5'))) ||
+          (isGameQuery && (isGamingCategory(pCat) || pPlat.includes('steam') || pPlat.includes('playstation') || pPlat.includes('xbox') || pName.includes('gta') || pName.includes('wukong'))) ||
+          (isAiQuery && (pCat.includes('ai') || pName.includes('gpt') || pName.includes('chatgpt') || pName.includes('claude') || pName.includes('canva'))) ||
+          (isVpnQuery && (pCat.includes('vpn') || pName.includes('nord') || pName.includes('surfshark') || pName.includes('express')));
+
+        const matchesStandard = 
+          pName.includes(rawQ) || 
+          pCat.includes(rawQ) || 
+          pDesc.includes(rawQ) || 
+          pPlat.includes(rawQ) ||
+          planText.includes(rawQ);
+
+        // Global search overrides tab limitations!
+        if (!matchesSynonym && !matchesStandard) return false;
+        return true;
       }
 
-      // Gaming Platform Sub-filter (Steam, PlayStation, Xbox)
+      // Normal category filtering when NOT searching:
       if (activeCategory === 'Gaming') {
         if (!isGamingCategory(p.category)) return false;
 
@@ -1052,6 +1148,11 @@ export default function StreamBazaarDemo() {
       return true;
     });
   }, [products, activeCategory, gamingPlatformFilter, searchQuery]);
+
+  const matchedSearchProducts = useMemo(() => {
+    if (!searchQuery || !searchQuery.trim()) return [];
+    return displayedProducts;
+  }, [searchQuery, displayedProducts]);
 
   return (
     <div className="sb-page">
@@ -1174,19 +1275,31 @@ export default function StreamBazaarDemo() {
             </a>
           </div>
 
-          {/* Dedicated Centered Search Bar */}
+          {/* Dedicated Centered Search Bar with Typewriter Animation, Pills & Dropdown */}
           <div className="sb-search-hero-wrap">
             <div className="sb-search-hero-box">
               <span style={{ fontSize: '18px', color: '#a855f7' }}>🔍</span>
-              <input
-                className="sb-search-hero-input"
-                type="text"
-                placeholder="Search Netflix, Spotify, Crunchyroll, GTA V, Canva, VPN..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              <div className="sb-search-input-wrap">
+                <input
+                  ref={searchInputRef}
+                  className="sb-search-hero-input"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 250)}
+                  aria-label="Search catalog"
+                />
+                {!searchQuery && (
+                  <div className="sb-search-typewriter-overlay">
+                    <span>{placeholderText}</span>
+                    <span className="sb-typewriter-cursor" />
+                  </div>
+                )}
+              </div>
               {searchQuery && (
                 <button
+                  type="button"
                   className="sb-search-clear-btn"
                   onClick={() => setSearchQuery('')}
                   title="Clear Search"
@@ -1195,12 +1308,123 @@ export default function StreamBazaarDemo() {
                 </button>
               )}
             </div>
+
+            {/* Smart Autocomplete / Live Suggestion Dropdown */}
+            {isSearchFocused && (
+              <div className="sb-search-dropdown">
+                <div className="sb-search-dropdown-header">
+                  <span>{searchQuery.trim() ? `Matching Products (${matchedSearchProducts.length})` : 'Popular Suggestions'}</span>
+                  <span className="sb-search-live-badge">⚡ Live Search</span>
+                </div>
+                <div className="sb-search-dropdown-list">
+                  {searchQuery.trim() ? (
+                    matchedSearchProducts.length > 0 ? (
+                      matchedSearchProducts.slice(0, 6).map((p) => {
+                        const isOos = isProductOutOfStock(p);
+                        const isCs = isProductComingSoon(p);
+                        return (
+                          <div
+                            key={p._id || p.name}
+                            className="sb-search-dropdown-item"
+                            onMouseDown={() => {
+                              setSearchQuery(p.name);
+                              setIsSearchFocused(false);
+                            }}
+                          >
+                            <div className="sb-dropdown-item-left">
+                              <span className="sb-dropdown-cat-tag">{(p.category || 'STREAMING').toUpperCase()}</span>
+                              <span className="sb-dropdown-name">{p.name}</span>
+                            </div>
+                            <div className="sb-dropdown-item-right">
+                              <span className="sb-dropdown-price">{getProductStartingPrice(p)}</span>
+                              <span className={`sb-dropdown-status ${isOos ? 'oos' : isCs ? 'cs' : 'avail'}`}>
+                                {isOos ? 'Out of Stock' : isCs ? 'Coming Soon' : 'Available'}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="sb-search-no-results">
+                        No products found for "{searchQuery}". Try "ott", "game", "ai", or "vpn".
+                      </div>
+                    )
+                  ) : (
+                    <div className="sb-search-quick-triggers">
+                      <div className="sb-search-trigger-item" onMouseDown={() => setSearchQuery('ott')}>
+                        <span>📺</span> <span>Browse all OTT Streaming Apps (Netflix, Prime, Crunchyroll)</span>
+                      </div>
+                      <div className="sb-search-trigger-item" onMouseDown={() => setSearchQuery('game')}>
+                        <span>🎮</span> <span>Browse PC & Console Games (GTA V, Wukong, Steam)</span>
+                      </div>
+                      <div className="sb-search-trigger-item" onMouseDown={() => setSearchQuery('ai')}>
+                        <span>🤖</span> <span>Browse AI+ Productivity Tools (ChatGPT Plus, Canva)</span>
+                      </div>
+                      <div className="sb-search-trigger-item" onMouseDown={() => setSearchQuery('vpn')}>
+                        <span>🛡️</span> <span>Browse High-Speed VPN Shields (NordVPN, ExpressVPN)</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Quick Suggestion Clickable Filter Pills */}
+            <div className="sb-search-pills">
+              <span className="sb-pills-label">Popular:</span>
+              <button
+                type="button"
+                className={`sb-pill-chip ${searchQuery.toLowerCase() === 'ott' ? 'active' : ''}`}
+                onClick={() => setSearchQuery(searchQuery.toLowerCase() === 'ott' ? '' : 'ott')}
+              >
+                <span>📺</span> OTT Apps
+              </button>
+              <button
+                type="button"
+                className={`sb-pill-chip ${searchQuery.toLowerCase() === 'game' ? 'active' : ''}`}
+                onClick={() => setSearchQuery(searchQuery.toLowerCase() === 'game' ? '' : 'game')}
+              >
+                <span>🎮</span> Games
+              </button>
+              <button
+                type="button"
+                className={`sb-pill-chip ${searchQuery.toLowerCase() === 'ai' ? 'active' : ''}`}
+                onClick={() => setSearchQuery(searchQuery.toLowerCase() === 'ai' ? '' : 'ai')}
+              >
+                <span>🤖</span> AI Tools
+              </button>
+              <button
+                type="button"
+                className={`sb-pill-chip ${searchQuery.toLowerCase() === 'vpn' ? 'active' : ''}`}
+                onClick={() => setSearchQuery(searchQuery.toLowerCase() === 'vpn' ? '' : 'vpn')}
+              >
+                <span>🛡️</span> VPNs
+              </button>
+            </div>
           </div>
         </motion.div>
       </section>
 
       {/* Content Container */}
       <main id="deals" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
+
+        {/* Active Search Feedback Bar */}
+        {searchQuery.trim() && (
+          <div className="sb-search-feedback-bar">
+            <div className="sb-search-feedback-text">
+              <span>🔍</span>
+              <span>
+                Showing <strong>{displayedProducts.length}</strong> {displayedProducts.length === 1 ? 'product' : 'products'} for <em>"{searchQuery}"</em>
+              </span>
+            </div>
+            <button
+              className="sb-search-feedback-clear"
+              onClick={() => setSearchQuery('')}
+            >
+              Clear Search ✕
+            </button>
+          </div>
+        )}
 
         {/* Category Navigation Pills */}
         <div className="sb-cats-scroll">
@@ -1295,11 +1519,18 @@ export default function StreamBazaarDemo() {
 
         {/* Empty State */}
         {displayedProducts.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#666' }}>
-            <div style={{ fontSize: '38px', marginBottom: '10px' }}>🔍</div>
-            <div style={{ fontSize: '17px', fontWeight: 700, color: '#fff' }}>No products found</div>
-            <div style={{ fontSize: '13px', color: '#888', marginTop: '4px' }}>
-              Try searching with another keyword or selecting "All Services".
+          <div className="sb-search-empty-state">
+            <div style={{ fontSize: '38px', marginBottom: '8px' }}>🔍</div>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>No products found</h3>
+            <p style={{ color: '#94a3b8', fontSize: '13px', margin: '6px 0 16px' }}>
+              We couldn't find any products matching "{searchQuery}". Try popular categories:
+            </p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button type="button" onClick={() => setSearchQuery('ott')} className="sb-pill-chip">📺 OTT Apps</button>
+              <button type="button" onClick={() => setSearchQuery('game')} className="sb-pill-chip">🎮 Games</button>
+              <button type="button" onClick={() => setSearchQuery('ai')} className="sb-pill-chip">🤖 AI Tools</button>
+              <button type="button" onClick={() => setSearchQuery('vpn')} className="sb-pill-chip">🛡️ VPNs</button>
+              <button type="button" onClick={() => setSearchQuery('')} className="sb-pill-chip" style={{ borderColor: '#ef4444', color: '#f87171' }}>Clear Search ✕</button>
             </div>
           </div>
         )}
