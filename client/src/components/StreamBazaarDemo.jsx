@@ -269,7 +269,7 @@ const CardLogo = ({ product }) => {
 };
 
 // ─── 2-STEP SMOOTH POP-UP PURCHASE MODAL ─────────────────────────
-const PurchaseModal = ({ product, initialPlan, onClose }) => {
+const PurchaseModal = React.memo(({ product, initialPlan, onClose }) => {
   const [step, setStep] = useState(1);
 
   const plans = useMemo(() => product?.plans || [], [product?.plans]);
@@ -300,6 +300,11 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
   const isGaming = isGamingCategory(product.category);
   const accountBadge = getAccountBadge(product.description);
   const specs = detectServiceSpecs(product, selectedPlan);
+
+  // Pre-calculate all plan specs in one pass for buttery smooth 60fps clicks
+  const plansSpecs = useMemo(() => {
+    return plans.map(pl => detectServiceSpecs(product, pl));
+  }, [plans, product]);
 
   const deviceList = useMemo(() => {
     if (isGaming) {
@@ -389,6 +394,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
         onClick={(e) => e.stopPropagation()}
         style={{
           '--c': brandColor,
+          '--c-rgb': colorRgb,
           borderColor: brandColor,
           boxShadow: `0 20px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(${colorRgb}, 0.35)`
         }}
@@ -562,7 +568,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                 {plans.map((pl, idx) => {
                   const isSelected = idx === safeIdx;
                   const plPrice = pl.price || '₹199';
-                  const rowSpecs = detectServiceSpecs(product, pl);
+                  const rowSpecs = plansSpecs[idx] || specs;
 
                   return (
                     <div
@@ -574,7 +580,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
                           ? `rgba(${colorRgb}, 0.16)`
                           : 'rgba(255, 255, 255, 0.025)',
                         borderColor: isSelected ? brandColor : 'rgba(255, 255, 255, 0.08)',
-                        boxShadow: isSelected ? `0 0 16px rgba(${colorRgb}, 0.35)` : 'none'
+                        boxShadow: isSelected ? `0 0 14px rgba(${colorRgb}, 0.3)` : 'none'
                       }}
                     >
                       <div className="sb-plan-row-left">
@@ -767,7 +773,7 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
       </motion.div>
     </motion.div>
   );
-};
+});
 
 // ─── STOCK STATUS & PRICING HELPERS ─────────────────────────────
 const isProductOutOfStock = (product) => {
@@ -984,7 +990,7 @@ export default function StreamBazaarDemo() {
     };
   }, [modalData, policyTab]);
 
-  // Dynamic Typewriter Animated Placeholder
+  // Dynamic Typewriter Animated Placeholder (DOM Ref for 0ms re-render performance)
   const SEARCH_PHRASES = useMemo(() => [
     "Search Netflix, Prime Video, Hotstar...",
     "Search GTA V Enhanced, Black Myth: Wukong...",
@@ -994,7 +1000,7 @@ export default function StreamBazaarDemo() {
     "Search Steam Keys, PlayStation, Xbox..."
   ], []);
 
-  const [placeholderText, setPlaceholderText] = useState(SEARCH_PHRASES[0]);
+  const typewriterSpanRef = useRef(null);
 
   useEffect(() => {
     let pIdx = 0;
@@ -1003,10 +1009,18 @@ export default function StreamBazaarDemo() {
     let timeoutId;
 
     const tick = () => {
+      // Pause typewriter when a modal is open or tab is hidden (Zero CPU load on mobile)
+      if (modalData || policyTab || document.hidden) {
+        timeoutId = setTimeout(tick, 500);
+        return;
+      }
+
       const currentPhrase = SEARCH_PHRASES[pIdx];
       if (isDeleting) {
         cIdx--;
-        setPlaceholderText(currentPhrase.substring(0, cIdx));
+        if (typewriterSpanRef.current) {
+          typewriterSpanRef.current.textContent = currentPhrase.substring(0, cIdx);
+        }
         if (cIdx <= 0) {
           isDeleting = false;
           pIdx = (pIdx + 1) % SEARCH_PHRASES.length;
@@ -1016,7 +1030,9 @@ export default function StreamBazaarDemo() {
         timeoutId = setTimeout(tick, 30);
       } else {
         cIdx++;
-        setPlaceholderText(currentPhrase.substring(0, cIdx));
+        if (typewriterSpanRef.current) {
+          typewriterSpanRef.current.textContent = currentPhrase.substring(0, cIdx);
+        }
         if (cIdx >= currentPhrase.length) {
           isDeleting = true;
           timeoutId = setTimeout(tick, 2200);
@@ -1028,7 +1044,7 @@ export default function StreamBazaarDemo() {
 
     timeoutId = setTimeout(tick, 600);
     return () => clearTimeout(timeoutId);
-  }, [SEARCH_PHRASES]);
+  }, [SEARCH_PHRASES, modalData, policyTab]);
 
   const lastDataRef = React.useRef('');
 
@@ -1346,7 +1362,7 @@ export default function StreamBazaarDemo() {
                 />
                 {!searchQuery && (
                   <div className="sb-search-typewriter-overlay">
-                    <span>{placeholderText}</span>
+                    <span ref={typewriterSpanRef}>{SEARCH_PHRASES[0]}</span>
                     <span className="sb-typewriter-cursor" />
                   </div>
                 )}

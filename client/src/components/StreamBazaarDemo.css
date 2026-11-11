@@ -2280,30 +2280,42 @@ html, body {
 @media (max-width: 640px) {
   .sb-modal-overlay {
     align-items: flex-end !important;
-    padding: 0 !important;
+    padding: 0 4px 0 !important;
     overscroll-behavior: contain;
   }
 
   .sb-modal-card {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: calc(100% - 8px) !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
     max-height: 88vh !important;
     max-height: 88dvh !important;
     border-radius: 24px 24px 0 0 !important;
+    border-top: 2px solid var(--c, #a855f7) !important;
+    border-left: 2px solid var(--c, #a855f7) !important;
+    border-right: 2px solid var(--c, #a855f7) !important;
     border-bottom: none !important;
-    border-left: none !important;
-    border-right: none !important;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.9),
+                -3px 0 16px rgba(var(--c-rgb, 168, 85, 247), 0.35),
+                3px 0 16px rgba(var(--c-rgb, 168, 85, 247), 0.35),
+                inset 1.5px 0 0 var(--c, #a855f7),
+                inset -1.5px 0 0 var(--c, #a855f7) !important;
   }
 
   .sb-policy-modal {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: calc(100% - 8px) !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
     max-height: 86vh !important;
     max-height: 86dvh !important;
     border-radius: 24px 24px 0 0 !important;
+    border-top: 2px solid var(--c, #a855f7) !important;
+    border-left: 2px solid var(--c, #a855f7) !important;
+    border-right: 2px solid var(--c, #a855f7) !important;
     border-bottom: none !important;
-    border-left: none !important;
-    border-right: none !important;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.9),
+                -3px 0 16px rgba(var(--c-rgb, 168, 85, 247), 0.35),
+                3px 0 16px rgba(var(--c-rgb, 168, 85, 247), 0.35) !important;
   }
 
   .sb-mobile-pull-handle {
@@ -2384,4 +2396,23 @@ html, body {
     grid-template-columns: 1fr;
     gap: 28px;
   }
+}
+
+/* ─── HARDWARE & DEVICE-AWARE ADAPTIVE PERFORMANCE ──────────────── */
+html[data-is-android="true"] .sb-modal-overlay,
+html[data-device-tier="low"] .sb-modal-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(4, 5, 12, 0.94) !important;
+}
+
+html[data-is-android="true"] .sb-plan-row,
+html[data-device-tier="low"] .sb-plan-row {
+  transition: background 0.08s ease, border-color 0.08s ease !important;
+}
+
+html[data-is-android="true"] .sb-modal-card,
+html[data-device-tier="low"] .sb-modal-card {
+  transform: translateZ(0) !important;
+  will-change: transform, opacity !important;
 }

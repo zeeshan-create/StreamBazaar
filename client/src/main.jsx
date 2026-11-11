@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './App.css'
+import { applyDevicePerformanceAttributes } from './utils/devicePerf'
+
+// Automatically detect hardware specifications & optimize rendering path
+applyDevicePerformanceAttributes();
 
 // Disable Right Click (Context Menu)
 document.addEventListener('contextmenu', event => event.preventDefault());
