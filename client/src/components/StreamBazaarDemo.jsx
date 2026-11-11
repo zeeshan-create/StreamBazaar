@@ -1148,38 +1148,30 @@ export default function StreamBazaarDemo() {
     });
   }, [products, activeCategory, gamingPlatformFilter, searchQuery]);
 
-  // Group searched products by category when searching
-  const searchedCategoryGroups = useMemo(() => {
-    if (!searchQuery || !searchQuery.trim()) return {};
-    const groups = {};
-    for (const p of displayedProducts) {
-      let catLabel = 'Streaming & OTT';
-      let catIcon = '📺';
-      const c = (p.category || '').toLowerCase();
-      if (isGamingCategory(p.category)) {
-        catLabel = 'Gaming Seats';
-        catIcon = '🎮';
-      } else if (c.includes('ai')) {
-        catLabel = 'AI & Productivity';
-        catIcon = '🤖';
-      } else if (c.includes('vpn')) {
-        catLabel = 'VPN Shields';
-        catIcon = '🛡️';
-      } else if (c.includes('stream') || c.includes('ott')) {
-        catLabel = 'Streaming & OTT';
-        catIcon = '📺';
-      } else {
-        catLabel = p.category ? (p.category.charAt(0).toUpperCase() + p.category.slice(1)) : 'Featured Services';
-        catIcon = '⚡';
-      }
+  const ALL_CATEGORY_TABS = useMemo(() => [
+    { id: 'All', label: 'All Services', icon: '⊞' },
+    { id: 'Streaming', label: 'Streaming & OTT', icon: '📺' },
+    { id: 'Gaming', label: 'Gaming Seats', icon: '🎮' },
+    { id: 'VPN', label: 'VPN Shields', icon: '🛡️' },
+    { id: 'AI+', label: 'AI & Productivity', icon: '⚙️' }
+  ], []);
 
-      if (!groups[catLabel]) {
-        groups[catLabel] = { label: catLabel, icon: catIcon, products: [] };
-      }
-      groups[catLabel].products.push(p);
-    }
-    return groups;
-  }, [searchQuery, displayedProducts]);
+  const getProductCategoryId = useCallback((product) => {
+    if (isGamingCategory(product?.category)) return 'Gaming';
+    const c = (product?.category || '').toLowerCase();
+    if (c.includes('ai')) return 'AI+';
+    if (c.includes('vpn')) return 'VPN';
+    if (c.includes('stream') || c.includes('ott')) return 'Streaming';
+    return product?.category || 'Streaming';
+  }, []);
+
+  // When searching, display ONLY the matching category tabs!
+  const activeSearchCategoryTabs = useMemo(() => {
+    if (!searchQuery || !searchQuery.trim()) return ALL_CATEGORY_TABS;
+    const catIds = new Set(displayedProducts.map(p => getProductCategoryId(p)));
+    const filtered = ALL_CATEGORY_TABS.filter(t => t.id !== 'All' && catIds.has(t.id));
+    return filtered;
+  }, [searchQuery, displayedProducts, ALL_CATEGORY_TABS, getProductCategoryId]);
 
   return (
     <div className="sb-page">
@@ -1340,156 +1332,117 @@ export default function StreamBazaarDemo() {
       {/* Content Container */}
       <main id="deals" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
 
-        {/* WHEN SEARCHING: Show Category Box directly at the TOP with matching cards */}
-        {searchQuery.trim() ? (
-          <div className="sb-search-results-top-wrap">
-            {displayedProducts.length > 0 ? (
-              Object.keys(searchedCategoryGroups).map((catName) => {
-                const group = searchedCategoryGroups[catName];
-                return (
-                  <div key={catName} className="sb-search-category-box">
-                    <div className="sb-category-box-header">
-                      <div className="sb-category-title-pill">
-                        <span>{group.icon}</span>
-                        <span>{group.label}</span>
-                        <span className="sb-category-count-badge">
-                          {group.products.length} {group.products.length === 1 ? 'Product' : 'Products'} Found
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setSearchQuery('')}
-                        className="sb-search-close-link"
-                      >
-                        ✕ Close Search
-                      </button>
-                    </div>
-
-                    <div className="sb-grid">
-                      {group.products.map((p) => (
-                        <ProductCard
-                          key={p._id || p.name}
-                          product={p}
-                          onOpenBuy={(prod, pl) => setModalData({ product: prod, plan: pl })}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="sb-search-category-box" style={{ textAlign: 'center', padding: '48px 20px' }}>
-                <div style={{ fontSize: '38px', marginBottom: '8px' }}>🔍</div>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
-                  No products found for "{searchQuery}"
-                </h3>
-                <p style={{ color: '#94a3b8', fontSize: '13px', margin: '6px 0 16px' }}>
-                  Try searching "Netflix", "GTA", "AI", or "VPN"
-                </p>
+        {/* Category Navigation Tabs:
+            - When NOT searching: Shows ALL categories (All Services, Streaming, Gaming, VPN, AI)
+            - When SEARCHING: Shows ONLY the matching category pill(s) without extra clutter! */}
+        {activeSearchCategoryTabs.length > 0 && (
+          <div className="sb-cats-scroll">
+            {activeSearchCategoryTabs.map((cat) => {
+              const isActive = searchQuery.trim() ? true : activeCategory === cat.id;
+              return (
                 <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="sb-search-close-link"
-                  style={{ display: 'inline-flex', padding: '7px 18px', fontSize: '12.5px' }}
-                >
-                  Back to All Services ✕
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          /* NORMAL WEBSITE VIEW: Category Navigation Tabs + Platform Filter + Catalog Grid */
-          <>
-            <div className="sb-cats-scroll">
-              {[
-                { id: 'All', label: 'All Services', icon: '⊞' },
-                { id: 'Streaming', label: 'Streaming & OTT', icon: '📺' },
-                { id: 'Gaming', label: 'Gaming Seats', icon: '🎮' },
-                { id: 'VPN', label: 'VPN Shields', icon: '🛡️' },
-                { id: 'AI+', label: 'AI & Productivity', icon: '⚙️' }
-              ].map((cat) => {
-                const isActive = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    className={`sb-cat-pill ${isActive ? 'active' : ''}`}
-                    onClick={() => {
+                  key={cat.id}
+                  className={`sb-cat-pill ${isActive ? 'active' : ''}`}
+                  onClick={() => {
+                    if (!searchQuery.trim()) {
                       setActiveCategory(cat.id);
                       setGamingPlatformFilter('All');
+                    }
+                  }}
+                  style={{ cursor: searchQuery.trim() ? 'default' : 'pointer' }}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Gaming Platform Sub-Filter Bar - ONLY SHOWS WHEN 'Gaming' CATEGORY IS ACTIVE AND NOT SEARCHING */}
+        {!searchQuery.trim() && activeCategory === 'Gaming' && (
+          <motion.div
+            className="sb-platform-bar"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '18px' }}>🎮</span>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#ccc' }}>
+                Filter Gaming Platform:
+              </span>
+            </div>
+
+            <div className="sb-platform-pills">
+              {[
+                { id: 'All', label: 'All Platforms', icon: '🌟', color: '#f59e0b' },
+                { id: 'steam', label: 'Steam', icon: <Icons.Steam size={13} />, color: '#d4a359' },
+                { id: 'playstation', label: 'PlayStation', icon: <Icons.PlayStation size={13} />, color: '#60a5fa' },
+                { id: 'xbox', label: 'Xbox', icon: <Icons.Xbox size={13} />, color: '#4ade80' }
+              ].map((p) => {
+                const isActive = gamingPlatformFilter.toLowerCase() === p.id.toLowerCase();
+                return (
+                  <button
+                    key={p.id}
+                    className={`sb-platform-pill ${isActive ? 'active' : ''}`}
+                    onClick={() => setGamingPlatformFilter(p.id)}
+                    style={{
+                      borderColor: isActive ? (p.color || '#fff') : 'rgba(255, 255, 255, 0.1)',
+                      background: isActive ? `${p.color}22` : 'rgba(255, 255, 255, 0.04)',
+                      color: isActive ? (p.color || '#fff') : '#bbb',
+                      boxShadow: isActive ? `0 0 14px ${p.color}44` : 'none'
                     }}
                   >
-                    <span>{cat.icon}</span>
-                    <span>{cat.label}</span>
+                    <span>{p.icon}</span>
+                    <span>{p.label}</span>
                   </button>
                 );
               })}
             </div>
+          </motion.div>
+        )}
 
-            {/* Gaming Platform Sub-Filter Bar - ONLY SHOWS WHEN 'Gaming' CATEGORY IS ACTIVE */}
-            {activeCategory === 'Gaming' && (
-              <motion.div
-                className="sb-platform-bar"
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '18px' }}>🎮</span>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#ccc' }}>
-                    Filter Gaming Platform:
-                  </span>
-                </div>
-
-                <div className="sb-platform-pills">
-                  {[
-                    { id: 'All', label: 'All Platforms', icon: '🌟', color: '#f59e0b' },
-                    { id: 'steam', label: 'Steam', icon: <Icons.Steam size={13} />, color: '#d4a359' },
-                    { id: 'playstation', label: 'PlayStation', icon: <Icons.PlayStation size={13} />, color: '#60a5fa' },
-                    { id: 'xbox', label: 'Xbox', icon: <Icons.Xbox size={13} />, color: '#4ade80' }
-                  ].map((p) => {
-                    const isActive = gamingPlatformFilter.toLowerCase() === p.id.toLowerCase();
-                    return (
-                      <button
-                        key={p.id}
-                        className={`sb-platform-pill ${isActive ? 'active' : ''}`}
-                        onClick={() => setGamingPlatformFilter(p.id)}
-                        style={{
-                          borderColor: isActive ? (p.color || '#fff') : 'rgba(255, 255, 255, 0.1)',
-                          background: isActive ? `${p.color}22` : 'rgba(255, 255, 255, 0.04)',
-                          color: isActive ? (p.color || '#fff') : '#bbb',
-                          boxShadow: isActive ? `0 0 14px ${p.color}44` : 'none'
-                        }}
-                      >
-                        <span>{p.icon}</span>
-                        <span>{p.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Product Cards Grid with Glowing Border */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${activeCategory}-${gamingPlatformFilter}`}
-                initial={{ opacity: 0, x: 28 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -28 }}
-                transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
-                className="sb-grid"
-              >
-                {displayedProducts.map((p) => (
-                  <ProductCard
-                    key={p._id || p.name}
-                    product={p}
-                    onOpenBuy={(prod, pl) => setModalData({ product: prod, plan: pl })}
-                  />
-                ))}
-              </motion.div>
-            </AnimatePresence>
-          </>
+        {/* Product Cards Grid: DIRECT CLEAN GRID (ZERO PURPLE BOX WRAPPER!) */}
+        {displayedProducts.length > 0 ? (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${activeCategory}-${gamingPlatformFilter}-${searchQuery}`}
+              initial={{ opacity: 0, x: 28 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -28 }}
+              transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+              className="sb-grid"
+            >
+              {displayedProducts.map((p) => (
+                <ProductCard
+                  key={p._id || p.name}
+                  product={p}
+                  onOpenBuy={(prod, pl) => setModalData({ product: prod, plan: pl })}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        ) : (
+          /* Clean Empty State (Only if 0 matches) */
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#666' }}>
+            <div style={{ fontSize: '38px', marginBottom: '10px' }}>🔍</div>
+            <div style={{ fontSize: '17px', fontWeight: 700, color: '#fff' }}>
+              No products found for "{searchQuery}"
+            </div>
+            <div style={{ fontSize: '13px', color: '#888', marginTop: '6px' }}>
+              Try searching with another keyword like "Netflix", "GTA", "AI", or "VPN".
+            </div>
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="sb-cat-pill"
+              style={{ marginTop: '16px', borderColor: '#ef4444', color: '#f87171', display: 'inline-flex' }}
+            >
+              Clear Search ✕
+            </button>
+          </div>
         )}
 
         {/* StreamBazaar Official Protection & Trust Hub */}
