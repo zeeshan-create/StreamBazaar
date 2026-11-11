@@ -467,6 +467,15 @@ export default function PolicyModal({ initialTab = 'accounts', onClose }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Close policy modal on Escape key press
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [onClose]);
+
   return (
     <motion.div
       className="sb-modal-overlay"

@@ -94,8 +94,9 @@
   top: 0;
   z-index: 1000;
   background: rgba(8, 9, 17, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transform: translateZ(0);
   border-bottom: 1px solid transparent;
   border-image: linear-gradient(90deg, transparent 0%, rgba(168, 85, 247, 0.7) 25%, rgba(99, 102, 241, 0.7) 75%, transparent 100%) 1;
   box-shadow: 0 4px 25px -4px rgba(168, 85, 247, 0.25);
@@ -197,7 +198,7 @@
   border: none;
   outline: none;
   color: #fff;
-  font-size: 13.5px;
+  font-size: 16px;
   width: 100%;
 }
 
@@ -318,8 +319,8 @@
   justify-content: center;
   gap: 16px;
   background: rgba(14, 16, 28, 0.78);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 10px 22px;
   border-radius: 9999px;
@@ -498,7 +499,7 @@
   border: none;
   outline: none;
   color: #ffffff;
-  font-size: 14.5px;
+  font-size: 16px;
   font-weight: 600;
   width: 100%;
 }
@@ -514,7 +515,7 @@
   align-items: center;
   pointer-events: none;
   color: rgba(255, 255, 255, 0.45);
-  font-size: 14.5px;
+  font-size: 16px;
   font-weight: 500;
   user-select: none;
   white-space: nowrap;
@@ -1004,14 +1005,15 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(3, 4, 10, 0.82);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(3, 4, 10, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
   will-change: opacity;
+  overscroll-behavior: contain;
 }
 
 .sb-modal-card {
@@ -1020,7 +1022,9 @@
   max-width: 480px;
   width: 100%;
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   position: relative;
   border: 1.5px solid var(--c, #a855f7);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 30px color-mix(in srgb, var(--c, #a855f7) 30%, transparent);
@@ -1068,21 +1072,24 @@
 .sb-modal-close,
 .sb-modal-close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #aaa;
-  font-size: 15px;
+  font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
   z-index: 10;
+  touch-action: manipulation;
 }
 
 .sb-modal-close:hover,
@@ -1736,7 +1743,7 @@ html, body {
     padding: 10px 16px;
   }
   .sb-search-hero-input {
-    font-size: 13.5px;
+    font-size: 16px;
   }
   .sb-device-grid.ott-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1784,6 +1791,7 @@ html, body {
   .sb-modal-card {
     border-radius: 20px;
     max-height: 88vh;
+    max-height: 88dvh;
     width: 100%;
   }
   .sb-modal-header {
@@ -2273,13 +2281,26 @@ html, body {
   .sb-modal-overlay {
     align-items: flex-end !important;
     padding: 0 !important;
+    overscroll-behavior: contain;
+  }
+
+  .sb-modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 88vh !important;
+    max-height: 88dvh !important;
+    border-radius: 24px 24px 0 0 !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
   }
 
   .sb-policy-modal {
     width: 100% !important;
     max-width: 100% !important;
     max-height: 86vh !important;
-    border-radius: 28px 28px 0 0 !important;
+    max-height: 86dvh !important;
+    border-radius: 24px 24px 0 0 !important;
     border-bottom: none !important;
     border-left: none !important;
     border-right: none !important;
@@ -2287,6 +2308,16 @@ html, body {
 
   .sb-mobile-pull-handle {
     display: block;
+    margin: 8px auto 2px;
+  }
+
+  .sb-modal-header {
+    padding: 12px 16px 10px !important;
+  }
+
+  .sb-modal-body {
+    padding: 14px 16px !important;
+    padding-bottom: max(20px, calc(16px + env(safe-area-inset-bottom))) !important;
   }
 
   .sb-policy-header {
@@ -2299,7 +2330,7 @@ html, body {
 
   .sb-policy-footer {
     padding: 10px 14px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    padding-bottom: max(14px, calc(10px + env(safe-area-inset-bottom)));
   }
 }
 

@@ -11,16 +11,18 @@
   flex-direction: column;
   justify-content: space-evenly;
   opacity: 0.11;
-  transform: rotate(-5deg) scale(1.15);
+  transform: rotate(-5deg) scale(1.15) translateZ(0);
   user-select: none;
-  will-change: transform;
+  contain: strict;
 }
 
 .ottbg-row {
   display: flex;
   width: max-content;
   animation: ottbgL 26s linear infinite;
-  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .ottbg-row.r {

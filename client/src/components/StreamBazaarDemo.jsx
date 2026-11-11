@@ -339,6 +339,15 @@ const PurchaseModal = ({ product, initialPlan, onClose }) => {
     }
   }, [selectedPlan, selectedDevice, isAvailable]);
 
+  // Close modal on Escape key press
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [onClose]);
+
   const handleTelegramOrder = () => {
     if (!selectedPlan || !selectedDevice) return;
     const price = selectedPlan.price || 'Contact Support';
@@ -384,6 +393,9 @@ Please share the payment QR / UPI ID and setup credentials. Thank you!`;
           boxShadow: `0 20px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(${colorRgb}, 0.35)`
         }}
       >
+        {/* Mobile Pull Bar Indicator (Native App feel) */}
+        <div className="sb-mobile-pull-handle" aria-hidden="true" />
+
         <button
           className="sb-modal-close-btn"
           onClick={onClose}
@@ -946,6 +958,31 @@ export default function StreamBazaarDemo() {
   const [gamingPlatformFilter, setGamingPlatformFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef(null);
+
+  // ─── IOS-SAFE BODY SCROLL LOCK WHEN ANY MODAL IS OPEN ──────────────
+  useEffect(() => {
+    const isAnyModalOpen = Boolean(modalData || policyTab);
+    if (!isAnyModalOpen) return;
+
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const prevOverflow = document.body.style.overflow;
+    const prevPosition = document.body.style.position;
+    const prevTop = document.body.style.top;
+    const prevWidth = document.body.style.width;
+
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.position = prevPosition;
+      document.body.style.top = prevTop;
+      document.body.style.width = prevWidth;
+      document.body.style.overflow = prevOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [modalData, policyTab]);
 
   // Dynamic Typewriter Animated Placeholder
   const SEARCH_PHRASES = useMemo(() => [
