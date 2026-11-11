@@ -351,7 +351,7 @@ const POLICIES = [
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
               <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
-              <div><strong style={{ color: '#fff' }}>How to claim:</strong> Send your Order ID on Telegram. We reply within [X] hours.</div>
+              <div><strong style={{ color: '#fff' }}>How to claim:</strong> Send your Order ID on Telegram. We reply and fix within 6 to 8 hours.</div>
             </div>
           </div>
         </div>
@@ -415,7 +415,7 @@ const POLICIES = [
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.55' }}>
               <span style={{ color: '#64748b', marginTop: '2px' }}>•</span>
-              <div><strong style={{ color: '#fff' }}>3. Get access:</strong> Login details arrive on Telegram, usually in [X] minutes.</div>
+              <div><strong style={{ color: '#fff' }}>3. Get access:</strong> Login details arrive on Telegram, usually in 5 to 15 minutes.</div>
             </div>
           </div>
         </div>
@@ -432,7 +432,7 @@ const POLICIES = [
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#d1fae5', lineHeight: '1.55' }}>
               <span style={{ color: '#10b981', marginTop: '2px' }}>•</span>
-              <div><strong style={{ color: '#fff' }}>Support hours:</strong> [HH:MM - HH:MM] IST.</div>
+              <div><strong style={{ color: '#fff' }}>Fix &amp; Update:</strong> Within 6 to 8 hours.</div>
             </div>
           </div>
         </div>
