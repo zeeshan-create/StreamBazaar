@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run build && cd .. && node copyDist.js",
+  "buildCommand": "cd client && npm install && npm run build && cd .. && node copyDist.js && node scripts/submit-to-bing.js",
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/api/brandfetch-search", "destination": "/api/brandfetch-search.js" },
